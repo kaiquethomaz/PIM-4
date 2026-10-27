@@ -295,25 +295,187 @@ td.numero, th.numero { text-align: right; white-space: nowrap; }
     .grade-dashboard { grid-template-columns: 1fr; }
 }
 
-/* ---------------- Login ---------------- */
-.login-pagina {
+/* ---------------- Logo ---------------- */
+.logo-marca { display: inline-flex; align-items: center; gap: 10px; }
+.logo-icone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+}
+.logo-icone svg { width: 20px; height: 20px; }
+.logo-texto { font-size: 1.2rem; font-weight: 400; letter-spacing: -0.01em; }
+.logo-texto strong { font-weight: 700; }
+
+/* O asp-validation-summary sem erros não deve aparecer como uma caixa vazia */
+.validation-summary-valid { display: none; }
+.validation-summary-errors ul { list-style: none; padding: 0; margin: 0; }
+
+/* ---------------- Login (tela dividida) ---------------- */
+.pagina-login { background: var(--superficie); }
+
+.login-tela {
+    display: grid;
+    grid-template-columns: minmax(380px, 5fr) 6fr;
     min-height: 100vh;
+}
+
+/* Lado esquerdo: painel da marca */
+.login-marca {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 32px;
+    padding: 40px 48px;
+    color: #e2e8f0;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.35), transparent 45%),
+        radial-gradient(circle at 10% 90%, rgba(29, 78, 216, 0.45), transparent 50%),
+        var(--azul-escuro);
+}
+/* Grade sutil de fundo (só decoração) */
+.login-marca::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 85%);
+    pointer-events: none;
+}
+.login-marca > * { position: relative; }
+.login-marca-topo .logo-texto { color: #fff; }
+
+.login-marca-conteudo { max-width: 440px; }
+.login-destaque {
+    font-size: 2rem;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+}
+.login-marca-conteudo > p:not(.login-destaque) { color: #cbd5e1; margin: 0 0 32px; font-size: 1.05rem; }
+
+.login-recursos { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.login-recursos li { display: flex; align-items: center; gap: 14px; color: #cbd5e1; }
+.login-recursos strong { color: #fff; font-weight: 600; }
+.recurso-icone {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #93c5fd;
+}
+.recurso-icone svg { width: 20px; height: 20px; }
+
+.login-marca-rodape { margin: 0; font-size: 0.85rem; color: #94a3b8; }
+
+/* Lado direito: formulário */
+.login-formulario {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
-    background: linear-gradient(135deg, var(--azul-escuro), var(--azul));
-}
-.login-cartao {
-    width: 100%;
-    max-width: 400px;
+    padding: 40px 24px;
     background: var(--superficie);
-    border-radius: 12px;
-    padding: 32px 24px;
 }
-.login-cartao h1 { text-align: center; margin-bottom: 4px; }
-.login-cartao .subtitulo { text-align: center; color: var(--texto-suave); margin: 0 0 24px; }
-.login-cartao .botao { width: 100%; }
+.login-caixa { width: 100%; max-width: 380px; }
+.login-caixa h1 { font-size: 1.75rem; margin: 0 0 6px; letter-spacing: -0.02em; }
+.login-subtitulo { color: var(--texto-suave); margin: 0 0 28px; }
+.login-logo-celular { display: none; margin-bottom: 28px; }
+
+.login-caixa .campo input[type="email"],
+.login-caixa .campo input[type="password"],
+.login-caixa .campo input[type="text"] {
+    height: 48px;
+    border-color: var(--borda);
+    background: #f8fafc;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.login-caixa .campo input:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+}
+/* Mantém o contorno amarelo para quem navega pelo teclado */
+.login-caixa .campo input:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+
+.campo-com-icone { position: relative; }
+.campo-com-icone .campo-icone {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: #64748b;
+    pointer-events: none;
+}
+.campo-com-icone .campo-icone svg { width: 18px; height: 18px; display: block; }
+.campo-com-icone input { padding-left: 44px !important; }
+.campo-com-icone input[name="Senha"] { padding-right: 48px !important; }
+
+.botao-ver-senha {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+}
+.botao-ver-senha:hover { background: #e2e8f0; color: var(--texto); }
+.botao-ver-senha svg { width: 18px; height: 18px; }
+.botao-ver-senha .icone-olho-fechado { display: none; }
+.botao-ver-senha[aria-pressed="true"] .icone-olho { display: none; }
+.botao-ver-senha[aria-pressed="true"] .icone-olho-fechado { display: block; }
+
+.botao-grande {
+    width: 100%;
+    height: 48px;
+    margin-top: 8px;
+    border-radius: var(--raio);
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+}
+
+.login-ajuda {
+    margin: 24px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+    color: var(--texto-suave);
+    text-align: center;
+}
+
+/* Tablet e celular: esconde o painel da marca e mostra o logo em cima do formulário */
+@media (max-width: 900px) {
+    .login-tela { grid-template-columns: 1fr; }
+    .login-marca { display: none; }
+    .login-logo-celular { display: block; }
+    .login-formulario { align-items: flex-start; padding-top: 56px; }
+}
 
 /* ---------------- Celular (até 768px) ---------------- */
 @media (max-width: 768px) {

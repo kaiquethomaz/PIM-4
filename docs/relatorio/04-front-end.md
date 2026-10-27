@@ -4,7 +4,7 @@
 
 A interface do sistema web é gerada no servidor com **ASP.NET Core MVC e Views Razor** (`.cshtml`): o Controller monta os dados e a View transforma esses dados em HTML. Não foram usados frameworks de CSS ou JavaScript. O visual é feito com **HTML5 semântico, CSS3 próprio** (`wwwroot/css/site.css`) e um pequeno script em **JavaScript puro** (`wwwroot/js/site.js`), só para abrir e fechar o menu no celular.
 
-A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a identidade visual do grupo.
+A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a identidade visual do grupo. O logo é um ícone de caixa desenhado em **SVG** (`Views/Shared/_Logo.cshtml`), reutilizado no cabeçalho e no login. Diferente de um emoji, o SVG fica nítido em qualquer tamanho e aparece igual em todos os navegadores e sistemas operacionais. Os demais ícones (e-mail, cadeado, olho, gráfico, celular, escudo) também são SVG embutidos no HTML, sem depender de bibliotecas externas.
 
 ## 4.2 Organização das Views
 
@@ -25,7 +25,7 @@ A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a i
 
 | Tela | O que faz | Perfil |
 |---|---|---|
-| **Login** | Entrada no sistema com e-mail e senha; opção "Manter conectado". | Todos |
+| **Login** | Tela dividida: à esquerda, um painel com a identidade visual e os principais recursos do sistema; à direita, o formulário com ícones nos campos, botão para mostrar/ocultar a senha e a opção "Manter conectado". No celular, o painel é ocultado e o logo aparece acima do formulário. | Todos |
 | **Dashboard** | Cartões com os números do dia (produtos ativos, abaixo do mínimo, vendas e entradas de hoje, valor em estoque), tabela "Precisam de reposição" com botão **Repor** em cada produto, últimas 10 movimentações e atalhos "Registrar venda" / "Registrar entrada". | Todos (valor em estoque só Admin/Gerente) |
 | **Registrar movimentação** | Formulário único para venda ou entrada: tipo (botões de opção), produto (lista com o estoque atual de cada um), quantidade e observação. Depois de salvar, mostra o estoque atualizado e volta pronto para a próxima venda. | Todos |
 | **Movimentações** | Listagem por período (padrão: últimos 7 dias) com totais de unidades vendidas e de entrada. | Todos |
@@ -65,6 +65,8 @@ O sistema segue recomendações da **WCAG 2.1** (Diretrizes de Acessibilidade pa
 | **Navegação por teclado** | Todos os controles são links, botões ou campos nativos; contorno de foco amarelo de 3 px bem visível (`:focus-visible`). | Pessoas que não usam mouse. |
 | **Rótulos nos campos** | Todo campo tem `<label>` ligado a ele; dicas ligadas por `aria-describedby`. | Leitores de tela anunciam o nome e a dica do campo. |
 | **Campos obrigatórios** | Asterisco visual + `required` / `aria-required="true"`. | Todos. |
+| **Mostrar/ocultar senha** | Botão com `aria-label` ("Mostrar senha" / "Ocultar senha") e `aria-pressed`; os ícones são decorativos (`aria-hidden`). | Quem tem dificuldade para digitar confere a senha antes de enviar; o leitor de tela informa se a senha está visível. |
+| **Ícones decorativos** | Todos os ícones SVG têm `aria-hidden="true"`; o significado está sempre no texto ao lado. | O leitor de tela não lê "imagem" sem sentido. |
 | **Grupos de opções** | Entrada/Venda em `<fieldset>` com `<legend>`, e cada opção com o rótulo clicável inteiro. | O leitor de tela anuncia a pergunta antes das opções; a área de clique é maior. |
 | **Regiões do Dashboard** | `<section aria-labelledby>` em cada bloco. | O leitor de tela permite pular direto para "Precisam de reposição". |
 | **Mensagens anunciadas** | Erros com `role="alert"`, sucesso com `role="status"`. | O leitor de tela lê a mensagem sem o usuário procurar. |

@@ -34,8 +34,8 @@ Entre como **admin@stockcontrol.local**.
 
 | ✔ | # | Tela | Como fazer | O que deve aparecer | Legenda sugerida |
 |---|---|---|---|---|---|
-| ☐ | 11 | Login | https://localhost:7080 (sem estar logado) | Tela azul com o cartão de login | Tela de login |
-| ☐ | 12 | Validação do login | Clique em "Entrar" com os campos vazios | "Informe o e-mail." / "Informe a senha." em vermelho | Validação dos campos |
+| ☐ | 11 | Login | https://localhost:7080 (sem estar logado), janela maximizada | Tela dividida: painel azul com os recursos à esquerda e formulário à direita | Tela de login |
+| ☐ | 12 | Validação do login | Digite o e-mail do admin e uma senha errada, clique em "Entrar" | Aviso "E-mail ou senha inválidos." acima dos campos | Validação do login |
 | ☐ | 13 | Dashboard | Depois do login | Cartões (15 ativos, **5 abaixo do mínimo** em vermelho), tabela de reposição, últimas movimentações | Dashboard do sistema |
 | ☐ | 14 | Produtos | Menu **Produtos** | Lista com etiquetas OK / ⚠ Abaixo do mínimo | Listagem de produtos |
 | ☐ | 15 | Busca | Digite "café" e clique em Buscar | Só o Café | Busca de produtos |

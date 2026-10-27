@@ -4,33 +4,115 @@
     Layout = "_LayoutLogin";
 }
 
-<div class="login-cartao">
-    <h1>📦 StockControl</h1>
-    <p class="subtitulo">Controle de estoque do mercadinho</p>
-
-    <form method="post" asp-action="Login" novalidate>
-        @* asp-validation-summary mostra erros gerais (ex.: senha errada) *@
-        <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
-
-        <input type="hidden" asp-for="ReturnUrl" />
-
-        <div class="campo">
-            <label asp-for="Email"></label>
-            <input asp-for="Email" type="email" autocomplete="username" autofocus />
-            <span asp-validation-for="Email" class="erro-campo"></span>
+<div class="login-tela">
+    @* ------- Lado esquerdo: apresentação do sistema (some no celular) ------- *@
+    <aside class="login-marca" aria-label="Sobre o StockControl">
+        <div class="login-marca-topo">
+            <partial name="_Logo" />
         </div>
 
-        <div class="campo">
-            <label asp-for="Senha"></label>
-            <input asp-for="Senha" autocomplete="current-password" />
-            <span asp-validation-for="Senha" class="erro-campo"></span>
+        <div class="login-marca-conteudo">
+            @* <p> e não <h2>: o título principal da página (h1) é "Entrar", no formulário *@
+            <p class="login-destaque">Controle de estoque simples para o dia a dia do mercadinho.</p>
+            <p>Vendas, entradas e reposição em um só lugar — no computador e no celular.</p>
+
+            <ul class="login-recursos">
+                <li>
+                    <span class="recurso-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10" /><line x1="18" y1="20" x2="18" y2="4" /><line x1="6" y1="20" x2="6" y2="16" /></svg>
+                    </span>
+                    <span><strong>Estoque em tempo real</strong> com alerta de reposição</span>
+                </li>
+                <li>
+                    <span class="recurso-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2" /><line x1="12" y1="18" x2="12.01" y2="18" /></svg>
+                    </span>
+                    <span><strong>Venda pelo celular</strong> lendo o código de barras</span>
+                </li>
+                <li>
+                    <span class="recurso-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                    </span>
+                    <span><strong>Acesso por perfil</strong> e histórico de cada alteração</span>
+                </li>
+            </ul>
         </div>
 
-        <div class="campo campo-checkbox">
-            <input asp-for="LembrarDeMim" />
-            <label asp-for="LembrarDeMim"></label>
-        </div>
+        <p class="login-marca-rodape">PIM IV · Análise e Desenvolvimento de Sistemas · UNIP</p>
+    </aside>
 
-        <button type="submit" class="botao">Entrar</button>
-    </form>
+    @* ------- Lado direito: formulário ------- *@
+    <main class="login-formulario">
+        <div class="login-caixa">
+            <div class="login-logo-celular">
+                <partial name="_Logo" />
+            </div>
+
+            <h1>Entrar</h1>
+            <p class="login-subtitulo">Use o e-mail e a senha cadastrados pelo administrador.</p>
+
+            <form method="post" asp-action="Login" novalidate>
+                @* Erros gerais (ex.: senha errada) *@
+                <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
+
+                <input type="hidden" asp-for="ReturnUrl" />
+
+                <div class="campo">
+                    <label asp-for="Email"></label>
+                    <div class="campo-com-icone">
+                        <span class="campo-icone" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                        </span>
+                        <input asp-for="Email" type="email" autocomplete="username" placeholder="seu.email@exemplo.com" autofocus />
+                    </div>
+                    <span asp-validation-for="Email" class="erro-campo"></span>
+                </div>
+
+                <div class="campo">
+                    <label asp-for="Senha"></label>
+                    <div class="campo-com-icone">
+                        <span class="campo-icone" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                        </span>
+                        <input asp-for="Senha" autocomplete="current-password" placeholder="Sua senha" />
+                        @* Botão de mostrar/ocultar senha. aria-pressed avisa o leitor de tela se está ativo. *@
+                        <button type="button" class="botao-ver-senha" id="botao-ver-senha"
+                                aria-label="Mostrar senha" aria-pressed="false" aria-controls="Senha">
+                            <svg class="icone-olho" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                            <svg class="icone-olho-fechado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Senha" class="erro-campo"></span>
+                </div>
+
+                <div class="campo campo-checkbox">
+                    <input asp-for="LembrarDeMim" />
+                    <label asp-for="LembrarDeMim"></label>
+                </div>
+
+                <button type="submit" class="botao botao-grande">Entrar</button>
+            </form>
+
+            <p class="login-ajuda">Esqueceu a senha? Peça ao administrador do sistema para redefini-la.</p>
+        </div>
+    </main>
 </div>
+
+@section Scripts {
+    <script>
+        // Mostrar / ocultar a senha.
+        (function () {
+            var botao = document.getElementById("botao-ver-senha");
+            var campo = document.getElementById("Senha");
+            if (!botao || !campo) return;
+
+            botao.addEventListener("click", function () {
+                var mostrando = campo.type === "text";
+                campo.type = mostrando ? "password" : "text";
+                botao.setAttribute("aria-pressed", mostrando ? "false" : "true");
+                botao.setAttribute("aria-label", mostrando ? "Mostrar senha" : "Ocultar senha");
+                campo.focus();
+            });
+        })();
+    </script>
+}

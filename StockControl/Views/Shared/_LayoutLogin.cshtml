@@ -6,10 +6,10 @@
     <title>@ViewData["Title"] - StockControl</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
-    @* Layout sem menu, usado só na tela de login *@
-    <main class="login-pagina">
-        @RenderBody()
-    </main>
+<body class="pagina-login">
+    @* Layout sem menu, usado só na tela de login.
+       O <main> fica dentro da própria view (lado do formulário). *@
+    @RenderBody()
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
