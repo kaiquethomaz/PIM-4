@@ -1,0 +1,49 @@
+@model ResumoDashboard
+@{
+    ViewData["Title"] = "Teste da etapa 3";
+}
+
+<h1>Teste da conexão com o banco</h1>
+<p>Se esta página carregou com números, o caminho Controller → Service → DAO → AppDbContext → SQL Server está funcionando.</p>
+
+<ul>
+    <li>Produtos ativos: <strong>@Model.TotalProdutosAtivos</strong></li>
+    <li>Categorias: <strong>@Model.TotalCategorias</strong></li>
+    <li>Fornecedores: <strong>@Model.TotalFornecedores</strong></li>
+    <li>Valor em estoque: <strong>@Model.ValorEmEstoque.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong></li>
+    <li>Entradas hoje: <strong>@Model.EntradasHoje</strong> · Saídas hoje: <strong>@Model.SaidasHoje</strong></li>
+</ul>
+
+<h2>Produtos abaixo do mínimo (procedure sp_ProdutosAbaixoDoMinimo)</h2>
+<table>
+    <thead>
+        <tr><th>Produto</th><th>Categoria</th><th>Atual</th><th>Mínimo</th><th>Falta</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model.ProdutosAbaixoDoMinimo)
+        {
+            <tr>
+                <td>@p.Nome</td><td>@p.Categoria</td><td>@p.EstoqueAtual</td><td>@p.EstoqueMinimo</td><td>@p.QuantidadeFaltante</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Últimas movimentações</h2>
+<table>
+    <thead>
+        <tr><th>Data</th><th>Tipo</th><th>Produto</th><th>Qtd.</th><th>Usuário</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var m in Model.UltimasMovimentacoes)
+        {
+            <tr>
+                <td>@m.Data.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@(m.Tipo == TipoMovimentacao.Entrada ? "Entrada" : "Saída")</td>
+                <td>@m.Produto?.Nome</td>
+                <td>@m.Quantidade</td>
+                <td>@m.Usuario?.Nome</td>
+            </tr>
+        }
+    </tbody>
+</table>

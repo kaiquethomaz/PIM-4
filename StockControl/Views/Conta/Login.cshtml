@@ -1,0 +1,36 @@
+@model StockControl.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Entrar";
+    Layout = "_LayoutLogin";
+}
+
+<div class="login-cartao">
+    <h1>📦 StockControl</h1>
+    <p class="subtitulo">Controle de estoque do mercadinho</p>
+
+    <form method="post" asp-action="Login" novalidate>
+        @* asp-validation-summary mostra erros gerais (ex.: senha errada) *@
+        <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
+
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <div class="campo">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" type="email" autocomplete="username" autofocus />
+            <span asp-validation-for="Email" class="erro-campo"></span>
+        </div>
+
+        <div class="campo">
+            <label asp-for="Senha"></label>
+            <input asp-for="Senha" autocomplete="current-password" />
+            <span asp-validation-for="Senha" class="erro-campo"></span>
+        </div>
+
+        <div class="campo campo-checkbox">
+            <input asp-for="LembrarDeMim" />
+            <label asp-for="LembrarDeMim"></label>
+        </div>
+
+        <button type="submit" class="botao">Entrar</button>
+    </form>
+</div>

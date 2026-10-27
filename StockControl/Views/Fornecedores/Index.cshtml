@@ -1,0 +1,52 @@
+@model List<Fornecedor>
+@{
+    ViewData["Title"] = "Fornecedores";
+}
+
+<div class="barra-titulo">
+    <h1>Fornecedores</h1>
+    <a class="botao" asp-action="Criar">+ Novo fornecedor</a>
+</div>
+
+<div class="cartao">
+    @if (Model.Count == 0)
+    {
+        <p>Nenhum fornecedor cadastrado.</p>
+    }
+    else
+    {
+        <div class="tabela-container">
+            <table>
+                <caption>@Model.Count fornecedor(es)</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Razão social</th>
+                        <th scope="col">CNPJ</th>
+                        <th scope="col">Telefone</th>
+                        <th scope="col">E-mail</th>
+                        <th scope="col"><span class="somente-leitor">Ações</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var f in Model)
+                    {
+                        <tr>
+                            <td>@f.RazaoSocial</td>
+                            <td style="white-space: nowrap">@f.CnpjFormatado()</td>
+                            <td>@f.Telefone</td>
+                            <td>@f.Email</td>
+                            <td>
+                                <div class="acoes">
+                                    <a class="botao botao-secundario botao-pequeno" asp-action="Editar" asp-route-id="@f.Id"
+                                       aria-label="Editar @f.RazaoSocial">Editar</a>
+                                    <a class="botao botao-perigo botao-pequeno" asp-action="Excluir" asp-route-id="@f.Id"
+                                       aria-label="Excluir @f.RazaoSocial">Excluir</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

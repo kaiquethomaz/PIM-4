@@ -1,0 +1,10 @@
+@* Mensagens de sucesso/erro enviadas pelos controllers via TempData.
+   role="status" e role="alert" fazem o leitor de tela anunciar a mensagem. *@
+@if (TempData["Sucesso"] is string sucesso)
+{
+    <div class="alerta alerta-sucesso" role="status">@sucesso</div>
+}
+@if (TempData["Erro"] is string erro)
+{
+    <div class="alerta alerta-erro" role="alert">@erro</div>
+}

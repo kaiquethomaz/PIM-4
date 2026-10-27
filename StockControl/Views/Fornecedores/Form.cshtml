@@ -1,0 +1,45 @@
+@model StockControl.ViewModels.FornecedorFormViewModel
+@{
+    ViewData["Title"] = Model.EhNovo ? "Novo fornecedor" : "Editar fornecedor";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="cartao formulario">
+    <form method="post" asp-action="@(Model.EhNovo ? "Criar" : "Editar")" asp-route-id="@(Model.EhNovo ? null : Model.Id)" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
+
+        <div class="campo">
+            <label asp-for="RazaoSocial">Razão social <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="RazaoSocial" type="text" maxlength="150" required aria-required="true" autocomplete="organization" />
+            <span asp-validation-for="RazaoSocial" class="erro-campo"></span>
+        </div>
+
+        <div class="campo">
+            <label asp-for="CNPJ">CNPJ <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="CNPJ" type="text" inputmode="numeric" maxlength="18" required aria-required="true"
+                   aria-describedby="dica-cnpj" />
+            <span id="dica-cnpj" class="dica">Com ou sem pontuação. Ex.: 11.222.333/0001-81</span>
+            <span asp-validation-for="CNPJ" class="erro-campo"></span>
+        </div>
+
+        <div class="grade-2">
+            <div class="campo">
+                <label asp-for="Telefone"></label>
+                <input asp-for="Telefone" type="tel" maxlength="20" autocomplete="tel" />
+                <span asp-validation-for="Telefone" class="erro-campo"></span>
+            </div>
+
+            <div class="campo">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" type="email" maxlength="150" autocomplete="email" />
+                <span asp-validation-for="Email" class="erro-campo"></span>
+            </div>
+        </div>
+
+        <div class="acoes">
+            <button type="submit" class="botao">Salvar</button>
+            <a class="botao botao-secundario" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>

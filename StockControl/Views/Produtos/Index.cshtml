@@ -1,0 +1,102 @@
+@model StockControl.ViewModels.ProdutoListaViewModel
+@{
+    ViewData["Title"] = "Produtos";
+}
+
+<div class="barra-titulo">
+    <h1>Produtos</h1>
+    @if (Model.PodeGerenciar)
+    {
+        <a class="botao" asp-action="Criar">+ Novo produto</a>
+    }
+</div>
+
+<div class="cartao">
+    @* Busca: formulário GET (os filtros ficam na URL e dá para favoritar) *@
+    <form method="get" asp-action="Index" class="busca" role="search">
+        <div class="campo">
+            <label for="busca">Buscar por nome ou código de barras</label>
+            <input type="search" id="busca" name="busca" value="@Model.Busca" />
+        </div>
+        @if (Model.PodeGerenciar)
+        {
+            <div class="campo-checkbox">
+                <input type="checkbox" id="mostrarInativos" name="mostrarInativos" value="true" checked="@Model.MostrarInativos" />
+                <label for="mostrarInativos">Mostrar inativos</label>
+            </div>
+        }
+        <button type="submit" class="botao">Buscar</button>
+        @if (!string.IsNullOrEmpty(Model.Busca) || Model.MostrarInativos)
+        {
+            <a class="botao botao-secundario" asp-action="Index">Limpar</a>
+        }
+    </form>
+
+    @if (Model.Produtos.Count == 0)
+    {
+        <p role="status">Nenhum produto encontrado.</p>
+    }
+    else
+    {
+        <div class="tabela-container">
+            <table>
+                <caption role="status">@Model.Produtos.Count produto(s) encontrado(s)</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Produto</th>
+                        <th scope="col">Código de barras</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col" class="numero">Preço</th>
+                        <th scope="col" class="numero">Estoque</th>
+                        <th scope="col">Situação</th>
+                        @if (Model.PodeGerenciar)
+                        {
+                            <th scope="col"><span class="somente-leitor">Ações</span></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.Produtos)
+                    {
+                        <tr>
+                            <td>@p.Nome</td>
+                            <td>@p.CodigoBarras</td>
+                            <td>@p.Categoria?.Nome</td>
+                            <td class="numero">@p.Preco.ToString("C")</td>
+                            <td class="numero">@p.EstoqueAtual <span class="dica">(mín. @p.EstoqueMinimo)</span></td>
+                            <td>
+                                @* Texto + cor: a informação não depende só da cor (acessibilidade) *@
+                                @if (!p.Ativo)
+                                {
+                                    <span class="etiqueta etiqueta-inativo">Inativo</span>
+                                }
+                                else if (p.EstaAbaixoDoMinimo())
+                                {
+                                    <span class="etiqueta etiqueta-alerta">⚠ Abaixo do mínimo</span>
+                                }
+                                else
+                                {
+                                    <span class="etiqueta etiqueta-ok">OK</span>
+                                }
+                            </td>
+                            @if (Model.PodeGerenciar)
+                            {
+                                <td>
+                                    <div class="acoes">
+                                        <a class="botao botao-secundario botao-pequeno" asp-action="Editar" asp-route-id="@p.Id"
+                                           aria-label="Editar @p.Nome">Editar</a>
+                                        @if (p.Ativo)
+                                        {
+                                            <a class="botao botao-perigo botao-pequeno" asp-action="Excluir" asp-route-id="@p.Id"
+                                               aria-label="Excluir @p.Nome">Excluir</a>
+                                        }
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,86 @@
+@model StockControl.ViewModels.ProdutoFormViewModel
+@{
+    ViewData["Title"] = Model.EhNovo ? "Novo produto" : "Editar produto";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="cartao formulario">
+    <form method="post" asp-action="@(Model.EhNovo ? "Criar" : "Editar")" asp-route-id="@(Model.EhNovo ? null : Model.Id)" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
+
+        <div class="campo">
+            <label asp-for="Nome">Nome <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="Nome" type="text" maxlength="120" required aria-required="true" />
+            <span asp-validation-for="Nome" class="erro-campo"></span>
+        </div>
+
+        <div class="campo">
+            <label asp-for="CodigoBarras">Código de barras <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="CodigoBarras" type="text" inputmode="numeric" maxlength="20" required aria-required="true" />
+            <span asp-validation-for="CodigoBarras" class="erro-campo"></span>
+        </div>
+
+        <div class="grade-2">
+            <div class="campo">
+                <label asp-for="Preco">Preço (R$) <span class="obrigatorio" aria-hidden="true">*</span></label>
+                @* type="text" + inputmode="decimal": aceita vírgula (28,90) e abre o teclado numérico no celular *@
+                <input asp-for="Preco" type="text" inputmode="decimal" required aria-required="true" aria-describedby="dica-preco" />
+                <span id="dica-preco" class="dica">Use vírgula para os centavos. Ex.: 28,90</span>
+                <span asp-validation-for="Preco" class="erro-campo"></span>
+            </div>
+
+            <div class="campo">
+                <label asp-for="EstoqueMinimo">Estoque mínimo <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <input asp-for="EstoqueMinimo" type="number" min="0" step="1" required aria-required="true" aria-describedby="dica-minimo" />
+                <span id="dica-minimo" class="dica">Abaixo disso, o produto aparece no alerta do dashboard.</span>
+                <span asp-validation-for="EstoqueMinimo" class="erro-campo"></span>
+            </div>
+        </div>
+
+        <div class="grade-2">
+            <div class="campo">
+                <label asp-for="CategoriaId">Categoria <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <select asp-for="CategoriaId" asp-items="Model.Categorias" required aria-required="true">
+                    <option value="0">Selecione...</option>
+                </select>
+                <span asp-validation-for="CategoriaId" class="erro-campo"></span>
+            </div>
+
+            <div class="campo">
+                <label asp-for="FornecedorId">Fornecedor <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <select asp-for="FornecedorId" asp-items="Model.Fornecedores" required aria-required="true">
+                    <option value="0">Selecione...</option>
+                </select>
+                <span asp-validation-for="FornecedorId" class="erro-campo"></span>
+            </div>
+        </div>
+
+        @if (Model.EhNovo)
+        {
+            <div class="campo">
+                <label asp-for="EstoqueInicial"></label>
+                <input asp-for="EstoqueInicial" type="number" min="0" step="1" aria-describedby="dica-inicial" />
+                <span id="dica-inicial" class="dica">Opcional. Vira uma movimentação de entrada no histórico.</span>
+                <span asp-validation-for="EstoqueInicial" class="erro-campo"></span>
+            </div>
+        }
+        else
+        {
+            <p>
+                Estoque atual: <strong>@Model.EstoqueAtual</strong>
+                <span class="dica">O estoque só muda por movimentação (entrada ou venda).</span>
+            </p>
+
+            <div class="campo campo-checkbox">
+                <input asp-for="Ativo" />
+                <label asp-for="Ativo"></label>
+            </div>
+        }
+
+        <div class="acoes">
+            <button type="submit" class="botao">Salvar</button>
+            <a class="botao botao-secundario" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>

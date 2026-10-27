@@ -1,0 +1,21 @@
+@model Produto
+@{
+    ViewData["Title"] = "Excluir produto";
+}
+
+<h1>Excluir produto</h1>
+
+<div class="cartao formulario">
+    <p>Tem certeza que deseja excluir o produto <strong>@Model.Nome</strong> (código @Model.CodigoBarras)?</p>
+    <div class="alerta alerta-aviso">
+        Se o produto já teve entradas ou vendas, ele será apenas <strong>desativado</strong>,
+        para não perder o histórico. Sem movimentações, ele é excluído de vez.
+    </div>
+
+    <form method="post" asp-action="Excluir" asp-route-id="@Model.Id">
+        <div class="acoes">
+            <button type="submit" class="botao botao-perigo">Sim, excluir</button>
+            <a class="botao botao-secundario" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>

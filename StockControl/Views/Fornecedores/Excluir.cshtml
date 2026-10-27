@@ -1,0 +1,18 @@
+@model Fornecedor
+@{
+    ViewData["Title"] = "Excluir fornecedor";
+}
+
+<h1>Excluir fornecedor</h1>
+
+<div class="cartao formulario">
+    <p>Tem certeza que deseja excluir o fornecedor <strong>@Model.RazaoSocial</strong> (CNPJ @Model.CnpjFormatado())?</p>
+    <p>Essa ação não pode ser desfeita. Fornecedores com produtos não podem ser excluídos.</p>
+
+    <form method="post" asp-action="Excluir" asp-route-id="@Model.Id">
+        <div class="acoes">
+            <button type="submit" class="botao botao-perigo">Sim, excluir</button>
+            <a class="botao botao-secundario" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>

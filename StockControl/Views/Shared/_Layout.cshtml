@@ -1,0 +1,58 @@
+@{
+    // Descobre em qual controller estamos, para destacar o item do menu.
+    var controllerAtual = ViewContext.RouteData.Values["controller"]?.ToString();
+    string? Atual(string controller) => controllerAtual == controller ? "page" : null;
+
+    var podeGerenciar = User.IsInRole("Admin") || User.IsInRole("Gerente");
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - StockControl</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    @* Acessibilidade: permite pular o menu e ir direto ao conteúdo com o teclado *@
+    <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+    <header class="cabecalho">
+        <div class="cabecalho-conteudo">
+            <a class="logo" asp-controller="Home" asp-action="Index">📦 StockControl</a>
+
+            <button type="button" id="botao-menu" class="botao-menu"
+                    aria-expanded="false" aria-controls="menu-principal">
+                Menu
+            </button>
+
+            <nav aria-label="Menu principal">
+                <ul class="menu" id="menu-principal">
+                    <li><a asp-controller="Home" asp-action="Index" aria-current="@Atual("Home")">Dashboard</a></li>
+                    <li><a asp-controller="Produtos" asp-action="Index" aria-current="@Atual("Produtos")">Produtos</a></li>
+                    @if (podeGerenciar)
+                    {
+                        <li><a asp-controller="Categorias" asp-action="Index" aria-current="@Atual("Categorias")">Categorias</a></li>
+                        <li><a asp-controller="Fornecedores" asp-action="Index" aria-current="@Atual("Fornecedores")">Fornecedores</a></li>
+                    }
+                </ul>
+            </nav>
+
+            <div class="usuario-logado">
+                <span>@User.Identity?.Name <span class="somente-leitor">, perfil</span> (@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value)</span>
+                <form method="post" asp-controller="Conta" asp-action="Sair">
+                    <button type="submit">Sair</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main id="conteudo" class="conteudo" tabindex="-1">
+        <partial name="_Mensagens" />
+        @RenderBody()
+    </main>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

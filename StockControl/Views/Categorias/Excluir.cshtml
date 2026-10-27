@@ -1,0 +1,18 @@
+@model Categoria
+@{
+    ViewData["Title"] = "Excluir categoria";
+}
+
+<h1>Excluir categoria</h1>
+
+<div class="cartao formulario">
+    <p>Tem certeza que deseja excluir a categoria <strong>@Model.Nome</strong>?</p>
+    <p>Essa ação não pode ser desfeita. Categorias com produtos não podem ser excluídas.</p>
+
+    <form method="post" asp-action="Excluir" asp-route-id="@Model.Id">
+        <div class="acoes">
+            <button type="submit" class="botao botao-perigo">Sim, excluir</button>
+            <a class="botao botao-secundario" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>
