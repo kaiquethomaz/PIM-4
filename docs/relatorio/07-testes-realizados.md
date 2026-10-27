@@ -50,7 +50,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R6 | `GET /api/produtos` | 15 produtos ativos | ✅ Passou |
 | R7 | `GET /api/produtos/codigo-barras/7891000000011` | Arroz, com categoria e estoque | ✅ Passou |
 | R8 | Código de barras inexistente | 404 com mensagem | ✅ Passou |
-| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.6) |
+| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.7) |
 | R10 | Entrada de 10 unidades pelo código de barras | 201; `estoqueAtual` = 34 | ✅ Passou |
 | R11 | Venda de 100 detergentes (estoque 3) | 400 "Estoque insuficiente..." | ✅ Passou |
 | R12 | Tipo "TROCA" | 400 "O tipo deve ser ENTRADA ou SAIDA." | ✅ Passou |
@@ -60,7 +60,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R16 | `GET /api/movimentacoes` com período invertido | 400 "A data inicial não pode ser maior..." | ✅ Passou |
 | R17 | Admin cadastra categoria "Pães e Bolos" (com acento) | 201 | ✅ Passou |
 | R18 | Categoria com nome repetido | 400 "Já existe uma categoria com este nome." | ✅ Passou |
-| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.6) |
+| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.7) |
 | R20 | Alterar o preço do produto (PUT) | 200; preço novo e estoque mantido | ✅ Passou |
 | R21 | Excluir categoria que tem produto | 400 com mensagem | ✅ Passou |
 | R22 | Excluir produto com movimentação | 200; produto desativado | ✅ Passou |
@@ -68,16 +68,39 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R24 | Fornecedor com CNPJ inválido | 400 "CNPJ inválido." | ✅ Passou |
 | R25 | Swagger em `/swagger` | 12 rotas documentadas, agrupadas, com botão Authorize | ✅ Passou |
 
-## 7.5 Interface
+## 7.5 Movimentações, Dashboard e Usuários
+
+| # | Teste | Resultado esperado | Resultado |
+|---|---|---|---|
+| M1 | Dashboard do Admin | 15 ativos, 5 abaixo do mínimo (cartão em vermelho), vendas de hoje, valor em estoque | ✅ Passou |
+| M2 | Abrir "Registrar" pelo link do Detergente com tipo Venda | Formulário já vem com "Venda" marcado e o produto selecionado, mostrando "estoque: 3" | ✅ Passou |
+| M3 | Venda de 100 detergentes (estoque 3) | Erro "Estoque insuficiente..." e o formulário mantém os dados | ✅ Passou |
+| M4 | Venda de 2 detergentes | "Venda registrada: 2 x Detergente... Estoque atual: 1." e o formulário volta com "Venda" marcado | ✅ Passou |
+| M5 | Listagem de movimentações sem filtro | Últimos 7 dias, com totais de unidades | ✅ Passou |
+| M6 | Período com data inicial maior que a final | Erro "A data inicial não pode ser maior que a data final." | ✅ Passou |
+| U1 | Cadastrar usuário com senha e confirmação diferentes | Erro "As senhas não conferem."; os campos de senha voltam vazios | ✅ Passou |
+| U2 | Cadastrar usuário com e-mail em maiúsculas (`Paula@StockControl.local`) | Salvo em minúsculas | ✅ Passou |
+| U3 | Lista de usuários | O próprio Admin aparece como "(você)", sem o botão Excluir | ✅ Passou |
+| U4 | Mudar o perfil do único Admin para Operador | Erro "O sistema precisa ter pelo menos um administrador ativo." | ✅ Passou |
+| U5 | Excluir usuário sem movimentações | Excluído | ✅ Passou |
+| U6 | Excluir usuário com movimentações (Operador) | Desativado, com mensagem explicando | ✅ Passou |
+| U7 | Login do usuário desativado | Recusado (401 na API) | ✅ Passou |
+| U8 | Reativar o Operador pela edição, com a senha em branco | Reativado; o login com a senha antiga continua funcionando | ✅ Passou |
+| U9 | Gerente abrindo `/Usuarios` | "Acesso negado"; o menu do Gerente não tem "Usuários" | ✅ Passou |
+| U10 | POST de venda sem o token anti-CSRF | Recusado com HTTP 400 | ✅ Passou |
+| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.7) |
+
+## 7.6 Interface
 
 | # | Teste | Resultado esperado | Resultado |
 |---|---|---|---|
 | I1 | Tela de login em 375 px (celular) | Cartão ocupa a largura, campos legíveis, sem rolagem lateral | ✅ Passou |
 | I2 | Tela de login em 1024 px | Cartão centralizado | ✅ Passou |
 
-## 7.6 Defeitos encontrados e corrigidos
+## 7.7 Defeitos encontrados e corrigidos
 
 | Defeito | Causa | Correção |
 |---|---|---|
 | Depois de uma venda pela API, a resposta mostrava o estoque **antigo** (29 em vez de 27), embora o banco estivesse correto. | O Entity Framework guarda em memória os objetos já lidos na requisição. A trigger `trg_AtualizaEstoque` altera o estoque direto no banco, sem o EF saber, então a segunda leitura devolvia a cópia antiga. | Depois de executar a procedure, o `MovimentacaoDAO` recarrega do banco o produto que estava em memória (`Entry(produto).ReloadAsync()`). Testes R9 e R19 repetidos com sucesso. |
 | Mensagens de validação da API em inglês ("One or more validation errors occurred"). | Formato padrão do ASP.NET Core. | Resposta personalizada (`InvalidModelStateResponseFactory`) no formato `{ "mensagem": "Dados inválidos.", "erros": {...} }`. |
+| No celular (375 px), o Dashboard ficava com 449 px de largura: o navegador reduzia o zoom e os quadros encostavam na borda. | Em um CSS Grid, cada coluna tem largura mínima igual ao seu conteúdo; a tabela de reposição "empurrava" a coluna para além da tela. | `min-width: 0` nas colunas do grid, para a tabela rolar por dentro do quadro. A página passou a ter exatamente 375 px. |

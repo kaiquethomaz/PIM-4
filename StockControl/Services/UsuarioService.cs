@@ -75,6 +75,28 @@ public class UsuarioService : IUsuarioService
         await _usuarioDAO.AtualizarAsync(existente);
     }
 
+    public async Task<string> ExcluirAsync(int id, int idUsuarioLogado)
+    {
+        var usuario = await _usuarioDAO.BuscarPorIdAsync(id)
+            ?? throw new RegraNegocioException("Usuário não encontrado.");
+
+        if (usuario.Id == idUsuarioLogado)
+            throw new RegraNegocioException("Você não pode excluir o seu próprio usuário.");
+
+        if (usuario.EhAdmin() && usuario.Ativo && await _usuarioDAO.ContarAdminsAtivosAsync() <= 1)
+            throw new RegraNegocioException("O sistema precisa ter pelo menos um administrador ativo.");
+
+        if (await _usuarioDAO.PossuiMovimentacoesAsync(id))
+        {
+            usuario.Ativo = false;
+            await _usuarioDAO.AtualizarAsync(usuario);
+            return $"\"{usuario.Nome}\" tem movimentações registradas, por isso foi desativado (não excluído).";
+        }
+
+        await _usuarioDAO.ExcluirAsync(usuario);
+        return $"Usuário \"{usuario.Nome}\" excluído.";
+    }
+
     private async Task ValidarAsync(Usuario usuario)
     {
         usuario.Nome = (usuario.Nome ?? string.Empty).Trim();

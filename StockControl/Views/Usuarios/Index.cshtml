@@ -1,0 +1,66 @@
+@model List<Usuario>
+@{
+    ViewData["Title"] = "Usuários";
+    var usuarioLogadoId = (int)ViewBag.UsuarioLogadoId;
+}
+
+<div class="barra-titulo">
+    <h1>Usuários</h1>
+    <a class="botao" asp-action="Criar">+ Novo usuário</a>
+</div>
+
+<div class="cartao">
+    <div class="tabela-container">
+        <table>
+            <caption>@Model.Count usuário(s)</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Perfil</th>
+                    <th scope="col">Situação</th>
+                    <th scope="col">Cadastrado em</th>
+                    <th scope="col"><span class="somente-leitor">Ações</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td>
+                            @u.Nome
+                            @if (u.Id == usuarioLogadoId)
+                            {
+                                <span class="dica">(você)</span>
+                            }
+                        </td>
+                        <td>@u.Email</td>
+                        <td>@u.Perfil</td>
+                        <td>
+                            @if (u.Ativo)
+                            {
+                                <span class="etiqueta etiqueta-ok">Ativo</span>
+                            }
+                            else
+                            {
+                                <span class="etiqueta etiqueta-inativo">Inativo</span>
+                            }
+                        </td>
+                        <td>@u.CriadoEm.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="acoes">
+                                <a class="botao botao-secundario botao-pequeno" asp-action="Editar" asp-route-id="@u.Id"
+                                   aria-label="Editar @u.Nome">Editar</a>
+                                @if (u.Id != usuarioLogadoId && u.Ativo)
+                                {
+                                    <a class="botao botao-perigo botao-pequeno" asp-action="Excluir" asp-route-id="@u.Id"
+                                       aria-label="Excluir @u.Nome">Excluir</a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

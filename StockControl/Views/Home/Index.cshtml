@@ -1,49 +1,137 @@
 @model ResumoDashboard
 @{
-    ViewData["Title"] = "Teste da etapa 3";
+    ViewData["Title"] = "Dashboard";
+    var podeGerenciar = User.IsInRole("Admin") || User.IsInRole("Gerente");
+    var qtdAbaixo = Model.ProdutosAbaixoDoMinimo.Count;
 }
 
-<h1>Teste da conexão com o banco</h1>
-<p>Se esta página carregou com números, o caminho Controller → Service → DAO → AppDbContext → SQL Server está funcionando.</p>
+<div class="barra-titulo">
+    <h1>Olá, @User.Identity?.Name</h1>
+    <div class="acoes">
+        <a class="botao" asp-controller="Movimentacoes" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Saida">+ Registrar venda</a>
+        <a class="botao botao-secundario" asp-controller="Movimentacoes" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Entrada">+ Registrar entrada</a>
+    </div>
+</div>
 
-<ul>
-    <li>Produtos ativos: <strong>@Model.TotalProdutosAtivos</strong></li>
-    <li>Categorias: <strong>@Model.TotalCategorias</strong></li>
-    <li>Fornecedores: <strong>@Model.TotalFornecedores</strong></li>
-    <li>Valor em estoque: <strong>@Model.ValorEmEstoque.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong></li>
-    <li>Entradas hoje: <strong>@Model.EntradasHoje</strong> · Saídas hoje: <strong>@Model.SaidasHoje</strong></li>
-</ul>
-
-<h2>Produtos abaixo do mínimo (procedure sp_ProdutosAbaixoDoMinimo)</h2>
-<table>
-    <thead>
-        <tr><th>Produto</th><th>Categoria</th><th>Atual</th><th>Mínimo</th><th>Falta</th></tr>
-    </thead>
-    <tbody>
-        @foreach (var p in Model.ProdutosAbaixoDoMinimo)
+@* Cartões com os números principais. <section aria-labelledby> dá um nome à região para o leitor de tela. *@
+<section aria-labelledby="titulo-resumo">
+    <h2 id="titulo-resumo" class="somente-leitor">Resumo do estoque</h2>
+    <div class="painel-cartoes">
+        <div class="cartao cartao-numero">
+            <span class="rotulo">Produtos ativos</span>
+            <span class="valor">@Model.TotalProdutosAtivos</span>
+        </div>
+        <div class="cartao cartao-numero @(qtdAbaixo > 0 ? "cartao-alerta" : "")">
+            <span class="rotulo">Abaixo do mínimo</span>
+            <span class="valor">@qtdAbaixo</span>
+        </div>
+        <div class="cartao cartao-numero">
+            <span class="rotulo">Vendas hoje</span>
+            <span class="valor">@Model.SaidasHoje</span>
+        </div>
+        <div class="cartao cartao-numero">
+            <span class="rotulo">Entradas hoje</span>
+            <span class="valor">@Model.EntradasHoje</span>
+        </div>
+        @if (podeGerenciar)
         {
-            <tr>
-                <td>@p.Nome</td><td>@p.Categoria</td><td>@p.EstoqueAtual</td><td>@p.EstoqueMinimo</td><td>@p.QuantidadeFaltante</td>
-            </tr>
+            <div class="cartao cartao-numero">
+                <span class="rotulo">Valor em estoque</span>
+                <span class="valor">@Model.ValorEmEstoque.ToString("C")</span>
+            </div>
+            <div class="cartao cartao-numero">
+                <span class="rotulo">Categorias / Fornecedores</span>
+                <span class="valor">@Model.TotalCategorias / @Model.TotalFornecedores</span>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+</section>
 
-<h2>Últimas movimentações</h2>
-<table>
-    <thead>
-        <tr><th>Data</th><th>Tipo</th><th>Produto</th><th>Qtd.</th><th>Usuário</th></tr>
-    </thead>
-    <tbody>
-        @foreach (var m in Model.UltimasMovimentacoes)
+<div class="grade-dashboard">
+    <section class="cartao" aria-labelledby="titulo-reposicao">
+        <h2 id="titulo-reposicao">⚠ Precisam de reposição</h2>
+        @if (qtdAbaixo == 0)
         {
-            <tr>
-                <td>@m.Data.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@(m.Tipo == TipoMovimentacao.Entrada ? "Entrada" : "Saída")</td>
-                <td>@m.Produto?.Nome</td>
-                <td>@m.Quantidade</td>
-                <td>@m.Usuario?.Nome</td>
-            </tr>
+            <p>Nenhum produto abaixo do estoque mínimo. 👍</p>
         }
-    </tbody>
-</table>
+        else
+        {
+            <div class="tabela-container">
+                <table>
+                    <caption>@qtdAbaixo produto(s) com estoque abaixo do mínimo</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Produto</th>
+                            <th scope="col" class="numero">Atual</th>
+                            <th scope="col" class="numero">Mínimo</th>
+                            <th scope="col" class="numero">Falta</th>
+                            <th scope="col"><span class="somente-leitor">Ações</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.ProdutosAbaixoDoMinimo)
+                        {
+                            <tr>
+                                <td>@p.Nome <span class="dica">(@p.Categoria)</span></td>
+                                <td class="numero"><strong>@p.EstoqueAtual</strong></td>
+                                <td class="numero">@p.EstoqueMinimo</td>
+                                <td class="numero">@p.QuantidadeFaltante</td>
+                                <td>
+                                    <a class="botao botao-secundario botao-pequeno"
+                                       asp-controller="Movimentacoes" asp-action="Registrar"
+                                       asp-route-tipo="@TipoMovimentacao.Entrada" asp-route-produtoId="@p.Id"
+                                       aria-label="Registrar entrada de @p.Nome">Repor</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    <section class="cartao" aria-labelledby="titulo-ultimas">
+        <h2 id="titulo-ultimas">Últimas movimentações</h2>
+        @if (Model.UltimasMovimentacoes.Count == 0)
+        {
+            <p>Nenhuma movimentação registrada.</p>
+        }
+        else
+        {
+            <div class="tabela-container">
+                <table>
+                    <caption class="somente-leitor">As 10 movimentações mais recentes</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Data</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col" class="numero">Qtd.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in Model.UltimasMovimentacoes)
+                        {
+                            <tr>
+                                <td style="white-space: nowrap">@m.Data.ToString("dd/MM HH:mm")</td>
+                                <td>
+                                    @if (m.Tipo == TipoMovimentacao.Entrada)
+                                    {
+                                        <span class="etiqueta etiqueta-entrada">▲ Entrada</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="etiqueta etiqueta-saida">▼ Venda</span>
+                                    }
+                                </td>
+                                <td>@m.Produto?.Nome</td>
+                                <td class="numero">@m.Quantidade</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <p><a asp-controller="Movimentacoes" asp-action="Index">Ver todas as movimentações →</a></p>
+        }
+    </section>
+</div>

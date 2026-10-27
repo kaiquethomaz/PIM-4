@@ -256,6 +256,45 @@ td.numero, th.numero { text-align: right; white-space: nowrap; }
 .etiqueta-ok      { background: var(--verde-fundo); color: var(--verde); }
 .etiqueta-inativo { background: #e2e8f0; color: #334155; }
 
+.etiqueta-entrada { background: var(--verde-fundo); color: var(--verde); }
+.etiqueta-saida   { background: var(--azul-claro); color: var(--azul-hover); }
+
+/* Botões de rádio (Entrada / Venda) */
+.opcoes-radio { border: 1px solid var(--borda); border-radius: var(--raio); padding: 12px 16px; }
+.opcoes-radio legend { font-weight: 600; padding: 0 4px; }
+.opcoes-radio .opcao {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 4px;
+    font-weight: normal;
+    cursor: pointer;
+}
+.opcoes-radio input[type="radio"] { width: 20px; height: 20px; flex-shrink: 0; }
+
+/* ---------------- Dashboard ---------------- */
+.painel-cartoes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.cartao-numero { display: flex; flex-direction: column; gap: 4px; padding: 16px; }
+.cartao-numero .rotulo { color: var(--texto-suave); font-size: 0.9rem; }
+.cartao-numero .valor { font-size: 1.6rem; font-weight: 700; color: var(--azul-escuro); }
+.cartao-alerta { border-color: var(--vermelho); border-width: 2px; }
+.cartao-alerta .valor { color: var(--vermelho); }
+
+.grade-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.grade-dashboard h2 { margin-top: 0; }
+/* min-width: 0 deixa a coluna do grid encolher; sem isso a tabela larga
+   "empurra" o quadro para fora da tela no celular (a tabela rola por dentro). */
+.grade-dashboard > * { min-width: 0; }
+
+@media (max-width: 960px) {
+    .grade-dashboard { grid-template-columns: 1fr; }
+}
+
 /* ---------------- Login ---------------- */
 .login-pagina {
     min-height: 100vh;

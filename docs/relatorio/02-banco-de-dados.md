@@ -184,7 +184,7 @@ O script insere:
 - **3 usuários**, um de cada perfil (senhas guardadas como hash BCrypt);
 - **5 categorias** e **3 fornecedores** (CNPJs fictícios com dígitos verificadores válidos);
 - **15 produtos** de mercadinho, começando com estoque zero;
-- **cerca de 37 movimentações** dos últimos 30 dias, registradas **pela própria procedure**. O estoque inicial é formado pelas triggers, exatamente como no uso real do sistema.
+- **38 movimentações** dos últimos 30 dias (16 entradas e 22 vendas), registradas **pela própria procedure**. O estoque inicial é formado pelas triggers, exatamente como no uso real do sistema.
 
 Depois do seed, 5 produtos ficam abaixo do mínimo (Feijão, Café, Água, Leite e Detergente), o que permite demonstrar o alerta do dashboard.
 

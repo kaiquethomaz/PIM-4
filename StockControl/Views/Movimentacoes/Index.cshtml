@@ -1,0 +1,83 @@
+@model StockControl.ViewModels.MovimentacaoListaViewModel
+@{
+    ViewData["Title"] = "Movimentações";
+}
+
+<div class="barra-titulo">
+    <h1>Movimentações</h1>
+    <div class="acoes">
+        <a class="botao" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Saida">+ Registrar venda</a>
+        <a class="botao botao-secundario" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Entrada">+ Registrar entrada</a>
+    </div>
+</div>
+
+<div class="cartao">
+    @* Filtro por período: formulário GET, as datas ficam na URL *@
+    <form method="get" asp-action="Index" class="busca" aria-label="Filtrar por período">
+        <div class="campo">
+            <label for="dataInicio">Data inicial</label>
+            <input type="date" id="dataInicio" name="dataInicio" value="@Model.DataInicio.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="campo">
+            <label for="dataFim">Data final</label>
+            <input type="date" id="dataFim" name="dataFim" value="@Model.DataFim.ToString("yyyy-MM-dd")" />
+        </div>
+        <button type="submit" class="botao">Filtrar</button>
+    </form>
+
+    @if (Model.Erro is not null)
+    {
+        <div class="alerta alerta-erro" role="alert">@Model.Erro</div>
+    }
+    else if (Model.Itens.Count == 0)
+    {
+        <p role="status">Nenhuma movimentação entre @Model.DataInicio.ToString("dd/MM/yyyy") e @Model.DataFim.ToString("dd/MM/yyyy").</p>
+    }
+    else
+    {
+        <p role="status">
+            De <strong>@Model.DataInicio.ToString("dd/MM/yyyy")</strong> a <strong>@Model.DataFim.ToString("dd/MM/yyyy")</strong>:
+            @Model.Itens.Count movimentação(ões) ·
+            <strong>@Model.TotalEntradas</strong> unidade(s) de entrada ·
+            <strong>@Model.TotalSaidas</strong> unidade(s) vendida(s)
+        </p>
+
+        <div class="tabela-container">
+            <table>
+                <caption class="somente-leitor">Movimentações do período</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Data</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Produto</th>
+                        <th scope="col" class="numero">Qtd.</th>
+                        <th scope="col">Usuário</th>
+                        <th scope="col">Observação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in Model.Itens)
+                    {
+                        <tr>
+                            <td style="white-space: nowrap">@m.Data.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @if (m.Tipo == "ENTRADA")
+                                {
+                                    <span class="etiqueta etiqueta-entrada">▲ Entrada</span>
+                                }
+                                else
+                                {
+                                    <span class="etiqueta etiqueta-saida">▼ Venda</span>
+                                }
+                            </td>
+                            <td>@m.Produto</td>
+                            <td class="numero">@m.Quantidade</td>
+                            <td>@m.Usuario</td>
+                            <td>@m.Observacao</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

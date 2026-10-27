@@ -1,0 +1,70 @@
+@model StockControl.ViewModels.UsuarioFormViewModel
+@{
+    ViewData["Title"] = Model.EhNovo ? "Novo usuário" : "Editar usuário";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="cartao formulario">
+    <form method="post" asp-action="@(Model.EhNovo ? "Criar" : "Editar")" asp-route-id="@(Model.EhNovo ? null : Model.Id)" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
+
+        <div class="campo">
+            <label asp-for="Nome">Nome <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="Nome" type="text" maxlength="100" required aria-required="true" autocomplete="name" />
+            <span asp-validation-for="Nome" class="erro-campo"></span>
+        </div>
+
+        <div class="campo">
+            <label asp-for="Email">E-mail <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="Email" type="email" maxlength="150" required aria-required="true" autocomplete="off"
+                   aria-describedby="dica-email" />
+            <span id="dica-email" class="dica">É o login do usuário no sistema e no app.</span>
+            <span asp-validation-for="Email" class="erro-campo"></span>
+        </div>
+
+        <div class="campo">
+            <label asp-for="Perfil"></label>
+            <select asp-for="Perfil" asp-items="Html.GetEnumSelectList<PerfilUsuario>()" aria-describedby="dica-perfil"></select>
+            <span id="dica-perfil" class="dica">
+                Admin: tudo, inclusive usuários · Gerente: cadastros e relatórios · Operador: consulta e registra vendas/entradas.
+            </span>
+        </div>
+
+        <div class="grade-2">
+            <div class="campo">
+                <label asp-for="Senha">
+                    Senha
+                    @if (Model.EhNovo)
+                    {
+                        <span class="obrigatorio" aria-hidden="true">*</span>
+                    }
+                </label>
+                <input asp-for="Senha" autocomplete="new-password" aria-describedby="dica-senha" />
+                <span id="dica-senha" class="dica">
+                    @(Model.EhNovo ? "Mínimo de 6 caracteres." : "Deixe em branco para manter a senha atual.")
+                </span>
+                <span asp-validation-for="Senha" class="erro-campo"></span>
+            </div>
+
+            <div class="campo">
+                <label asp-for="ConfirmarSenha"></label>
+                <input asp-for="ConfirmarSenha" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmarSenha" class="erro-campo"></span>
+            </div>
+        </div>
+
+        @if (!Model.EhNovo)
+        {
+            <div class="campo campo-checkbox">
+                <input asp-for="Ativo" />
+                <label asp-for="Ativo"></label>
+            </div>
+        }
+
+        <div class="acoes">
+            <button type="submit" class="botao">Salvar</button>
+            <a class="botao botao-secundario" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>

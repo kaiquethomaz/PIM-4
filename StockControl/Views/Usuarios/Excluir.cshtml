@@ -1,0 +1,21 @@
+@model Usuario
+@{
+    ViewData["Title"] = "Excluir usuário";
+}
+
+<h1>Excluir usuário</h1>
+
+<div class="cartao formulario">
+    <p>Tem certeza que deseja excluir o usuário <strong>@Model.Nome</strong> (@Model.Email)?</p>
+    <div class="alerta alerta-aviso">
+        Se o usuário já registrou entradas ou vendas, ele será apenas <strong>desativado</strong>
+        (não consegue mais entrar), para o histórico continuar mostrando quem fez cada movimentação.
+    </div>
+
+    <form method="post" asp-action="Excluir" asp-route-id="@Model.Id">
+        <div class="acoes">
+            <button type="submit" class="botao botao-perigo">Sim, excluir</button>
+            <a class="botao botao-secundario" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>

@@ -14,10 +14,12 @@ Recebem a requisição HTTP, validam os dados de entrada (`ModelState`), chamam 
 | Controller | Função | Quem acessa |
 |---|---|---|
 | `ContaController` | Login, logout e acesso negado | Todos (login sem autenticação) |
-| `HomeController` | Página inicial / dashboard | Usuários logados |
+| `HomeController` | Dashboard (totais, reposição, últimas movimentações) | Usuários logados |
+| `MovimentacoesController` | Registrar entrada/venda e listar por período | Usuários logados |
 | `ProdutosController` | Listagem com busca e CRUD de produtos | Consulta: todos; cadastro/edição/exclusão: Admin e Gerente |
 | `CategoriasController` | CRUD de categorias | Admin e Gerente |
 | `FornecedoresController` | CRUD de fornecedores | Admin e Gerente |
+| `UsuariosController` | CRUD de usuários (estrutura administrativa) | Somente Admin |
 
 Os controllers da API REST (`Controllers/Api/`) herdam de `ApiControllerBase`, usam autenticação JWT e devolvem JSON. Eles estão descritos em [06-api-rest.md](06-api-rest.md).
 
@@ -36,7 +38,7 @@ Cada Service tem uma **interface** (`IProdutoService`) e uma **implementação**
 | `MovimentacaoService` | Quantidade maior que zero; produto ativo; **saída não pode ser maior que o estoque**; período do relatório válido. |
 | `CategoriaService` | Nome obrigatório e único; não exclui categoria que tenha produtos. |
 | `FornecedorService` | Remove a máscara do CNPJ e **valida os dígitos verificadores**; CNPJ único; não exclui fornecedor que tenha produtos. |
-| `UsuarioService` | Senha com no mínimo 6 caracteres, guardada com hash BCrypt; e-mail único e sempre minúsculo; o sistema não pode ficar sem administrador ativo; o usuário não pode desativar a si mesmo. |
+| `UsuarioService` | Senha com no mínimo 6 caracteres, guardada com hash BCrypt; e-mail único e sempre minúsculo; o sistema não pode ficar sem administrador ativo; o usuário não pode desativar nem excluir a si mesmo; usuário que já registrou movimentações é **desativado** em vez de excluído (o histórico precisa mostrar quem fez cada venda); na edição, senha em branco mantém a atual. |
 | `DashboardService` | Monta os totais do painel, os produtos abaixo do mínimo e as últimas movimentações. |
 
 Quando uma regra é violada, o Service lança uma `RegraNegocioException` com uma mensagem amigável. O Controller captura essa exceção e mostra a mensagem na tela (ou devolve no JSON).
@@ -185,4 +187,7 @@ public ProdutoService(IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO, ...)
 
 O controle é feito com `[Authorize(Roles = "...")]` nos Controllers (detalhes em [05-seguranca.md](05-seguranca.md)).
 
-> ⏳ **Em desenvolvimento (etapa 6):** tela de gerenciamento de usuários (somente Admin), registro de movimentações e dashboard definitivo.
+A **tela de Usuários** (`UsuariosController`, somente Admin) é a estrutura administrativa do sistema: nela o administrador cadastra funcionários, define o perfil de cada um, redefine senhas e desativa quem não trabalha mais no mercadinho. Ela tem proteções contra erros administrativos:
+- não é possível remover ou rebaixar o **último administrador ativo** (o sistema ficaria sem ninguém para gerenciá-lo);
+- o administrador não pode desativar nem excluir **a própria conta**;
+- funcionários que já registraram vendas são **desativados**, não apagados: deixam de conseguir entrar, mas o histórico continua mostrando quem fez cada movimentação.

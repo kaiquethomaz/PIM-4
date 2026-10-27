@@ -29,11 +29,16 @@
             <nav aria-label="Menu principal">
                 <ul class="menu" id="menu-principal">
                     <li><a asp-controller="Home" asp-action="Index" aria-current="@Atual("Home")">Dashboard</a></li>
+                    <li><a asp-controller="Movimentacoes" asp-action="Index" aria-current="@Atual("Movimentacoes")">Movimentações</a></li>
                     <li><a asp-controller="Produtos" asp-action="Index" aria-current="@Atual("Produtos")">Produtos</a></li>
                     @if (podeGerenciar)
                     {
                         <li><a asp-controller="Categorias" asp-action="Index" aria-current="@Atual("Categorias")">Categorias</a></li>
                         <li><a asp-controller="Fornecedores" asp-action="Index" aria-current="@Atual("Fornecedores")">Fornecedores</a></li>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li><a asp-controller="Usuarios" asp-action="Index" aria-current="@Atual("Usuarios")">Usuários</a></li>
                     }
                 </ul>
             </nav>

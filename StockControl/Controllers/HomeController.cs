@@ -4,11 +4,7 @@ using StockControl.Services;
 
 namespace StockControl.Controllers;
 
-/// <summary>
-/// Página inicial TEMPORÁRIA (etapa 3): só serve para provar que a cadeia
-/// Controller -> Service -> DAO -> AppDbContext -> Banco está funcionando.
-/// Na etapa 6 ela vira o Dashboard de verdade.
-/// </summary>
+/// <summary>Dashboard: a primeira tela depois do login.</summary>
 [Authorize]   // só usuários logados
 public class HomeController : Controller
 {
@@ -19,8 +15,11 @@ public class HomeController : Controller
         _dashboardService = dashboardService;
     }
 
+    // GET /  (ou /Home/Index)
     public async Task<IActionResult> Index()
     {
+        // Totais, produtos abaixo do mínimo (procedure sp_ProdutosAbaixoDoMinimo)
+        // e últimas movimentações.
         var resumo = await _dashboardService.ObterResumoAsync();
         return View(resumo);
     }

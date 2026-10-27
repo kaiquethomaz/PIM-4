@@ -13,7 +13,7 @@ Baseado no projeto do PIM III (`D:\PIM-3`), reescrito para atender aos requisito
 | 3. AppDbContext + Fluent API + DAOs + Services | ✅ |
 | 4. Login (cookie) + CRUDs de Produtos, Categorias e Fornecedores | ✅ |
 | 5. API para o mobile + JWT + Swagger | ✅ |
-| 6. Movimentações, Dashboard, Usuários | ⏳ |
+| 6. Movimentações, Dashboard, Usuários | ✅ |
 | 7. Revisão final e lista de prints | ⏳ |
 
 ## Estrutura

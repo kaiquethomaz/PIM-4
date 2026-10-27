@@ -1,0 +1,55 @@
+@model StockControl.ViewModels.MovimentacaoFormViewModel
+@{
+    ViewData["Title"] = "Registrar movimentação";
+}
+
+<div class="barra-titulo">
+    <h1>Registrar entrada ou venda</h1>
+    <a class="botao botao-secundario" asp-action="Index">Ver movimentações</a>
+</div>
+
+<div class="cartao formulario">
+    <form method="post" asp-action="Registrar" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
+
+        @* fieldset + legend: o leitor de tela anuncia "Tipo da movimentação" antes das opções *@
+        <fieldset class="campo opcoes-radio">
+            <legend>Tipo da movimentação <span class="obrigatorio" aria-hidden="true">*</span></legend>
+            <label class="opcao">
+                <input type="radio" asp-for="Tipo" id="tipo-saida" value="@TipoMovimentacao.Saida" />
+                <span><strong>Venda (saída)</strong> — tira do estoque</span>
+            </label>
+            <label class="opcao">
+                <input type="radio" asp-for="Tipo" id="tipo-entrada" value="@TipoMovimentacao.Entrada" />
+                <span><strong>Entrada</strong> — compra ou reposição do fornecedor</span>
+            </label>
+            <span asp-validation-for="Tipo" class="erro-campo"></span>
+        </fieldset>
+
+        <div class="campo">
+            <label asp-for="ProdutoId">Produto <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <select asp-for="ProdutoId" asp-items="Model.Produtos" required aria-required="true">
+                <option value="0">Selecione...</option>
+            </select>
+            <span asp-validation-for="ProdutoId" class="erro-campo"></span>
+        </div>
+
+        <div class="campo">
+            <label asp-for="Quantidade">Quantidade <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="Quantidade" type="number" min="1" step="1" required aria-required="true" />
+            <span asp-validation-for="Quantidade" class="erro-campo"></span>
+        </div>
+
+        <div class="campo">
+            <label asp-for="Observacao"></label>
+            <input asp-for="Observacao" type="text" maxlength="250" aria-describedby="dica-obs" />
+            <span id="dica-obs" class="dica">Opcional. Ex.: número da nota fiscal, nome do cliente.</span>
+            <span asp-validation-for="Observacao" class="erro-campo"></span>
+        </div>
+
+        <div class="acoes">
+            <button type="submit" class="botao">Registrar</button>
+            <a class="botao botao-secundario" asp-controller="Home" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>

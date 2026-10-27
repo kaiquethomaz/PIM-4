@@ -26,13 +26,14 @@ A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a i
 | Tela | O que faz | Perfil |
 |---|---|---|
 | **Login** | Entrada no sistema com e-mail e senha; opção "Manter conectado". | Todos |
-| **Dashboard** | Totais, produtos abaixo do mínimo e últimas movimentações. | Todos |
+| **Dashboard** | Cartões com os números do dia (produtos ativos, abaixo do mínimo, vendas e entradas de hoje, valor em estoque), tabela "Precisam de reposição" com botão **Repor** em cada produto, últimas 10 movimentações e atalhos "Registrar venda" / "Registrar entrada". | Todos (valor em estoque só Admin/Gerente) |
+| **Registrar movimentação** | Formulário único para venda ou entrada: tipo (botões de opção), produto (lista com o estoque atual de cada um), quantidade e observação. Depois de salvar, mostra o estoque atualizado e volta pronto para a próxima venda. | Todos |
+| **Movimentações** | Listagem por período (padrão: últimos 7 dias) com totais de unidades vendidas e de entrada. | Todos |
 | **Produtos** | Lista com busca por nome ou código de barras, etiqueta de situação (OK / Abaixo do mínimo / Inativo), cadastro, edição e exclusão. | Consulta: todos; edição: Admin e Gerente |
 | **Categorias** | Lista, cadastro, edição e exclusão. | Admin e Gerente |
 | **Fornecedores** | Lista com CNPJ formatado, cadastro, edição e exclusão. | Admin e Gerente |
 | **Acesso negado** | Mostrada quando o usuário tenta abrir uma página sem permissão. | Todos |
-| ⏳ **Movimentações** | Registrar entrada/venda e listar por período. *(etapa 6)* | Todos |
-| ⏳ **Usuários** | CRUD de usuários. *(etapa 6)* | Somente Admin |
+| **Usuários** | Lista com perfil e situação, cadastro (com confirmação de senha), edição (senha em branco mantém a atual; ativar/desativar) e exclusão. | Somente Admin |
 
 **Adaptação ao perfil:** o menu e os botões mudam conforme o usuário logado. O Operador, por exemplo, não vê os itens "Categorias" e "Fornecedores" nem os botões "Editar" e "Excluir" de produtos. Mesmo que digite o endereço da página, ele é redirecionado para "Acesso negado", porque a proteção também existe no servidor.
 
@@ -48,6 +49,7 @@ O layout se adapta a celulares, tablets e computadores:
 - Página com largura máxima de 1200 px, centralizada; nas telas pequenas ocupa a largura toda.
 - **Abaixo de 768 px** (celular), o menu vira um botão **"Menu"** que abre e fecha as opções, e os formulários em duas colunas passam para uma coluna só.
 - Tabelas largas ficam dentro de um contêiner com rolagem horizontal, para não quebrar a página.
+- No Dashboard, os cartões de números usam CSS Grid com `auto-fit`: são 6 por linha no computador e 2 por linha no celular. Os dois quadros de baixo ficam lado a lado no computador e um embaixo do outro abaixo de 960 px.
 - Todos os botões têm no mínimo **44 px de altura**, tamanho recomendado para toque com o dedo.
 - Os campos usam o teclado adequado no celular: `inputmode="decimal"` no preço, `inputmode="numeric"` no código de barras e no CNPJ, `type="email"` e `type="tel"`.
 - A tag `<meta name="viewport">` faz o navegador do celular usar a largura real da tela.
@@ -63,6 +65,8 @@ O sistema segue recomendações da **WCAG 2.1** (Diretrizes de Acessibilidade pa
 | **Navegação por teclado** | Todos os controles são links, botões ou campos nativos; contorno de foco amarelo de 3 px bem visível (`:focus-visible`). | Pessoas que não usam mouse. |
 | **Rótulos nos campos** | Todo campo tem `<label>` ligado a ele; dicas ligadas por `aria-describedby`. | Leitores de tela anunciam o nome e a dica do campo. |
 | **Campos obrigatórios** | Asterisco visual + `required` / `aria-required="true"`. | Todos. |
+| **Grupos de opções** | Entrada/Venda em `<fieldset>` com `<legend>`, e cada opção com o rótulo clicável inteiro. | O leitor de tela anuncia a pergunta antes das opções; a área de clique é maior. |
+| **Regiões do Dashboard** | `<section aria-labelledby>` em cada bloco. | O leitor de tela permite pular direto para "Precisam de reposição". |
 | **Mensagens anunciadas** | Erros com `role="alert"`, sucesso com `role="status"`. | O leitor de tela lê a mensagem sem o usuário procurar. |
 | **Botões com contexto** | "Editar" tem `aria-label="Editar Arroz Branco Tipo 1 5kg"`. | O leitor de tela diz *qual* item será editado. |
 | **Menu atual** | `aria-current="page"` no item da página aberta. | Orientação dentro do sistema. |

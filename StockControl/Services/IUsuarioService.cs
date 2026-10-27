@@ -15,4 +15,10 @@ public interface IUsuarioService
 
     /// <summary>Atualiza os dados. Se novaSenha vier vazia, a senha atual é mantida.</summary>
     Task AtualizarAsync(Usuario usuario, string? novaSenha, int idUsuarioLogado);
+
+    /// <summary>
+    /// Exclui o usuário. Se ele já registrou movimentações, apenas desativa
+    /// (o histórico precisa saber quem fez cada venda). Retorna o que foi feito.
+    /// </summary>
+    Task<string> ExcluirAsync(int id, int idUsuarioLogado);
 }
