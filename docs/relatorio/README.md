@@ -11,6 +11,8 @@ Textos prontos (ou quase) para copiar para o relatório do PIM IV. Cada arquivo 
 | [05-seguranca.md](05-seguranca.md) | Autenticação, autorização por perfil, senhas, CSRF, validação | Etapa 4 — Autenticação e Segurança |
 | [06-api-rest.md](06-api-rest.md) | Endpoints REST para o app mobile, JWT, Swagger | Etapa 4 — APIs REST |
 | [07-testes-realizados.md](07-testes-realizados.md) | Testes manuais executados e resultados | Testes / Validação |
+| [08-conferencia-de-requisitos.md](08-conferencia-de-requisitos.md) | Cada requisito do PIM IV × o que foi entregue | Conclusão / Checklist de entrega |
+| [09-lista-de-prints.md](09-lista-de-prints.md) | Checklist dos 57 prints, na ordem certa, com legendas sugeridas | Montagem do relatório |
 
 Arquivos de apoio:
 - [`../mer.md`](../mer.md) — diagrama MER/DER (Mermaid)

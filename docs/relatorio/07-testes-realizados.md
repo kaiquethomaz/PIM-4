@@ -50,7 +50,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R6 | `GET /api/produtos` | 15 produtos ativos | ✅ Passou |
 | R7 | `GET /api/produtos/codigo-barras/7891000000011` | Arroz, com categoria e estoque | ✅ Passou |
 | R8 | Código de barras inexistente | 404 com mensagem | ✅ Passou |
-| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.7) |
+| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.8) |
 | R10 | Entrada de 10 unidades pelo código de barras | 201; `estoqueAtual` = 34 | ✅ Passou |
 | R11 | Venda de 100 detergentes (estoque 3) | 400 "Estoque insuficiente..." | ✅ Passou |
 | R12 | Tipo "TROCA" | 400 "O tipo deve ser ENTRADA ou SAIDA." | ✅ Passou |
@@ -60,7 +60,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R16 | `GET /api/movimentacoes` com período invertido | 400 "A data inicial não pode ser maior..." | ✅ Passou |
 | R17 | Admin cadastra categoria "Pães e Bolos" (com acento) | 201 | ✅ Passou |
 | R18 | Categoria com nome repetido | 400 "Já existe uma categoria com este nome." | ✅ Passou |
-| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.7) |
+| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.8) |
 | R20 | Alterar o preço do produto (PUT) | 200; preço novo e estoque mantido | ✅ Passou |
 | R21 | Excluir categoria que tem produto | 400 com mensagem | ✅ Passou |
 | R22 | Excluir produto com movimentação | 200; produto desativado | ✅ Passou |
@@ -88,7 +88,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | U8 | Reativar o Operador pela edição, com a senha em branco | Reativado; o login com a senha antiga continua funcionando | ✅ Passou |
 | U9 | Gerente abrindo `/Usuarios` | "Acesso negado"; o menu do Gerente não tem "Usuários" | ✅ Passou |
 | U10 | POST de venda sem o token anti-CSRF | Recusado com HTTP 400 | ✅ Passou |
-| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.7) |
+| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.8) |
 
 ## 7.6 Interface
 
@@ -97,7 +97,21 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | I1 | Tela de login em 375 px (celular) | Cartão ocupa a largura, campos legíveis, sem rolagem lateral | ✅ Passou |
 | I2 | Tela de login em 1024 px | Cartão centralizado | ✅ Passou |
 
-## 7.7 Defeitos encontrados e corrigidos
+## 7.7 Revisão final (etapa 7)
+
+Sistema rodando do zero com `dotnet run` (HTTPS na porta 7080) e o banco recriado pelo script.
+
+| # | Teste | Resultado esperado | Resultado |
+|---|---|---|---|
+| F1 | Abrir as 17 páginas do sistema logado como **Admin** | Todas abrem | ✅ 17/17 |
+| F2 | Abrir as 17 páginas como **Gerente** | Abrem, exceto as 3 de Usuários ("Acesso negado") | ✅ 17/17 |
+| F3 | Abrir as 17 páginas como **Operador** | Abrem só Dashboard, Movimentações e Produtos (consulta); as outras 12 dão "Acesso negado" | ✅ 17/17 |
+| F4 | `/Produtos/Editar/999` (id inexistente) | 404 | ✅ Passou |
+| F5 | `/Movimentacoes` sem login | Redireciona para o login com `ReturnUrl` | ✅ Passou |
+| F6 | `http://localhost:5080/Produtos` | Redireciona (307) para `https://localhost:7080/Produtos` | ✅ Passou |
+| F7 | `/swagger` | Abre a documentação | ✅ Passou |
+
+## 7.8 Defeitos encontrados e corrigidos
 
 | Defeito | Causa | Correção |
 |---|---|---|
