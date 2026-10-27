@@ -2,7 +2,9 @@
 
 ## 1.1 O sistema
 
-O **StockControl** é um sistema de controle de estoque desenvolvido para um mercadinho. Ele permite cadastrar produtos, categorias, fornecedores e usuários, registrar entradas de mercadoria e vendas (saídas), acompanhar os produtos que precisam de reposição e consultar o histórico de movimentações.
+O **StockControl** é um sistema de controle de estoque para mercadinhos. Ele permite cadastrar produtos, categorias, fornecedores e usuários, registrar entradas de mercadoria e vendas (saídas), acompanhar os produtos que precisam de reposição e consultar o histórico de movimentações.
+
+O sistema atende **vários estabelecimentos ao mesmo tempo**. O dono de um mercadinho cadastra o próprio estabelecimento, vira o administrador dele e cria o acesso dos seus funcionários. Cada estabelecimento só enxerga os próprios dados (ver [10-multiestabelecimento.md](10-multiestabelecimento.md)).
 
 O sistema é composto por três partes que trabalham juntas:
 
@@ -105,6 +107,7 @@ sequenceDiagram
 - **Web ↔ Banco:** pelo Entity Framework Core, através dos DAOs. O banco é criado pelo script SQL e o EF apenas mapeia as tabelas existentes (não são usadas *migrations*).
 - **Mobile ↔ Banco:** o app nunca acessa o banco. Ele chama a API REST (JSON sobre HTTPS), autenticando-se com um token **JWT**.
 - **Regras de negócio em dois níveis:** as regras ficam nos Services (C#) e as mais críticas são repetidas no banco (procedure, trigger e `CHECK`). Assim, mesmo um acesso direto ao banco não consegue, por exemplo, deixar o estoque negativo.
+- **Isolamento entre estabelecimentos:** o estabelecimento do usuário vai no cookie (web) e no token JWT (mobile). O Entity Framework filtra automaticamente todas as consultas por ele, e as procedures recebem o estabelecimento como parâmetro. Web e mobile do mesmo mercadinho veem os mesmos dados; mercadinhos diferentes nunca se enxergam.
 - **Sincronização do mobile:** cada cadastro tem a coluna `AtualizadoEm`. O app pede à API somente os produtos alterados desde a última sincronização (`GET /api/produtos?atualizadoDesde=...`).
 
 ## 1.6 Estrutura de pastas

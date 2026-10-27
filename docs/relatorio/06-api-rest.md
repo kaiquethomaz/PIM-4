@@ -72,9 +72,14 @@ Content-Type: application/json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "expiraEm": "2026-10-27T21:35:37Z",
-  "usuario": { "id": 3, "nome": "Otávio Operador", "email": "operador@stockcontrol.local", "perfil": "Operador" }
+  "usuario": {
+    "id": 3, "nome": "Otávio Operador", "email": "operador@stockcontrol.local", "perfil": "Operador",
+    "estabelecimentoId": 1, "estabelecimento": "Mercadinho Bom Preço"
+  }
 }
 ```
+
+**Vários estabelecimentos:** o token leva o estabelecimento do usuário, e **todas as respostas da API trazem só os dados daquele estabelecimento**. O app não precisa enviar o estabelecimento em nenhuma rota. Por exemplo, `GET /api/produtos/codigo-barras/7891000000011` devolve o Arroz **do mercadinho de quem está logado**, mesmo que outro mercadinho tenha um produto com o mesmo código. O app pode mostrar o campo `estabelecimento` no topo da tela.
 
 ### Venda pelo código de barras
 ```http
@@ -130,7 +135,7 @@ sequenceDiagram
 ```
 
 O **JWT** (*JSON Web Token*) tem três partes separadas por ponto: `cabeçalho.dados.assinatura`.
-- **Dados (*claims*):** `sub` (Id do usuário), `name`, `email`, `role` (perfil), `jti` (identificador único do token) e `exp` (validade).
+- **Dados (*claims*):** `sub` (Id do usuário), `name`, `email`, `role` (perfil), `EstabelecimentoId` e `Estabelecimento` (mercadinho do usuário), `jti` (identificador único do token) e `exp` (validade).
 - **Assinatura:** calculada com uma **chave secreta** que só o servidor conhece (algoritmo HMAC-SHA256). Se alguém alterar os dados do token, por exemplo trocando o perfil para "Admin", a assinatura deixa de bater e a API responde **401**.
 - **Validade:** 8 horas. Depois disso o app precisa fazer login de novo.
 
@@ -175,7 +180,7 @@ Para o app funcionar bem com internet ruim, ele pode guardar os produtos no celu
 3. Nas próximas vezes: `GET /api/produtos?atualizadoDesde={maior atualizadoEm}`.
 4. Os produtos recebidos com `"ativo": false` devem ser removidos da lista do app.
 
-Toda alteração em um produto, inclusive a mudança de estoque feita pela trigger, atualiza `AtualizadoEm`, e a coluna tem um índice (`IX_Produto_AtualizadoEm`) para essa consulta ser rápida.
+Toda alteração em um produto, inclusive a mudança de estoque feita pela trigger, atualiza `AtualizadoEm`, e existe um índice (`IX_Produto_Estab_AtualizadoEm`, por estabelecimento e data) para essa consulta ser rápida.
 
 ## 6.8 Segurança da API
 

@@ -6,7 +6,8 @@ namespace StockControl.Services;
 
 public class UsuarioService : IUsuarioService
 {
-    private const int TamanhoMinimoSenha = 6;
+    // public: o cadastro de estabelecimento usa a mesma regra para a senha do dono.
+    public const int TamanhoMinimoSenha = 6;
 
     private readonly IUsuarioDAO _usuarioDAO;
 
@@ -25,7 +26,9 @@ public class UsuarioService : IUsuarioService
             return null;
 
         var usuario = await _usuarioDAO.BuscarPorEmailAsync(NormalizarEmail(email));
-        if (usuario is null || !usuario.Ativo)
+
+        // Usuário desativado, ou de um estabelecimento desativado, não entra.
+        if (usuario is null || !usuario.Ativo || usuario.Estabelecimento is not { Ativo: true })
             return null;
 
         // BCrypt.Verify gera o hash da senha digitada e compara com o hash salvo.

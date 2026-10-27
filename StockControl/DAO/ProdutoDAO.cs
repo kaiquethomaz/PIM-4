@@ -83,8 +83,11 @@ public class ProdutoDAO : DAOBase<Produto>, IProdutoDAO
     {
         // Chama a procedure do banco. O resultado é convertido para a classe
         // ProdutoAbaixoMinimo (as colunas e as propriedades têm o mesmo nome).
+        // Procedure não passa pelo filtro automático do EF, por isso o
+        // estabelecimento é enviado como parâmetro.
         return await _contexto.Database
-            .SqlQuery<ProdutoAbaixoMinimo>($"EXEC sp_ProdutosAbaixoDoMinimo")
+            .SqlQuery<ProdutoAbaixoMinimo>(
+                $"EXEC sp_ProdutosAbaixoDoMinimo @EstabelecimentoId = {_contexto.EstabelecimentoAtualId}")
             .ToListAsync();
     }
 

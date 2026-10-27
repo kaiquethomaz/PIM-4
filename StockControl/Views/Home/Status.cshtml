@@ -1,0 +1,20 @@
+@{
+    var codigo = (int)ViewBag.Codigo;
+    var naoEncontrado = codigo == 404;
+    ViewData["Title"] = naoEncontrado ? "Página não encontrada" : "Erro";
+}
+
+<div class="cartao formulario">
+    <p class="dica">Erro @codigo</p>
+    @if (naoEncontrado)
+    {
+        <h1>Página não encontrada</h1>
+        <p>O endereço não existe ou o registro não pertence ao seu estabelecimento.</p>
+    }
+    else
+    {
+        <h1>Não foi possível abrir esta página</h1>
+        <p>Tente novamente. Se o problema continuar, avise o administrador do sistema.</p>
+    }
+    <a class="botao" asp-controller="Home" asp-action="Index">Voltar ao início</a>
+</div>

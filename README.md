@@ -1,11 +1,13 @@
 # StockControl — PIM IV (ADS UNIP)
 
-Sistema de controle de estoque para um mercadinho: sistema web (ASP.NET Core MVC) + API REST para o app mobile + banco SQL Server.
+Sistema de controle de estoque para mercadinhos: sistema web (ASP.NET Core MVC) + API REST para o app mobile + banco SQL Server. Vários estabelecimentos usam o mesmo sistema, e cada um só enxerga os próprios dados.
 
 Baseado no projeto do PIM III, reescrito para atender aos requisitos do PIM IV.
 
 ## Funcionalidades
 
+- **Cadastro do estabelecimento**: o dono cadastra o mercadinho, vira Admin e cria o acesso dos funcionários
+- **Isolamento dos dados** entre estabelecimentos (banco + filtro automático do Entity Framework)
 - **Login** com perfis **Admin**, **Gerente** e **Operador** (cookie no site, JWT na API)
 - **Dashboard** com totais do dia, produtos que precisam de reposição e últimas movimentações
 - **Vendas e entradas** de estoque, com bloqueio de venda sem estoque
@@ -57,13 +59,14 @@ cd StockControl
 dotnet run
 ```
 
-Abra **https://localhost:7080** e entre com um dos usuários de teste:
+Abra **https://localhost:7080** e entre com um dos usuários de teste, ou clique em **Cadastrar meu estabelecimento** para criar um mercadinho novo:
 
-| E-mail | Senha | Perfil |
-|---|---|---|
-| admin@stockcontrol.local | Admin@123 | Admin |
-| gerente@stockcontrol.local | Gerente@123 | Gerente |
-| operador@stockcontrol.local | Operador@123 | Operador |
+| E-mail | Senha | Perfil | Estabelecimento |
+|---|---|---|---|
+| admin@stockcontrol.local | Admin@123 | Admin | Mercadinho Bom Preço |
+| gerente@stockcontrol.local | Gerente@123 | Gerente | Mercadinho Bom Preço |
+| operador@stockcontrol.local | Operador@123 | Operador | Mercadinho Bom Preço |
+| maria@donamaria.local | Maria@123 | Admin | Mercearia Dona Maria |
 
 - Documentação da API: **https://localhost:7080/swagger**
 - Para o **celular** acessar a API pela rede: `dotnet run --urls "http://0.0.0.0:5080"` e use `http://<IP do PC>:5080/api` (detalhes em [`docs/relatorio/06-api-rest.md`](docs/relatorio/06-api-rest.md#69-como-o-app-mobile-se-conecta-guia-para-o-colega-do-grupo))

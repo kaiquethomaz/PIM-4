@@ -29,4 +29,13 @@ public class HomeController : Controller
     {
         return View();
     }
+
+    // GET /Home/Status/404 -> página amigável para erros sem conteúdo
+    // (configurado no Program.cs com UseStatusCodePagesWithReExecute).
+    [AllowAnonymous]
+    public IActionResult Status(int id)
+    {
+        ViewBag.Codigo = id;
+        return View();
+    }
 }

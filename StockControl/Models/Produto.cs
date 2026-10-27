@@ -1,8 +1,10 @@
 namespace StockControl.Models;
 
 /// <summary>Produto vendido no mercadinho (tabela Produto).</summary>
-public class Produto : EntidadeBase
+public class Produto : EntidadeBase, IPertenceAEstabelecimento
 {
+    public int EstabelecimentoId { get; set; }
+
     public string Nome { get; set; } = string.Empty;
     public string CodigoBarras { get; set; } = string.Empty;
     public decimal Preco { get; set; }

@@ -26,6 +26,8 @@ A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a i
 | Tela | O que faz | Perfil |
 |---|---|---|
 | **Login** | Tela dividida: à esquerda, um painel com a identidade visual e os principais recursos do sistema; à direita, o formulário com ícones nos campos, botão para mostrar/ocultar a senha e a opção "Manter conectado". No celular, o painel é ocultado e o logo aparece acima do formulário. | Todos |
+| **Cadastrar meu estabelecimento** | Mesmo layout do login, com o formulário em dois grupos numerados: "1. Dados do estabelecimento" (nome, CNPJ, telefone) e "2. Seus dados de acesso" (nome, e-mail e senha com confirmação). Depois de cadastrar, o dono já entra no sistema. | Público |
+| **Meu estabelecimento** | CNPJ e data de cadastro (só leitura) + edição do nome, telefone e e-mail. O nome alterado aparece na hora no cabeçalho. | Somente Admin |
 | **Dashboard** | Cartões com os números do dia (produtos ativos, abaixo do mínimo, vendas e entradas de hoje, valor em estoque), tabela "Precisam de reposição" com botão **Repor** em cada produto, últimas 10 movimentações e atalhos "Registrar venda" / "Registrar entrada". | Todos (valor em estoque só Admin/Gerente) |
 | **Registrar movimentação** | Formulário único para venda ou entrada: tipo (botões de opção), produto (lista com o estoque atual de cada um), quantidade e observação. Depois de salvar, mostra o estoque atualizado e volta pronto para a próxima venda. | Todos |
 | **Movimentações** | Listagem por período (padrão: últimos 7 dias) com totais de unidades vendidas e de entrada. | Todos |
@@ -33,7 +35,10 @@ A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a i
 | **Categorias** | Lista, cadastro, edição e exclusão. | Admin e Gerente |
 | **Fornecedores** | Lista com CNPJ formatado, cadastro, edição e exclusão. | Admin e Gerente |
 | **Acesso negado** | Mostrada quando o usuário tenta abrir uma página sem permissão. | Todos |
+| **Página não encontrada** | Mostrada em endereços inexistentes ou ao tentar abrir um registro de outro estabelecimento (erro 404), no visual do sistema em vez da página padrão do navegador. | Todos |
 | **Usuários** | Lista com perfil e situação, cadastro (com confirmação de senha), edição (senha em branco mantém a atual; ativar/desativar) e exclusão. | Somente Admin |
+
+**Cabeçalho:** mostra o nome do estabelecimento, o nome do usuário e o perfil (ex.: "Mercadinho Bom Preço · Administrador (Admin)"), para o funcionário sempre saber em qual mercadinho está.
 
 **Adaptação ao perfil:** o menu e os botões mudam conforme o usuário logado. O Operador, por exemplo, não vê os itens "Categorias" e "Fornecedores" nem os botões "Editar" e "Excluir" de produtos. Mesmo que digite o endereço da página, ele é redirecionado para "Acesso negado", porque a proteção também existe no servidor.
 

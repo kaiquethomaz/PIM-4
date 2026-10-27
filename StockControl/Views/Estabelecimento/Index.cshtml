@@ -1,0 +1,49 @@
+@model StockControl.ViewModels.EstabelecimentoFormViewModel
+@{
+    ViewData["Title"] = "Meu estabelecimento";
+}
+
+<h1>Meu estabelecimento</h1>
+
+<div class="cartao formulario">
+    <form method="post" asp-action="Index" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
+
+        <dl class="dados-fixos">
+            <div>
+                <dt>CNPJ</dt>
+                <dd>@Model.CnpjFormatado</dd>
+            </div>
+            <div>
+                <dt>Cliente desde</dt>
+                <dd>@Model.CriadoEm.ToString("dd/MM/yyyy")</dd>
+            </div>
+        </dl>
+
+        <div class="campo">
+            <label asp-for="NomeFantasia">Nome do estabelecimento <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="NomeFantasia" type="text" maxlength="120" required aria-required="true" autocomplete="organization" />
+            <span asp-validation-for="NomeFantasia" class="erro-campo"></span>
+        </div>
+
+        <div class="grade-2">
+            <div class="campo">
+                <label asp-for="Telefone"></label>
+                <input asp-for="Telefone" type="tel" maxlength="20" autocomplete="tel" />
+                <span asp-validation-for="Telefone" class="erro-campo"></span>
+            </div>
+            <div class="campo">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" type="email" maxlength="150" autocomplete="email" />
+                <span asp-validation-for="Email" class="erro-campo"></span>
+            </div>
+        </div>
+
+        <p class="dica">O CNPJ identifica o estabelecimento e não pode ser alterado.
+            Para dar acesso aos seus funcionários, use o menu <a asp-controller="Usuarios" asp-action="Index">Usuários</a>.</p>
+
+        <div class="acoes">
+            <button type="submit" class="botao">Salvar</button>
+        </div>
+    </form>
+</div>

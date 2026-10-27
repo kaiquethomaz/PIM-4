@@ -25,8 +25,10 @@ public class MovimentacaoDAO : IMovimentacaoDAO
             // String interpolada ($"...{valor}..."): o EF transforma cada {valor}
             // em um parâmetro SQL (@p0, @p1...). Isso evita SQL Injection.
             // O INSERT é feito pela procedure; o estoque é atualizado pela trigger.
+            // A procedure só aceita produto e usuário do estabelecimento informado.
             var resultado = await _contexto.Database
                 .SqlQuery<IdGerado>($@"EXEC sp_RegistrarMovimentacao
+                    @EstabelecimentoId = {_contexto.EstabelecimentoAtualId},
                     @ProdutoId  = {movimentacao.ProdutoId},
                     @Tipo       = {tipo},
                     @Quantidade = {movimentacao.Quantidade},
@@ -59,7 +61,10 @@ public class MovimentacaoDAO : IMovimentacaoDAO
         {
             return await _contexto.Database
                 .SqlQuery<MovimentacaoRelatorio>(
-                    $"EXEC sp_RelatorioMovimentacoes @DataInicio = {dataInicio.Date}, @DataFim = {dataFim.Date}")
+                    $@"EXEC sp_RelatorioMovimentacoes
+                        @EstabelecimentoId = {_contexto.EstabelecimentoAtualId},
+                        @DataInicio = {dataInicio.Date},
+                        @DataFim = {dataFim.Date}")
                 .ToListAsync();
         }
         catch (SqlException erro) when (erro.Number >= 50000)

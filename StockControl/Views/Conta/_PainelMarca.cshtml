@@ -1,0 +1,42 @@
+@* Painel azul da esquerda, usado no Login e no Cadastro de estabelecimento.
+   No celular ele fica escondido (CSS). *@
+<aside class="login-marca" aria-label="Sobre o StockControl">
+    <div class="login-marca-topo">
+        <partial name="_Logo" />
+    </div>
+
+    <div class="login-marca-conteudo">
+        @* <p> e não <h2>: o título principal da página (h1) fica no formulário *@
+        <p class="login-destaque">Controle de estoque simples para o dia a dia do seu mercadinho.</p>
+        <p>Vendas, entradas e reposição em um só lugar — no computador e no celular.</p>
+
+        <ul class="login-recursos">
+            <li>
+                <span class="recurso-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10" /><line x1="18" y1="20" x2="18" y2="4" /><line x1="6" y1="20" x2="6" y2="16" /></svg>
+                </span>
+                <span><strong>Estoque em tempo real</strong> com alerta de reposição</span>
+            </li>
+            <li>
+                <span class="recurso-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2" /><line x1="12" y1="18" x2="12.01" y2="18" /></svg>
+                </span>
+                <span><strong>Venda pelo celular</strong> lendo o código de barras</span>
+            </li>
+            <li>
+                <span class="recurso-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                </span>
+                <span><strong>Sua equipe com acesso próprio</strong>: você cria o login de cada funcionário</span>
+            </li>
+            <li>
+                <span class="recurso-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                </span>
+                <span><strong>Dados protegidos</strong>: cada estabelecimento só vê o que é seu</span>
+            </li>
+        </ul>
+    </div>
+
+    <p class="login-marca-rodape">PIM IV · Análise e Desenvolvimento de Sistemas · UNIP</p>
+</aside>

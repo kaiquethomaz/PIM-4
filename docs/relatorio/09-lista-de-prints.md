@@ -23,10 +23,11 @@ Checklist dos prints, organizada pela seção do relatório onde cada um entra. 
 | ☐ | 04 | Diagrama do MER | Cole o código de `docs/mer.md` em https://mermaid.live → *Actions* → PNG | Diagrama com as 6 entidades | Modelo Entidade-Relacionamento |
 | ☐ | 05 | Diagrama físico (opcional) | SSMS: **Diagramas de Banco de Dados → Novo Diagrama**, adicione as 6 tabelas | Tabelas com as linhas de FK | Diagrama físico gerado pelo SQL Server |
 | ☐ | 06 | Dados de teste | Nova Consulta: `SELECT * FROM Produto` | 15 produtos | Produtos cadastrados pelo seed |
-| ☐ | 07 | Procedure do dashboard | `EXEC sp_ProdutosAbaixoDoMinimo;` | 5 linhas (Detergente, Leite, Água, Café, Feijão) com "QuantidadeFaltante" | Procedure de produtos abaixo do estoque mínimo |
-| ☐ | 08 | Procedure de relatório | `EXEC sp_RelatorioMovimentacoes @DataInicio = '2026-10-01', @DataFim = '2026-11-30';` (ajuste as datas para o mês atual) | Movimentações com produto e usuário | Relatório de movimentações por período |
+| ☐ | 07 | Procedure do dashboard | `EXEC sp_ProdutosAbaixoDoMinimo @EstabelecimentoId = 1;` e depois `= 2;` (selecione as duas linhas e F5) | Duas grades: 5 produtos no estabelecimento 1 e 2 no estabelecimento 2 | Procedure de produtos abaixo do mínimo, separada por estabelecimento |
+| ☐ | 08 | Procedure de relatório | `EXEC sp_RelatorioMovimentacoes @EstabelecimentoId = 1, @DataInicio = '2026-10-01', @DataFim = '2026-11-30';` (ajuste as datas para o mês atual) | Movimentações com produto e usuário | Relatório de movimentações por período |
 | ☐ | 09 | Senhas com hash | `SELECT Nome, Email, SenhaHash, Perfil FROM Usuario` | Coluna SenhaHash começando com `$2a$11$` | Senhas armazenadas com hash BCrypt |
-| ☐ | 10 | Índices | Expanda **dbo.Produto → Índices** | `UX_Produto_CodigoBarras`, `IX_Produto_CategoriaId`... | Índices para otimização |
+| ☐ | 10 | Índices | Expanda **dbo.Produto → Índices** | `UX_Produto_Estab_CodigoBarras`, `IX_Produto_CategoriaId`... | Índices para otimização |
+| ☐ | 10b | Mesmo código em 2 estabelecimentos | `SELECT Id, EstabelecimentoId, Nome, CodigoBarras, Preco FROM Produto WHERE CodigoBarras = '7891000000011';` | 2 linhas: Arroz do estabelecimento 1 (R$ 28,90) e do 2 (R$ 27,50) | Código de barras único por estabelecimento |
 
 ## B. Sistema web (Etapa 4)
 
@@ -34,7 +35,8 @@ Entre como **admin@stockcontrol.local**.
 
 | ✔ | # | Tela | Como fazer | O que deve aparecer | Legenda sugerida |
 |---|---|---|---|---|---|
-| ☐ | 11 | Login | https://localhost:7080 (sem estar logado), janela maximizada | Tela dividida: painel azul com os recursos à esquerda e formulário à direita | Tela de login |
+| ☐ | 11 | Login | https://localhost:7080 (sem estar logado), janela maximizada | Tela dividida: painel azul com os recursos à esquerda e formulário à direita, com "Cadastrar meu estabelecimento" embaixo | Tela de login |
+| ☐ | 11b | Cadastro de estabelecimento | No login, clique em **Cadastrar meu estabelecimento** | Formulário com os grupos "1. Dados do estabelecimento" e "2. Seus dados de acesso" | Cadastro de um novo mercadinho |
 | ☐ | 12 | Validação do login | Digite o e-mail do admin e uma senha errada, clique em "Entrar" | Aviso "E-mail ou senha inválidos." acima dos campos | Validação do login |
 | ☐ | 13 | Dashboard | Depois do login | Cartões (15 ativos, **5 abaixo do mínimo** em vermelho), tabela de reposição, últimas movimentações | Dashboard do sistema |
 | ☐ | 14 | Produtos | Menu **Produtos** | Lista com etiquetas OK / ⚠ Abaixo do mínimo | Listagem de produtos |
@@ -47,11 +49,14 @@ Entre como **admin@stockcontrol.local**.
 | ☐ | 21 | Registrar venda | Dashboard → **+ Registrar venda** → escolha o Detergente, quantidade 100 | "Estoque insuficiente. "Detergente..." tem 3 unidade(s)." | Bloqueio de venda sem estoque |
 | ☐ | 22 | Venda registrada | Mude a quantidade para 2 e registre | "Venda registrada: 2 x Detergente... Estoque atual: 1." | Registro de venda |
 | ☐ | 23 | Movimentações | Menu **Movimentações** | Lista dos últimos 7 dias com totais | Movimentações por período |
-| ☐ | 24 | Usuários | Menu **Usuários** | 3 usuários, o admin marcado como "(você)" | Gerenciamento de usuários (estrutura administrativa) |
+| ☐ | 24 | Usuários | Menu **Usuários** | 3 usuários do Mercadinho Bom Preço, o admin marcado como "(você)" | Gerenciamento dos funcionários (estrutura administrativa) |
+| ☐ | 24b | Meu estabelecimento | Menu **Estabelecimento** | CNPJ e "Cliente desde" + nome, telefone e e-mail editáveis | Dados do estabelecimento |
 | ☐ | 25 | Cadastro de usuário | **+ Novo usuário** | Formulário com perfil e confirmação de senha | Cadastro de usuário |
 | ☐ | 26 | Proteção do último Admin | Editar o Administrador → Perfil "Operador" → Salvar | "O sistema precisa ter pelo menos um administrador ativo." | Proteção da estrutura administrativa |
 | ☐ | 27 | Menu do Operador | Saia e entre como **operador@stockcontrol.local** | Menu só com Dashboard, Movimentações e Produtos; sem botões Editar/Excluir | Permissões do perfil Operador |
 | ☐ | 28 | Acesso negado | Como Operador, digite https://localhost:7080/Usuarios | Página "Acesso negado" | Controle de acesso por perfil |
+| ☐ | 28b | Outro estabelecimento | Saia e entre como **maria@donamaria.local** / Maria@123 → Dashboard | Cabeçalho "Mercearia Dona Maria", 5 produtos ativos, 2 abaixo do mínimo | Cada estabelecimento vê só os próprios dados |
+| ☐ | 28c | Isolamento | Ainda como Maria, digite https://localhost:7080/Produtos/Editar/1 (produto do outro mercadinho) | Página "Página não encontrada — o registro não pertence ao seu estabelecimento" | Isolamento dos dados entre estabelecimentos |
 
 ## C. Responsividade e acessibilidade
 
@@ -89,6 +94,7 @@ Abra a pasta `StockControl` no Visual Studio ou VS Code.
 | ☐ | 44 | Estrutura de pastas | Explorador de arquivos do editor, com as pastas expandidas | Organização em camadas |
 | ☐ | 45 | Classe base | `Models/EntidadeBase.cs` | Herança e encapsulamento: classe base abstrata |
 | ☐ | 46 | Encapsulamento do estoque | `Models/Produto.cs` (`EstoqueAtual { get; private set; }`) | Encapsulamento do estoque |
+| ☐ | 46b | Filtro automático por estabelecimento | `Data/AppDbContext.cs` (os `HasQueryFilter` e o `SaveChangesAsync`) | Isolamento dos dados com Global Query Filter |
 | ☐ | 47 | Fluent API + trigger | `Data/Configurations/ProdutoConfiguration.cs` | Mapeamento com Fluent API e `HasTrigger` |
 | ☐ | 48 | Padrão DAO | `DAO/IProdutoDAO.cs` + `DAO/ProdutoDAO.cs` | Padrão DAO: interface e implementação |
 | ☐ | 49 | Chamada da procedure | `DAO/MovimentacaoDAO.cs` (`EXEC sp_RegistrarMovimentacao`) | Chamada da procedure pelo Entity Framework |
@@ -105,7 +111,8 @@ Faça no SSMS, nesta ordem. Os comandos estão prontos no fim do script (seção
 | ☐ | 53 | Trigger de estoque | `SELECT EstoqueAtual FROM Produto WHERE Id = 3;` → `INSERT INTO Movimentacao (...) VALUES (3, 'ENTRADA', 5, 1, ...)` → o SELECT de novo | Estoque aumenta em 5 | Trigger `trg_AtualizaEstoque` atualizando o estoque |
 | ☐ | 54 | Proteção do estoque | `INSERT INTO Movimentacao (ProdutoId, Tipo, Quantidade, UsuarioId) VALUES (4, 'SAIDA', 999, 1);` | Erro de CHECK em vermelho; nada é gravado | Estoque nunca fica negativo |
 | ☐ | 55 | Trigger de auditoria | `UPDATE Produto SET Preco = 30.90 ... WHERE Id = 1;` → `SELECT * FROM LogAuditoria` | Linha `UPDATE_PRECO` com 28.90 → 30.90 | Trigger de auditoria de preço |
-| ☐ | 56 | Procedure com erro | `EXEC sp_RegistrarMovimentacao @ProdutoId = 12, @Tipo = 'SAIDA', @Quantidade = 100, @UsuarioId = 3;` | Mensagem 50005 "Estoque insuficiente para esta saída." | Validação dentro da procedure |
+| ☐ | 56 | Procedure com erro | `EXEC sp_RegistrarMovimentacao @EstabelecimentoId = 1, @ProdutoId = 12, @Tipo = 'SAIDA', @Quantidade = 100, @UsuarioId = 3;` | Mensagem 50005 "Estoque insuficiente para esta saída." | Validação dentro da procedure |
+| ☐ | 56b | Isolamento na procedure | `EXEC sp_RegistrarMovimentacao @EstabelecimentoId = 2, @ProdutoId = 1, @Tipo = 'SAIDA', @Quantidade = 1, @UsuarioId = 4;` | Mensagem 50001 "Produto inexistente ou inativo." | Um estabelecimento não movimenta produto de outro |
 | ☐ | 57 | Restrição única | `INSERT INTO Usuario ... 'admin@stockcontrol.local' ...` (bloco "Constraints" do script) | Erro de chave duplicada `UX_Usuario_Email` | Restrição de e-mail único |
 
 ## Depois dos prints

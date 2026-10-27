@@ -15,5 +15,14 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
         builder.Property(c => c.Nome).IsRequired().HasMaxLength(60);
         builder.Property(c => c.Descricao).HasMaxLength(250);
         builder.Property(c => c.AtualizadoEm).IsRequired();
+
+        // Cada categoria pertence a um estabelecimento (FK sem propriedade de navegação).
+        builder.HasOne<Estabelecimento>()
+            .WithMany()
+            .HasForeignKey(c => c.EstabelecimentoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // O nome se repete entre estabelecimentos, mas não dentro do mesmo.
+        builder.HasIndex(c => new { c.EstabelecimentoId, c.Nome }).IsUnique().HasDatabaseName("UX_Categoria_Estab_Nome");
     }
 }

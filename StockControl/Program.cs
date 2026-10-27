@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using StockControl.DAO;
 using StockControl.Data;
 using StockControl.Dtos;
+using StockControl.Extensions;
+using Microsoft.AspNetCore.Authentication;
 using StockControl.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -89,6 +91,17 @@ builder.Services
         opcoes.Cookie.HttpOnly = true;                   // JavaScript não consegue ler o cookie
         opcoes.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         opcoes.Cookie.SameSite = SameSiteMode.Lax;       // ajuda contra CSRF
+
+        // Sessões antigas (criadas antes de o sistema ter vários estabelecimentos)
+        // não têm o estabelecimento gravado: são descartadas e o usuário entra de novo.
+        opcoes.Events.OnValidatePrincipal = async contexto =>
+        {
+            if (contexto.Principal?.FindFirst(ClaimsStockControl.EstabelecimentoId) is null)
+            {
+                contexto.RejectPrincipal();
+                await contexto.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+        };
     })
     .AddJwtBearer(opcoes =>
     {
@@ -176,7 +189,12 @@ builder.Services.AddSwaggerGen(opcoes =>
 //    Fluxo: Controller -> Service -> DAO -> AppDbContext -> Banco
 // ---------------------------------------------------------------------
 
+// Usuário logado: de qual estabelecimento ele é (usado pelo filtro automático do AppDbContext)
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUsuarioAtual, UsuarioAtual>();
+
 // DAOs (acesso a dados)
+builder.Services.AddScoped<IEstabelecimentoDAO, EstabelecimentoDAO>();
 builder.Services.AddScoped<IUsuarioDAO, UsuarioDAO>();
 builder.Services.AddScoped<ICategoriaDAO, CategoriaDAO>();
 builder.Services.AddScoped<IFornecedorDAO, FornecedorDAO>();
@@ -184,6 +202,7 @@ builder.Services.AddScoped<IProdutoDAO, ProdutoDAO>();
 builder.Services.AddScoped<IMovimentacaoDAO, MovimentacaoDAO>();
 
 // Services (regras de negócio)
+builder.Services.AddScoped<IEstabelecimentoService, EstabelecimentoService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IFornecedorService, FornecedorService>();
@@ -215,6 +234,12 @@ else
 app.UseWhen(
     contexto => !(app.Environment.IsDevelopment() && contexto.Request.Path.StartsWithSegments("/api")),
     ramo => ramo.UseHttpsRedirection());
+
+// Telas web: erros sem conteúdo (ex.: 404) mostram uma página amigável do sistema
+// em vez da página padrão do navegador. A API fica de fora: ela responde em JSON.
+app.UseWhen(
+    contexto => !contexto.Request.Path.StartsWithSegments("/api"),
+    ramo => ramo.UseStatusCodePagesWithReExecute("/Home/Status/{0}"));
 
 app.UseStaticFiles();        // arquivos da pasta wwwroot (CSS, JS)
 

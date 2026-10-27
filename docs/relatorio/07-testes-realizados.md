@@ -6,8 +6,10 @@ Testes manuais executados no sistema em funcionamento (SQL Server 2025 Express +
 
 | # | Teste | Resultado esperado | Resultado |
 |---|---|---|---|
-| B1 | Executar `script_stockcontrol.sql` no SSMS | Banco criado sem erros; 3 usuários, 5 categorias, 3 fornecedores, 15 produtos | ✅ Passou |
-| B2 | `EXEC sp_ProdutosAbaixoDoMinimo` | 5 produtos: Detergente, Leite, Água, Café, Feijão | ✅ Passou |
+| B1 | Executar `script_stockcontrol.sql` no SSMS | Banco criado sem erros; 2 estabelecimentos; o 1º com 3 usuários, 5 categorias, 3 fornecedores e 15 produtos | ✅ Passou |
+| B2 | `EXEC sp_ProdutosAbaixoDoMinimo @EstabelecimentoId = 1` | 5 produtos: Detergente, Leite, Água, Café, Feijão | ✅ Passou |
+| B2b | `EXEC sp_ProdutosAbaixoDoMinimo @EstabelecimentoId = 2` | 2 produtos: Feijão, Banana (só os do estabelecimento 2) | ✅ Passou |
+| B2c | `sp_RegistrarMovimentacao` com o estabelecimento 2 vendendo o produto 1 (do estabelecimento 1) | Erro 50001 "Produto inexistente ou inativo." | ✅ Passou |
 | B3 | Cadastrar produto com estoque inicial 5 | ENTRADA de 5 registrada pela procedure; trigger deixa `EstoqueAtual = 5` | ✅ Passou |
 | B4 | Alterar o preço de 10,50 para 11,90 | Trigger grava `UPDATE_PRECO` (10.50 → 11.90) em `LogAuditoria` | ✅ Passou |
 | B5 | Atualização de estoque e desativação do produto | **Nenhum** registro extra em `LogAuditoria` (só mudança de preço é auditada) | ✅ Passou |
@@ -50,7 +52,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R6 | `GET /api/produtos` | 15 produtos ativos | ✅ Passou |
 | R7 | `GET /api/produtos/codigo-barras/7891000000011` | Arroz, com categoria e estoque | ✅ Passou |
 | R8 | Código de barras inexistente | 404 com mensagem | ✅ Passou |
-| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.8) |
+| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.9) |
 | R10 | Entrada de 10 unidades pelo código de barras | 201; `estoqueAtual` = 34 | ✅ Passou |
 | R11 | Venda de 100 detergentes (estoque 3) | 400 "Estoque insuficiente..." | ✅ Passou |
 | R12 | Tipo "TROCA" | 400 "O tipo deve ser ENTRADA ou SAIDA." | ✅ Passou |
@@ -60,7 +62,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R16 | `GET /api/movimentacoes` com período invertido | 400 "A data inicial não pode ser maior..." | ✅ Passou |
 | R17 | Admin cadastra categoria "Pães e Bolos" (com acento) | 201 | ✅ Passou |
 | R18 | Categoria com nome repetido | 400 "Já existe uma categoria com este nome." | ✅ Passou |
-| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.8) |
+| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.9) |
 | R20 | Alterar o preço do produto (PUT) | 200; preço novo e estoque mantido | ✅ Passou |
 | R21 | Excluir categoria que tem produto | 400 com mensagem | ✅ Passou |
 | R22 | Excluir produto com movimentação | 200; produto desativado | ✅ Passou |
@@ -88,7 +90,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | U8 | Reativar o Operador pela edição, com a senha em branco | Reativado; o login com a senha antiga continua funcionando | ✅ Passou |
 | U9 | Gerente abrindo `/Usuarios` | "Acesso negado"; o menu do Gerente não tem "Usuários" | ✅ Passou |
 | U10 | POST de venda sem o token anti-CSRF | Recusado com HTTP 400 | ✅ Passou |
-| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.8) |
+| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.9) |
 
 ## 7.6 Interface
 
@@ -111,10 +113,35 @@ Sistema rodando do zero com `dotnet run` (HTTPS na porta 7080) e o banco recriad
 | F6 | `http://localhost:5080/Produtos` | Redireciona (307) para `https://localhost:7080/Produtos` | ✅ Passou |
 | F7 | `/swagger` | Abre a documentação | ✅ Passou |
 
-## 7.8 Defeitos encontrados e corrigidos
+## 7.8 Vários estabelecimentos (isolamento e cadastro)
+
+Feitos com os dois estabelecimentos do seed (Mercadinho Bom Preço e Mercearia Dona Maria) e com um terceiro cadastrado pela tela.
+
+| # | Teste | Resultado esperado | Resultado |
+|---|---|---|---|
+| E1 | Dashboard do admin do Bom Preço × da Maria | Cabeçalho com o nome de cada estabelecimento; 15 × 5 produtos ativos; 5 × 2 abaixo do mínimo | ✅ Passou |
+| E2 | Listas de cada um (produtos, categorias, fornecedores, usuários, movimentações) | Bom Preço: 15 / 5 / 3 / 3 / 12; Maria: 5 / 2 / 1 / 1 / 4 | ✅ Passou |
+| E3 | Maria abre `/Produtos/Editar/1`, `/Categorias/Editar/1` e `/Usuarios/Editar/1` (registros do Bom Preço) | 404 nos três | ✅ Passou |
+| E4 | Admin do Bom Preço abre `/Produtos/Editar/16` (produto da Maria) | 404 | ✅ Passou |
+| E5 | Login da Maria pela API | Token com `estabelecimentoId = 2` e o nome "Mercearia Dona Maria" | ✅ Passou |
+| E6 | Maria: `GET /api/produtos/codigo-barras/7891000000011` (código que existe nos dois) | Devolve o Arroz **dela** (Id 16, R$ 27,50) | ✅ Passou |
+| E7 | Maria: `GET /api/produtos/1` | 404 | ✅ Passou |
+| E8 | Maria: vender pela API o produto 1 (do Bom Preço) | 400 "Produto não encontrado ou inativo." | ✅ Passou |
+| E9 | Cadastrar estabelecimento com CNPJ já cadastrado | "Este CNPJ já está cadastrado. Peça ao administrador..." | ✅ Passou |
+| E10 | Cadastrar com e-mail já usado | "Este e-mail já está em uso..." | ✅ Passou |
+| E11 | Cadastrar com CNPJ de dígito verificador errado | "CNPJ do estabelecimento inválido." | ✅ Passou |
+| E12 | Cadastro válido ("Mercado Teste") | Entra direto no Dashboard com mensagem de boas-vindas; 0 produtos, 6 categorias iniciais, 1 usuário; menu com "Estabelecimento" | ✅ Passou |
+| E13 | Dono do Mercado Teste cria a funcionária Carla (Operador) | Criada; Carla entra pela API vendo o "Mercado Teste" (0 produtos, 6 categorias) | ✅ Passou |
+| E14 | Admin do Bom Preço cria a categoria "Hortifrúti" (nome que existe só na Maria) | Criada | ✅ Passou |
+| E15 | Admin do Bom Preço cria "Mercearia" (já existe no Bom Preço) | "Já existe uma categoria com este nome." | ✅ Passou |
+| E16 | Dono renomeia o estabelecimento em "Meu estabelecimento" | Cabeçalho mostra o nome novo na hora | ✅ Passou |
+| E17 | Gerente abre `/Estabelecimento` | "Acesso negado" | ✅ Passou |
+
+## 7.9 Defeitos encontrados e corrigidos
 
 | Defeito | Causa | Correção |
 |---|---|---|
 | Depois de uma venda pela API, a resposta mostrava o estoque **antigo** (29 em vez de 27), embora o banco estivesse correto. | O Entity Framework guarda em memória os objetos já lidos na requisição. A trigger `trg_AtualizaEstoque` altera o estoque direto no banco, sem o EF saber, então a segunda leitura devolvia a cópia antiga. | Depois de executar a procedure, o `MovimentacaoDAO` recarrega do banco o produto que estava em memória (`Entry(produto).ReloadAsync()`). Testes R9 e R19 repetidos com sucesso. |
 | Mensagens de validação da API em inglês ("One or more validation errors occurred"). | Formato padrão do ASP.NET Core. | Resposta personalizada (`InvalidModelStateResponseFactory`) no formato `{ "mensagem": "Dados inválidos.", "erros": {...} }`. |
+| Campo **Telefone** (cadastro de estabelecimento e de fornecedor) menor e com borda diferente dos outros campos. | A regra de estilo dos campos de formulário não incluía `input[type="tel"]`. | `type="tel"` incluído na regra; conferido que Telefone e CNPJ ficaram idênticos (48 px de altura, mesma borda e fonte). |
 | No celular (375 px), o Dashboard ficava com 449 px de largura: o navegador reduzia o zoom e os quadros encostavam na borda. | Em um CSS Grid, cada coluna tem largura mínima igual ao seu conteúdo; a tabela de reposição "empurrava" a coluna para além da tela. | `min-width: 0` nas colunas do grid, para a tabela rolar por dentro do quadro. A página passou a ter exatamente 375 px. |

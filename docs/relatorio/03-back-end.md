@@ -13,7 +13,8 @@ Recebem a requisição HTTP, validam os dados de entrada (`ModelState`), chamam 
 
 | Controller | Função | Quem acessa |
 |---|---|---|
-| `ContaController` | Login, logout e acesso negado | Todos (login sem autenticação) |
+| `ContaController` | Login, logout, acesso negado e **cadastro de um novo estabelecimento** | Todos (login e cadastro sem autenticação) |
+| `EstabelecimentoController` | "Meu estabelecimento": dados do mercadinho | Somente Admin |
 | `HomeController` | Dashboard (totais, reposição, últimas movimentações) | Usuários logados |
 | `MovimentacoesController` | Registrar entrada/venda e listar por período | Usuários logados |
 | `ProdutosController` | Listagem com busca e CRUD de produtos | Consulta: todos; cadastro/edição/exclusão: Admin e Gerente |
@@ -39,6 +40,7 @@ Cada Service tem uma **interface** (`IProdutoService`) e uma **implementação**
 | `CategoriaService` | Nome obrigatório e único; não exclui categoria que tenha produtos. |
 | `FornecedorService` | Remove a máscara do CNPJ e **valida os dígitos verificadores**; CNPJ único; não exclui fornecedor que tenha produtos. |
 | `UsuarioService` | Senha com no mínimo 6 caracteres, guardada com hash BCrypt; e-mail único e sempre minúsculo; o sistema não pode ficar sem administrador ativo; o usuário não pode desativar nem excluir a si mesmo; usuário que já registrou movimentações é **desativado** em vez de excluído (o histórico precisa mostrar quem fez cada venda); na edição, senha em branco mantém a atual. |
+| `EstabelecimentoService` | Cadastro de mercadinho novo: CNPJ válido e ainda não usado, e-mail do dono ainda não usado, senha com no mínimo 6 caracteres; o dono vira Admin; cria 6 categorias iniciais; tudo em uma transação. Edição do nome, telefone e e-mail (o CNPJ não muda). |
 | `DashboardService` | Monta os totais do painel, os produtos abaixo do mínimo e as últimas movimentações. |
 
 Quando uma regra é violada, o Service lança uma `RegraNegocioException` com uma mensagem amigável. O Controller captura essa exceção e mostra a mensagem na tela (ou devolve no JSON).
@@ -85,6 +87,8 @@ classDiagram
 
 - `IDAOBase<T>` / `DAOBase<T>`: CRUD genérico, escrito uma única vez e herdado por `ProdutoDAO`, `CategoriaDAO`, `FornecedorDAO` e `UsuarioDAO`.
 - Cada DAO específico acrescenta suas consultas (ex.: `ProdutoDAO.ListarAbaixoDoMinimoAsync()` chama a procedure `sp_ProdutosAbaixoDoMinimo`).
+- `EstabelecimentoDAO` faz o cadastro do estabelecimento, do dono e das categorias iniciais **em uma única transação** (`BeginTransactionAsync` / `CommitAsync`).
+- Todos os DAOs passam pelo **filtro automático por estabelecimento** do `AppDbContext`. Só o login e a checagem de e-mail/CNPJ únicos usam `IgnoreQueryFilters()` (ver [10-multiestabelecimento.md](10-multiestabelecimento.md)).
 - `MovimentacaoDAO` **não** herda o CRUD genérico: uma movimentação é histórica e não pode ser editada nem excluída. Ela é registrada pela procedure `sp_RegistrarMovimentacao`.
 - Os erros lançados pela procedure (`THROW 50005 'Estoque insuficiente'`) são convertidos em `RegraNegocioException`.
 
@@ -99,7 +103,8 @@ classDiagram
 | **Herança** | `Usuario`, `Categoria`, `Fornecedor` e `Produto` herdam `Id` e `AtualizadoEm` de `EntidadeBase`. `ProdutoDAO`, `CategoriaDAO`, `FornecedorDAO` e `UsuarioDAO` herdam o CRUD de `DAOBase<T>`. |
 | **Encapsulamento** | `Produto.EstoqueAtual` tem `private set`: nenhum código C# consegue alterar o estoque diretamente; ele só muda por movimentação. `EntidadeBase.AtualizadoEm` tem `protected set` e só é alterada pelo método `MarcarComoAtualizado()`. Os DAOs guardam o `DbContext` em campos `protected readonly`. |
 | **Polimorfismo** | Os métodos de `DAOBase<T>` são `virtual` e são sobrescritos (`override`) pelos DAOs filhos. Por exemplo, `ProdutoDAO.ListarTodosAsync()` também carrega a categoria e o fornecedor. Os Services trabalham com interfaces (`IProdutoDAO`), sem depender da classe concreta. |
-| **Interfaces** | Todo Service e todo DAO tem uma interface (`IProdutoService`, `IProdutoDAO`...). |
+| **Interfaces** | Todo Service e todo DAO tem uma interface (`IProdutoService`, `IProdutoDAO`...). A interface `IPertenceAEstabelecimento` é implementada por `Usuario`, `Categoria`, `Fornecedor` e `Produto`: o `AppDbContext` trata todas elas da mesma forma ao preencher o estabelecimento (polimorfismo por interface). |
+| **Classe estática** | `Cnpj` reúne limpeza, formatação e validação de CNPJ, usadas por `Estabelecimento` e `Fornecedor` sem repetir código. |
 | **Métodos com comportamento** | As entidades não são só "sacos de dados": `Produto.EstaAbaixoDoMinimo()`, `Produto.TemEstoquePara(qtd)`, `Fornecedor.CnpjFormatado()`, `Usuario.EhAdmin()`. |
 | **Generics** | `IDAOBase<T>` e `DAOBase<T> where T : EntidadeBase` reaproveitam o mesmo código para qualquer entidade de cadastro. |
 
@@ -179,9 +184,11 @@ public ProdutoService(IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO, ...)
 
 ## 3.6 Estrutura administrativa (perfis de acesso)
 
+Os perfis valem **dentro do estabelecimento** do usuário: o Admin do Mercadinho A gerencia só a equipe e os dados do Mercadinho A.
+
 | Perfil | Pode fazer |
 |---|---|
-| **Admin** | Tudo, inclusive gerenciar usuários. |
+| **Admin** (dono) | Tudo, inclusive gerenciar os usuários (funcionários) e os dados do estabelecimento. |
 | **Gerente** | Cadastros (produtos, categorias, fornecedores), movimentações e relatórios. |
 | **Operador** | Consultar produtos e registrar entradas e vendas. |
 

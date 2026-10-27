@@ -1,8 +1,10 @@
 namespace StockControl.Models;
 
 /// <summary>Categoria de produtos (tabela Categoria).</summary>
-public class Categoria : EntidadeBase
+public class Categoria : EntidadeBase, IPertenceAEstabelecimento
 {
+    public int EstabelecimentoId { get; set; }
+
     public string Nome { get; set; } = string.Empty;
     public string? Descricao { get; set; }
 

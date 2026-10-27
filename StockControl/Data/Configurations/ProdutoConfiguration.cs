@@ -40,6 +40,13 @@ public class ProdutoConfiguration : IEntityTypeConfiguration<Produto>
             .HasForeignKey(p => p.FornecedorId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(p => p.CodigoBarras).IsUnique().HasDatabaseName("UX_Produto_CodigoBarras");
+        builder.HasOne<Estabelecimento>()
+            .WithMany()
+            .HasForeignKey(p => p.EstabelecimentoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Código de barras único dentro de cada estabelecimento
+        // (dois mercadinhos podem vender o mesmo arroz, com o mesmo código).
+        builder.HasIndex(p => new { p.EstabelecimentoId, p.CodigoBarras }).IsUnique().HasDatabaseName("UX_Produto_Estab_CodigoBarras");
     }
 }

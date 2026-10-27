@@ -12,7 +12,8 @@ Textos prontos (ou quase) para copiar para o relatório do PIM IV. Cada arquivo 
 | [06-api-rest.md](06-api-rest.md) | Endpoints REST para o app mobile, JWT, Swagger | Etapa 4 — APIs REST |
 | [07-testes-realizados.md](07-testes-realizados.md) | Testes manuais executados e resultados | Testes / Validação |
 | [08-conferencia-de-requisitos.md](08-conferencia-de-requisitos.md) | Cada requisito do PIM IV × o que foi entregue | Conclusão / Checklist de entrega |
-| [09-lista-de-prints.md](09-lista-de-prints.md) | Checklist dos 57 prints, na ordem certa, com legendas sugeridas | Montagem do relatório |
+| [09-lista-de-prints.md](09-lista-de-prints.md) | Checklist dos prints, na ordem certa, com legendas sugeridas | Montagem do relatório |
+| [10-multiestabelecimento.md](10-multiestabelecimento.md) | Vários mercadinhos no mesmo sistema: cadastro do estabelecimento, isolamento dos dados (banco, EF e sessão) | Etapa 4 — Arquitetura / Segurança; Etapa 7 — Banco |
 
 Arquivos de apoio:
 - [`../mer.md`](../mer.md) — diagrama MER/DER (Mermaid)

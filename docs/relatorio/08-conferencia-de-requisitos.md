@@ -40,7 +40,7 @@ Legenda: ✅ atendido · ➕ entregue além do pedido
 | Procedures chamadas pelo EF com SQL interpolado | ✅ | `MovimentacaoDAO`, `ProdutoDAO` |
 | Ordem do script: CREATE DATABASE → tabelas → índices → procedures → triggers → seed → testes comentados | ✅ | — |
 | PK, FK, UNIQUE e CHECK (ex.: Quantidade > 0, Tipo IN ...) | ✅ | — |
-| Seed: 1 admin, categorias, fornecedores, ~15 produtos, movimentações | ✅ | ➕ 3 usuários (um por perfil), 38 movimentações |
+| Seed: 1 admin, categorias, fornecedores, ~15 produtos, movimentações | ✅ | ➕ 2 estabelecimentos; o principal com 3 usuários (um por perfil), 15 produtos e 38 movimentações |
 | MER em Mermaid (`docs/mer.md`) | ✅ | `docs/mer.md` |
 | Modelo lógico (`docs/modelo-logico.md`) | ✅ | `docs/modelo-logico.md` |
 | Modelo físico = o script | ✅ | — |
@@ -56,6 +56,7 @@ Legenda: ✅ atendido · ➕ entregue além do pedido
 | Fornecedores: CRUD | ✅ | `/Fornecedores` ➕ validação do dígito verificador do CNPJ |
 | Movimentações: registrar entrada/saída + listagem por período | ✅ | `/Movimentacoes`, `/Movimentacoes/Registrar` |
 | Usuários: CRUD somente Admin (estrutura administrativa) | ✅ | `/Usuarios` ➕ proteção do último administrador |
+| ➕ Vários estabelecimentos no mesmo sistema | ➕ | `/Conta/Cadastrar` (cadastro do mercadinho + dono), `/Estabelecimento` (dados do mercadinho) e isolamento automático dos dados; ver [10-multiestabelecimento.md](10-multiestabelecimento.md) |
 | Layout simples, responsivo e acessível | ✅ | [04-front-end.md](04-front-end.md) |
 
 ## 8.4 API para o mobile
@@ -98,7 +99,8 @@ Legenda: ✅ atendido · ➕ entregue além do pedido
 ## 8.7 Resultado da revisão final
 
 - **Compilação:** 0 erros, 0 avisos.
-- **Banco recriado do zero pelo script:** 3 usuários, 5 categorias, 3 fornecedores, 15 produtos e 38 movimentações; 5 produtos abaixo do mínimo.
+- **Banco recriado do zero pelo script:** 2 estabelecimentos. Mercadinho Bom Preço com 3 usuários, 5 categorias, 3 fornecedores, 15 produtos e 38 movimentações (5 abaixo do mínimo); Mercearia Dona Maria com 1 usuário, 5 produtos e 10 movimentações (2 abaixo do mínimo).
+- **Isolamento entre estabelecimentos:** 17 testes (web, API e banco) sem nenhum vazamento de dados entre mercadinhos.
 - **Teste de todas as telas com os 3 perfis:** 51 de 51 combinações (17 páginas × 3 perfis) com o comportamento esperado (abre ou "Acesso negado").
 - **Outros:** id inexistente → 404; sem login → tela de login; `http://` → `https://`; Swagger no ar.
 - **Total de testes manuais registrados:** ver [07-testes-realizados.md](07-testes-realizados.md).

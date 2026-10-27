@@ -12,6 +12,7 @@ public class LogAuditoriaConfiguration : IEntityTypeConfiguration<LogAuditoria>
         builder.ToTable("LogAuditoria");
         builder.HasKey(l => l.Id);
 
+        builder.Property(l => l.EstabelecimentoId);
         builder.Property(l => l.Tabela).IsRequired().HasMaxLength(50);
         builder.Property(l => l.Acao).IsRequired().HasMaxLength(20);
         builder.Property(l => l.RegistroId).IsRequired();

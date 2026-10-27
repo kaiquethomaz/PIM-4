@@ -7,9 +7,22 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="pagina-login">
-    @* Layout sem menu, usado só na tela de login.
-       O <main> fica dentro da própria view (lado do formulário). *@
-    @RenderBody()
-    @await RenderSectionAsync("Scripts", required: false)
+    @* Layout sem menu, usado no Login e no Cadastro de estabelecimento:
+       painel da marca à esquerda + formulário à direita. *@
+    <div class="login-tela">
+        <partial name="_PainelMarca" />
+
+        <main class="login-formulario">
+            <div class="login-caixa @ViewData["ClasseCaixa"]">
+                <div class="login-logo-celular">
+                    <partial name="_Logo" />
+                </div>
+
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <script src="~/js/conta.js" asp-append-version="true"></script>
 </body>
 </html>

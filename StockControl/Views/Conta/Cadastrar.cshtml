@@ -1,0 +1,77 @@
+@model StockControl.ViewModels.CadastroEstabelecimentoViewModel
+@{
+    ViewData["Title"] = "Cadastrar estabelecimento";
+    ViewData["ClasseCaixa"] = "login-caixa-larga";
+    Layout = "_LayoutLogin";
+}
+
+<h1>Cadastrar meu estabelecimento</h1>
+<p class="login-subtitulo">
+    Crie a conta do seu mercadinho. Você será o <strong>administrador</strong> e depois poderá criar o acesso dos seus funcionários.
+</p>
+
+<form method="post" asp-action="Cadastrar" novalidate>
+    <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
+
+    @* fieldset + legend agrupam os campos e o leitor de tela anuncia o grupo *@
+    <fieldset class="grupo-cadastro">
+        <legend><span class="grupo-numero" aria-hidden="true">1</span> Dados do estabelecimento</legend>
+
+        <div class="campo">
+            <label asp-for="NomeFantasia">Nome do estabelecimento <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="NomeFantasia" type="text" maxlength="120" placeholder="Ex.: Mercadinho Bom Preço"
+                   required aria-required="true" autocomplete="organization" autofocus />
+            <span asp-validation-for="NomeFantasia" class="erro-campo"></span>
+        </div>
+
+        <div class="grade-2">
+            <div class="campo">
+                <label asp-for="CNPJ">CNPJ <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <input asp-for="CNPJ" type="text" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00"
+                       required aria-required="true" />
+                <span asp-validation-for="CNPJ" class="erro-campo"></span>
+            </div>
+            <div class="campo">
+                <label asp-for="Telefone"></label>
+                <input asp-for="Telefone" type="tel" maxlength="20" placeholder="(11) 4000-1000" autocomplete="tel" />
+                <span asp-validation-for="Telefone" class="erro-campo"></span>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="grupo-cadastro">
+        <legend><span class="grupo-numero" aria-hidden="true">2</span> Seus dados de acesso (administrador)</legend>
+
+        <div class="campo">
+            <label asp-for="NomeResponsavel">Seu nome <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="NomeResponsavel" type="text" maxlength="100" required aria-required="true" autocomplete="name" />
+            <span asp-validation-for="NomeResponsavel" class="erro-campo"></span>
+        </div>
+
+        <div class="campo">
+            <label asp-for="Email">E-mail (será o seu login) <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input asp-for="Email" type="email" maxlength="150" placeholder="seu.email@exemplo.com"
+                   required aria-required="true" autocomplete="email" />
+            <span asp-validation-for="Email" class="erro-campo"></span>
+        </div>
+
+        <div class="grade-2">
+            <div class="campo">
+                <label for="Senha">Senha <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <partial name="_CampoSenha" model='("Senha", "Senha", "Mín. 6 caracteres", "new-password")' />
+                <span asp-validation-for="Senha" class="erro-campo"></span>
+            </div>
+            <div class="campo">
+                <label for="ConfirmarSenha">Confirmar senha <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <partial name="_CampoSenha" model='("ConfirmarSenha", "ConfirmarSenha", "Repita a senha", "new-password")' />
+                <span asp-validation-for="ConfirmarSenha" class="erro-campo"></span>
+            </div>
+        </div>
+    </fieldset>
+
+    <button type="submit" class="botao botao-grande">Criar conta do estabelecimento</button>
+</form>
+
+<p class="login-ajuda">
+    Já tem conta? <a asp-action="Login">Entrar</a>
+</p>

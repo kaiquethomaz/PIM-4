@@ -39,12 +39,17 @@
                     @if (User.IsInRole("Admin"))
                     {
                         <li><a asp-controller="Usuarios" asp-action="Index" aria-current="@Atual("Usuarios")">Usuários</a></li>
+                        <li><a asp-controller="Estabelecimento" asp-action="Index" aria-current="@Atual("Estabelecimento")">Estabelecimento</a></li>
                     }
                 </ul>
             </nav>
 
             <div class="usuario-logado">
-                <span>@User.Identity?.Name <span class="somente-leitor">, perfil</span> (@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value)</span>
+                <span>
+                    <span class="estabelecimento-atual">@User.FindFirst(StockControl.Extensions.ClaimsStockControl.Estabelecimento)?.Value</span>
+                    <span class="separador" aria-hidden="true">·</span>
+                    @User.Identity?.Name <span class="somente-leitor">, perfil</span> (@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value)
+                </span>
                 <form method="post" asp-controller="Conta" asp-action="Sair">
                     <button type="submit">Sair</button>
                 </form>

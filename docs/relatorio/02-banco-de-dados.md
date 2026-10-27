@@ -4,6 +4,8 @@
 
 O banco de dados do StockControl roda no **Microsoft SQL Server** (edição Express 2025) e se chama `StockControl`. Ele é usado pelo sistema web e, por meio da API, pelo aplicativo mobile.
 
+Um único banco atende **vários estabelecimentos** (mercadinhos). Cada usuário, categoria, fornecedor e produto pertence a um estabelecimento (`EstabelecimentoId`), e cada estabelecimento só enxerga os próprios dados (detalhes em [10-multiestabelecimento.md](10-multiestabelecimento.md)).
+
 O banco é criado **por um único script SQL** ([`database/script_stockcontrol.sql`](../../database/script_stockcontrol.sql)), que é o **modelo físico** do sistema. O Entity Framework Core, usado na aplicação, **não cria nem altera** tabelas (não são usadas *migrations*): ele apenas mapeia as tabelas criadas pelo script.
 
 **Por que um script único em vez de migrations?**
@@ -26,6 +28,10 @@ O diagrama completo está em [`docs/mer.md`](../mer.md).
 
 ```mermaid
 erDiagram
+    ESTABELECIMENTO ||--o{ USUARIO : "emprega"
+    ESTABELECIMENTO ||--o{ CATEGORIA : "possui"
+    ESTABELECIMENTO ||--o{ FORNECEDOR : "compra de"
+    ESTABELECIMENTO ||--o{ PRODUTO : "vende"
     USUARIO ||--o{ MOVIMENTACAO : "registra"
     PRODUTO ||--o{ MOVIMENTACAO : "sofre"
     CATEGORIA ||--o{ PRODUTO : "classifica"
@@ -35,7 +41,8 @@ erDiagram
 
 | Entidade | Descrição |
 |---|---|
-| **Usuario** | Pessoa que acessa o sistema; o perfil (Admin, Gerente, Operador) define as permissões. |
+| **Estabelecimento** | Mercadinho que usa o sistema; criado pela tela "Cadastrar meu estabelecimento", junto com o dono (Admin). |
+| **Usuario** | Pessoa que acessa o sistema e trabalha em um estabelecimento; o perfil (Admin, Gerente, Operador) define as permissões. |
 | **Categoria** | Agrupamento de produtos (Mercearia, Bebidas, Limpeza...). |
 | **Fornecedor** | Empresa que fornece os produtos ao mercadinho. |
 | **Produto** | Item vendido, com preço, estoque atual e estoque mínimo. |
@@ -43,6 +50,7 @@ erDiagram
 | **LogAuditoria** | Histórico automático de alterações de preço e exclusões de produtos. |
 
 **Relacionamentos:**
+- Um **estabelecimento** tem vários usuários, categorias, fornecedores e produtos; cada um deles pertence a um único estabelecimento (1:N).
 - Uma **categoria** classifica vários produtos; cada produto pertence a uma categoria (1:N).
 - Um **fornecedor** fornece vários produtos; cada produto tem um fornecedor (1:N).
 - Um **produto** possui várias movimentações; cada movimentação refere-se a um produto (1:N).
@@ -55,10 +63,11 @@ O detalhamento de todas as colunas, tipos, chaves e restrições está em [`docs
 
 | Tabela | Chave primária | Chaves estrangeiras | Únicos | Principais restrições (CHECK) |
 |---|---|---|---|---|
-| Usuario | Id | — | Email | Perfil ∈ {Admin, Gerente, Operador}; formato de e-mail |
-| Categoria | Id | — | — | — |
-| Fornecedor | Id | — | CNPJ | CNPJ com 14 dígitos numéricos |
-| Produto | Id | CategoriaId, FornecedorId | CodigoBarras | Preço ≥ 0; EstoqueAtual ≥ 0; EstoqueMinimo ≥ 0 |
+| Estabelecimento | Id | — | CNPJ | CNPJ com 14 dígitos numéricos |
+| Usuario | Id | EstabelecimentoId | Email | Perfil ∈ {Admin, Gerente, Operador}; formato de e-mail |
+| Categoria | Id | EstabelecimentoId | (EstabelecimentoId, Nome) | — |
+| Fornecedor | Id | EstabelecimentoId | (EstabelecimentoId, CNPJ) | CNPJ com 14 dígitos numéricos |
+| Produto | Id | EstabelecimentoId, CategoriaId, FornecedorId | (EstabelecimentoId, CodigoBarras) | Preço ≥ 0; EstoqueAtual ≥ 0; EstoqueMinimo ≥ 0 |
 | Movimentacao | Id | ProdutoId, UsuarioId | — | Tipo ∈ {ENTRADA, SAIDA}; Quantidade > 0 |
 | LogAuditoria | Id | — | — | — |
 
@@ -75,7 +84,7 @@ O detalhamento de todas as colunas, tipos, chaves e restrições está em [`docs
 O modelo está na **3ª Forma Normal (3FN)**:
 - **1FN:** todas as colunas são atômicas (um único valor por campo).
 - **2FN:** as chaves primárias são simples, então não há dependência parcial.
-- **3FN:** não há dependência transitiva. Por exemplo, o nome da categoria fica apenas em `Categoria`; `Produto` guarda somente `CategoriaId`.
+- **3FN:** não há dependência transitiva. Por exemplo, o nome da categoria fica apenas em `Categoria`; `Produto` guarda somente `CategoriaId`. Pelo mesmo motivo, `Movimentacao` não guarda `EstabelecimentoId`: ele é obtido pelo produto.
 
 **Desnormalização controlada:** `Produto.EstoqueAtual` poderia ser calculado somando todas as movimentações, mas é armazenado para que o dashboard e o app consultem o estoque instantaneamente. A consistência é garantida pela trigger `trg_AtualizaEstoque`, a única responsável por alterar essa coluna.
 
@@ -85,23 +94,25 @@ O modelo físico é o próprio script. Exemplo da tabela `Produto`:
 
 ```sql
 CREATE TABLE Produto (
-    Id            INT IDENTITY(1,1) NOT NULL,
-    Nome          NVARCHAR(120)     NOT NULL,
-    CodigoBarras  VARCHAR(20)       NOT NULL,
-    Preco         DECIMAL(10,2)     NOT NULL,
-    EstoqueAtual  INT               NOT NULL CONSTRAINT DF_Produto_EstoqueAtual DEFAULT 0,
-    EstoqueMinimo INT               NOT NULL CONSTRAINT DF_Produto_EstoqueMinimo DEFAULT 0,
-    CategoriaId   INT               NOT NULL,
-    FornecedorId  INT               NOT NULL,
-    Ativo         BIT               NOT NULL CONSTRAINT DF_Produto_Ativo        DEFAULT 1,
-    AtualizadoEm  DATETIME2         NOT NULL CONSTRAINT DF_Produto_AtualizadoEm DEFAULT SYSDATETIME(),
+    Id                INT IDENTITY(1,1) NOT NULL,
+    EstabelecimentoId INT               NOT NULL,
+    Nome              NVARCHAR(120)     NOT NULL,
+    CodigoBarras      VARCHAR(20)       NOT NULL,
+    Preco             DECIMAL(10,2)     NOT NULL,
+    EstoqueAtual      INT               NOT NULL CONSTRAINT DF_Produto_EstoqueAtual DEFAULT 0,
+    EstoqueMinimo     INT               NOT NULL CONSTRAINT DF_Produto_EstoqueMinimo DEFAULT 0,
+    CategoriaId       INT               NOT NULL,
+    FornecedorId      INT               NOT NULL,
+    Ativo             BIT               NOT NULL CONSTRAINT DF_Produto_Ativo        DEFAULT 1,
+    AtualizadoEm      DATETIME2         NOT NULL CONSTRAINT DF_Produto_AtualizadoEm DEFAULT SYSDATETIME(),
 
-    CONSTRAINT PK_Produto            PRIMARY KEY (Id),
-    CONSTRAINT FK_Produto_Categoria  FOREIGN KEY (CategoriaId)  REFERENCES Categoria (Id),
-    CONSTRAINT FK_Produto_Fornecedor FOREIGN KEY (FornecedorId) REFERENCES Fornecedor (Id),
-    CONSTRAINT CK_Produto_Preco         CHECK (Preco >= 0),
-    CONSTRAINT CK_Produto_EstoqueAtual  CHECK (EstoqueAtual >= 0),
-    CONSTRAINT CK_Produto_EstoqueMinimo CHECK (EstoqueMinimo >= 0)
+    CONSTRAINT PK_Produto                 PRIMARY KEY (Id),
+    CONSTRAINT FK_Produto_Estabelecimento FOREIGN KEY (EstabelecimentoId) REFERENCES Estabelecimento (Id),
+    CONSTRAINT FK_Produto_Categoria       FOREIGN KEY (CategoriaId)  REFERENCES Categoria (Id),
+    CONSTRAINT FK_Produto_Fornecedor      FOREIGN KEY (FornecedorId) REFERENCES Fornecedor (Id),
+    CONSTRAINT CK_Produto_Preco           CHECK (Preco >= 0),
+    CONSTRAINT CK_Produto_EstoqueAtual    CHECK (EstoqueAtual >= 0),
+    CONSTRAINT CK_Produto_EstoqueMinimo   CHECK (EstoqueMinimo >= 0)
 );
 ```
 
@@ -110,11 +121,11 @@ Todas as restrições têm **nome explícito** (`PK_`, `FK_`, `CK_`, `DF_`, `UX_
 ## 2.5 Procedures (procedimentos armazenados)
 
 ### `sp_RegistrarMovimentacao`
-Registra uma entrada ou uma saída de estoque. É a forma oficial de movimentar o estoque, usada pelo sistema web e pela API.
+Registra uma entrada ou uma saída de estoque. É a forma oficial de movimentar o estoque, usada pelo sistema web e pela API. Parâmetros: `@EstabelecimentoId`, `@ProdutoId`, `@Tipo`, `@Quantidade`, `@UsuarioId`, `@Observacao` (opcional) e `@Data` (opcional).
 
-1. Valida o tipo (`ENTRADA`/`SAIDA`), a quantidade (> 0) e se o usuário existe e está ativo.
+1. Valida o tipo (`ENTRADA`/`SAIDA`), a quantidade (> 0) e se o usuário existe, está ativo e **é do estabelecimento informado**.
 2. Abre uma **transação**.
-3. Lê o estoque do produto com **bloqueio da linha** (`WITH (UPDLOCK, HOLDLOCK)`). Se duas vendas do mesmo produto chegarem ao mesmo tempo (por exemplo, uma pela web e outra pelo celular), a segunda espera a primeira terminar. Isso evita vender um produto que já acabou.
+3. Lê o estoque do produto (que precisa ser **do mesmo estabelecimento**; o produto de outro mercadinho "não existe" para ele) com **bloqueio da linha** (`WITH (UPDLOCK, HOLDLOCK)`). Se duas vendas do mesmo produto chegarem ao mesmo tempo (por exemplo, uma pela web e outra pelo celular), a segunda espera a primeira terminar. Isso evita vender um produto que já acabou.
 4. Na saída, verifica se há estoque suficiente; se não houver, gera o erro 50005 "Estoque insuficiente".
 5. Insere a movimentação e confirma a transação (`COMMIT`). Em qualquer erro, desfaz tudo (`ROLLBACK`).
 6. Devolve o Id da movimentação criada.
@@ -132,10 +143,10 @@ Erros personalizados (`THROW`), convertidos em mensagens amigáveis na aplicaç�
 | 50005 | Estoque insuficiente para esta saída. |
 
 ### `sp_ProdutosAbaixoDoMinimo`
-Lista os produtos ativos cujo `EstoqueAtual` é menor que o `EstoqueMinimo`, com a quantidade que falta para chegar ao mínimo. É usada no **dashboard** como alerta de reposição.
+Recebe `@EstabelecimentoId` e lista os produtos ativos daquele estabelecimento cujo `EstoqueAtual` é menor que o `EstoqueMinimo`, com a quantidade que falta para chegar ao mínimo. É usada no **dashboard** como alerta de reposição.
 
 ### `sp_RelatorioMovimentacoes`
-Recebe `@DataInicio` e `@DataFim` e devolve as movimentações do período (os dois dias inclusos), com o nome do produto e do usuário. É usada na tela e no relatório de movimentações.
+Recebe `@EstabelecimentoId`, `@DataInicio` e `@DataFim` e devolve as movimentações do estabelecimento no período (os dois dias inclusos), com o nome do produto e do usuário. É usada na tela e no relatório de movimentações.
 
 ## 2.6 Triggers (gatilhos)
 
@@ -158,7 +169,7 @@ INNER JOIN (
 A trigger trabalha com **conjuntos** (`inserted` + `GROUP BY`), e não com uma linha só, então funciona mesmo quando um único comando insere várias movimentações. Se o resultado deixasse o estoque negativo, a restrição `CK_Produto_EstoqueAtual` falharia e toda a operação seria desfeita: é uma **segunda barreira** de segurança, além da procedure.
 
 ### `trg_AuditoriaProduto` — `AFTER UPDATE, DELETE` em `Produto`
-Grava em `LogAuditoria`:
+Grava em `LogAuditoria`, junto com o estabelecimento do produto:
 - **`UPDATE_PRECO`:** quando o preço muda, com o valor antigo e o novo.
 - **`DELETE`:** quando um produto é excluído, com os dados que ele tinha.
 
@@ -166,33 +177,45 @@ Como a trigger de estoque também faz `UPDATE` em `Produto`, a auditoria filtra 
 
 ## 2.7 Índices (otimização)
 
-| Índice | Coluna | Tipo | Motivo |
+| Índice | Coluna(s) | Tipo | Motivo |
 |---|---|---|---|
-| UX_Produto_CodigoBarras | Produto.CodigoBarras | Único | Busca rápida pelo leitor de código de barras; impede duplicados |
-| UX_Usuario_Email | Usuario.Email | Único | Login; impede e-mail repetido |
-| UX_Fornecedor_CNPJ | Fornecedor.CNPJ | Único | Impede fornecedor duplicado |
+| UX_Estabelecimento_CNPJ | Estabelecimento.CNPJ | Único | Um CNPJ = um estabelecimento |
+| UX_Usuario_Email | Usuario.Email | Único | Login; e-mail não se repete no sistema todo |
+| UX_Produto_Estab_CodigoBarras | Produto (EstabelecimentoId, CodigoBarras) | Único composto | Busca rápida pelo leitor; código não se repete no mesmo estabelecimento |
+| UX_Fornecedor_Estab_CNPJ | Fornecedor (EstabelecimentoId, CNPJ) | Único composto | Fornecedor não é cadastrado duas vezes no mesmo estabelecimento |
+| UX_Categoria_Estab_Nome | Categoria (EstabelecimentoId, Nome) | Único composto | Nome de categoria não se repete no mesmo estabelecimento |
+| IX_Usuario_EstabelecimentoId | Usuario.EstabelecimentoId | Comum | Lista da equipe do estabelecimento |
 | IX_Produto_CategoriaId / IX_Produto_FornecedorId | FKs de Produto | Comum | Acelera JOINs |
 | IX_Movimentacao_ProdutoId / IX_Movimentacao_UsuarioId | FKs de Movimentacao | Comum | Acelera JOINs e o histórico do produto |
 | IX_Movimentacao_Data | Movimentacao.Data | Comum | Relatório por período |
-| IX_Produto_AtualizadoEm | Produto.AtualizadoEm | Comum | Sincronização do app mobile |
+| IX_Produto_Estab_AtualizadoEm | Produto (EstabelecimentoId, AtualizadoEm) | Comum composto | Sincronização do app mobile |
 
 O SQL Server cria índice automaticamente só para a chave primária; as chaves estrangeiras **não** recebem índice sozinhas, por isso eles foram criados no script.
 
+**Por que os índices únicos são compostos?** Dois mercadinhos diferentes podem vender o mesmo arroz (mesmo código de barras) e comprar do mesmo distribuidor (mesmo CNPJ). O que não pode é o **mesmo** estabelecimento cadastrar duas vezes. Como os índices começam por `EstabelecimentoId`, eles também aceleram as consultas filtradas por estabelecimento, que são todas.
+
 ## 2.8 Dados de teste (seed)
 
-O script insere:
-- **3 usuários**, um de cada perfil (senhas guardadas como hash BCrypt);
-- **5 categorias** e **3 fornecedores** (CNPJs fictícios com dígitos verificadores válidos);
-- **15 produtos** de mercadinho, começando com estoque zero;
-- **38 movimentações** dos últimos 30 dias (16 entradas e 22 vendas), registradas **pela própria procedure**. O estoque inicial é formado pelas triggers, exatamente como no uso real do sistema.
+O script cria **dois estabelecimentos**, para demonstrar que um não enxerga os dados do outro:
 
-Depois do seed, 5 produtos ficam abaixo do mínimo (Feijão, Café, Água, Leite e Detergente), o que permite demonstrar o alerta do dashboard.
+| | Mercadinho Bom Preço | Mercearia Dona Maria |
+|---|---|---|
+| Usuários | 3 (um de cada perfil) | 1 (Admin) |
+| Categorias / Fornecedores | 5 / 3 | 2 / 1 |
+| Produtos | 15 | 5 |
+| Movimentações (últimos 30 dias) | 38 | 10 |
+| Abaixo do mínimo | 5 (Feijão, Café, Água, Leite, Detergente) | 2 (Feijão, Banana) |
 
-| Usuário | Perfil |
-|---|---|
-| admin@stockcontrol.local | Admin |
-| gerente@stockcontrol.local | Gerente |
-| operador@stockcontrol.local | Operador |
+- Senhas guardadas como hash BCrypt; CNPJs fictícios com dígitos verificadores válidos.
+- Os produtos começam com estoque zero e as movimentações são registradas **pela própria procedure**: o estoque é formado pelas triggers, exatamente como no uso real.
+- De propósito, o **Arroz** tem o mesmo código de barras nos dois estabelecimentos, a categoria **"Mercearia"** existe nos dois e a **Distribuidora Alfa** (mesmo CNPJ) atende os dois, o que é permitido porque a unicidade vale por estabelecimento.
+
+| Usuário | Senha | Perfil | Estabelecimento |
+|---|---|---|---|
+| admin@stockcontrol.local | Admin@123 | Admin | Mercadinho Bom Preço |
+| gerente@stockcontrol.local | Gerente@123 | Gerente | Mercadinho Bom Preço |
+| operador@stockcontrol.local | Operador@123 | Operador | Mercadinho Bom Preço |
+| maria@donamaria.local | Maria@123 | Admin | Mercearia Dona Maria |
 
 ## 2.9 Integração com a aplicação (Entity Framework Core)
 
@@ -209,8 +232,11 @@ Depois do seed, 5 produtos ficam abaixo do mínimo (Feijão, Café, Água, Leite
 
   ```csharp
   _contexto.Database.SqlQuery<IdGerado>($@"EXEC sp_RegistrarMovimentacao
+      @EstabelecimentoId = {_contexto.EstabelecimentoAtualId},
       @ProdutoId = {movimentacao.ProdutoId}, @Tipo = {tipo}, ...")
   ```
+
+- **Filtro automático por estabelecimento (*Global Query Filter*):** o `AppDbContext` acrescenta `WHERE EstabelecimentoId = @estabelecimentoDoUsuario` em todas as consultas das tabelas de cadastro, e preenche o `EstabelecimentoId` ao salvar registros novos. Detalhes em [10-multiestabelecimento.md](10-multiestabelecimento.md).
 
 - A coluna `EstoqueAtual` foi configurada para **nunca ser enviada em um UPDATE** pelo EF (`SetAfterSaveBehavior(Ignore)`), garantindo que só a trigger altere o estoque.
 

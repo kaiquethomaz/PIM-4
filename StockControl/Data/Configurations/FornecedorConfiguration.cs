@@ -21,6 +21,13 @@ public class FornecedorConfiguration : IEntityTypeConfiguration<Fornecedor>
         builder.Property(f => f.Email).HasMaxLength(150);
         builder.Property(f => f.AtualizadoEm).IsRequired();
 
-        builder.HasIndex(f => f.CNPJ).IsUnique().HasDatabaseName("UX_Fornecedor_CNPJ");
+        builder.HasOne<Estabelecimento>()
+            .WithMany()
+            .HasForeignKey(f => f.EstabelecimentoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // O mesmo fornecedor (CNPJ) pode atender vários estabelecimentos,
+        // mas não pode ser cadastrado duas vezes no mesmo.
+        builder.HasIndex(f => new { f.EstabelecimentoId, f.CNPJ }).IsUnique().HasDatabaseName("UX_Fornecedor_Estab_CNPJ");
     }
 }

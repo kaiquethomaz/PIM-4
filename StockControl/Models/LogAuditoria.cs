@@ -7,6 +7,7 @@ namespace StockControl.Models;
 public class LogAuditoria
 {
     public int Id { get; set; }
+    public int? EstabelecimentoId { get; set; }
     public string Tabela { get; set; } = string.Empty;
     public string Acao { get; set; } = string.Empty;
     public int RegistroId { get; set; }

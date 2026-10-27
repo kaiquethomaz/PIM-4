@@ -23,7 +23,13 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.CriadoEm).IsRequired();
         builder.Property(u => u.AtualizadoEm).IsRequired();
 
-        // Documenta o índice único que o script SQL já criou.
+        // Cada usuário trabalha em um estabelecimento (N:1).
+        builder.HasOne(u => u.Estabelecimento)
+            .WithMany()
+            .HasForeignKey(u => u.EstabelecimentoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // E-mail é o login: único no sistema inteiro (documenta o índice do script).
         builder.HasIndex(u => u.Email).IsUnique().HasDatabaseName("UX_Usuario_Email");
     }
 }

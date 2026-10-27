@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using StockControl.Dtos;
+using StockControl.Extensions;
 using StockControl.Models;
 
 namespace StockControl.Services;
@@ -43,6 +44,9 @@ public class TokenService : ITokenService
                 new Claim("name", usuario.Nome),
                 new Claim("email", usuario.Email),
                 new Claim("role", usuario.Perfil.ToString()),     // usado no [Authorize(Roles = ...)]
+                // Estabelecimento do usuário: a API filtra todos os dados por ele.
+                new Claim(ClaimsStockControl.EstabelecimentoId, usuario.EstabelecimentoId.ToString()),
+                new Claim(ClaimsStockControl.Estabelecimento, usuario.Estabelecimento?.NomeFantasia ?? string.Empty),
                 new Claim("jti", Guid.NewGuid().ToString())       // identificador único do token
             })
         };

@@ -42,12 +42,20 @@ public class UsuarioResumo
     /// <summary>Admin, Gerente ou Operador.</summary>
     public string Perfil { get; set; } = string.Empty;
 
+    /// <summary>Estabelecimento (mercadinho) do usuário. Todos os dados da API são deste estabelecimento.</summary>
+    public int EstabelecimentoId { get; set; }
+
+    /// <example>Mercadinho Bom Preço</example>
+    public string Estabelecimento { get; set; } = string.Empty;
+
     public static UsuarioResumo DeModelo(Usuario usuario) => new()
     {
         Id = usuario.Id,
         Nome = usuario.Nome,
         Email = usuario.Email,
-        Perfil = usuario.Perfil.ToString()
+        Perfil = usuario.Perfil.ToString(),
+        EstabelecimentoId = usuario.EstabelecimentoId,
+        Estabelecimento = usuario.Estabelecimento?.NomeFantasia ?? string.Empty
     };
 }
 

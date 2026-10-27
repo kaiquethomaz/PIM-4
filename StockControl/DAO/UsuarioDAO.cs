@@ -15,14 +15,26 @@ public class UsuarioDAO : DAOBase<Usuario>, IUsuarioDAO
         return await _tabela.AsNoTracking().OrderBy(u => u.Nome).ToListAsync();
     }
 
+    public override async Task<Usuario?> BuscarPorIdAsync(int id)
+    {
+        return await _tabela.Include(u => u.Estabelecimento).FirstOrDefaultAsync(u => u.Id == id);
+    }
+
     public async Task<Usuario?> BuscarPorEmailAsync(string email)
     {
-        return await _tabela.FirstOrDefaultAsync(u => u.Email == email);
+        // Usado no LOGIN: ainda não sabemos o estabelecimento (ninguém está logado),
+        // então ignoramos o filtro automático e buscamos no sistema inteiro.
+        return await _tabela
+            .IgnoreQueryFilters()
+            .Include(u => u.Estabelecimento)
+            .FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<bool> EmailExisteAsync(string email, int? ignorarId = null)
     {
-        return await _tabela.AnyAsync(u => u.Email == email && u.Id != ignorarId);
+        // O e-mail é o login, então precisa ser único no sistema inteiro
+        // (não só no estabelecimento): ignora o filtro automático.
+        return await _tabela.IgnoreQueryFilters().AnyAsync(u => u.Email == email && u.Id != ignorarId);
     }
 
     public async Task<int> ContarAdminsAtivosAsync()
