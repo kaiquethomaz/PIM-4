@@ -3,7 +3,13 @@
     ViewData["Title"] = Model.EhNovo ? "Nova categoria" : "Editar categoria";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="barra-titulo">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p class="subtitulo">Categorias organizam os produtos do estabelecimento.</p>
+    </div>
+    <a class="botao botao-secundario" asp-action="Index">Voltar para a lista</a>
+</div>
 
 <div class="cartao formulario">
     <form method="post" asp-action="@(Model.EhNovo ? "Criar" : "Editar")" asp-route-id="@(Model.EhNovo ? null : Model.Id)" novalidate>

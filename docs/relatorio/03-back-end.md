@@ -41,7 +41,7 @@ Cada Service tem uma **interface** (`IProdutoService`) e uma **implementação**
 | `FornecedorService` | Remove a máscara do CNPJ e **valida os dígitos verificadores**; CNPJ único; não exclui fornecedor que tenha produtos. |
 | `UsuarioService` | Senha com no mínimo 6 caracteres, guardada com hash BCrypt; e-mail único e sempre minúsculo; o sistema não pode ficar sem administrador ativo; o usuário não pode desativar nem excluir a si mesmo; usuário que já registrou movimentações é **desativado** em vez de excluído (o histórico precisa mostrar quem fez cada venda); na edição, senha em branco mantém a atual. |
 | `EstabelecimentoService` | Cadastro de mercadinho novo: CNPJ válido e ainda não usado, e-mail do dono ainda não usado, senha com no mínimo 6 caracteres; o dono vira Admin; cria 6 categorias iniciais; tudo em uma transação. Edição do nome, telefone e e-mail (o CNPJ não muda). |
-| `DashboardService` | Monta os totais do painel, os produtos abaixo do mínimo e as últimas movimentações. |
+| `DashboardService` | Monta os indicadores do painel: vendas de hoje em R$ e em itens, vendas dos últimos 7 dias (completando com zero os dias sem venda, para o gráfico), produtos abaixo do mínimo, valor em estoque e as últimas movimentações. O valor de cada venda é quantidade × preço atual do produto. |
 
 Quando uma regra é violada, o Service lança uma `RegraNegocioException` com uma mensagem amigável. O Controller captura essa exceção e mostra a mensagem na tela (ou devolve no JSON).
 

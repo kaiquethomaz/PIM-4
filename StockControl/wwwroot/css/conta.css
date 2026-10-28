@@ -1,0 +1,217 @@
+/* =====================================================================
+   StockControl - telas de conta (Login e Cadastro de estabelecimento)
+   Usa as variáveis e componentes do site.css (carregado antes).
+   ===================================================================== */
+
+/* ---------------- Login (tela dividida) ---------------- */
+.pagina-login { background: var(--superficie); }
+
+.login-tela {
+    display: grid;
+    grid-template-columns: minmax(380px, 5fr) 6fr;
+    min-height: 100vh;
+}
+
+/* Lado esquerdo: painel da marca */
+.login-marca {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 32px;
+    padding: 40px 48px;
+    color: #e2e8f0;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.35), transparent 45%),
+        radial-gradient(circle at 10% 90%, rgba(29, 78, 216, 0.45), transparent 50%),
+        var(--azul-escuro);
+}
+/* Grade sutil de fundo (só decoração) */
+.login-marca::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 85%);
+    pointer-events: none;
+}
+.login-marca > * { position: relative; }
+.login-marca-topo .logo-texto { color: #fff; }
+
+.login-marca-conteudo { max-width: 440px; }
+.login-destaque {
+    font-size: 2rem;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+}
+.login-marca-conteudo > p:not(.login-destaque) { color: #cbd5e1; margin: 0 0 32px; font-size: 1.05rem; }
+
+.login-recursos { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.login-recursos li { display: flex; align-items: center; gap: 14px; color: #cbd5e1; }
+.login-recursos strong { color: #fff; font-weight: 600; }
+.recurso-icone {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #93c5fd;
+}
+.recurso-icone svg { width: 20px; height: 20px; }
+
+.login-marca-rodape { margin: 0; font-size: 0.85rem; color: #94a3b8; }
+
+/* Lado direito: formulário */
+.login-formulario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: var(--superficie);
+}
+.login-caixa { width: 100%; max-width: 380px; }
+.login-caixa h1 { font-size: 1.75rem; margin: 0 0 6px; letter-spacing: -0.02em; }
+.login-subtitulo { color: var(--texto-suave); margin: 0 0 28px; }
+.login-logo-celular { display: none; margin-bottom: 28px; }
+
+.login-caixa .campo input[type="email"],
+.login-caixa .campo input[type="password"],
+.login-caixa .campo input[type="text"],
+.login-caixa .campo input[type="tel"] {
+    height: 48px;
+    border-color: var(--borda-campo);   /* contraste de 3:1 exigido para bordas de campos */
+    background: #f8fafc;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.login-caixa .campo input:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+}
+/* Foco por teclado: contorno azul sólido (bem visível, mas combinando com o login,
+   que já abre com o cursor no e-mail por causa do autofocus) */
+.login-caixa .campo input:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+
+.campo-com-icone { position: relative; }
+.campo-com-icone .campo-icone {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: #64748b;
+    pointer-events: none;
+}
+.campo-com-icone .campo-icone svg { width: 18px; height: 18px; display: block; }
+.campo-com-icone input { padding-left: 44px !important; }
+.campo-com-icone .campo-senha { padding-right: 48px !important; }
+
+.botao-ver-senha {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+}
+.botao-ver-senha:hover { background: #e2e8f0; color: var(--texto); }
+.botao-ver-senha svg { width: 18px; height: 18px; }
+.botao-ver-senha .icone-olho-fechado { display: none; }
+.botao-ver-senha[aria-pressed="true"] .icone-olho { display: none; }
+.botao-ver-senha[aria-pressed="true"] .icone-olho-fechado { display: block; }
+
+.botao-grande {
+    width: 100%;
+    height: 48px;
+    margin-top: 8px;
+    border-radius: var(--raio);
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+}
+
+.login-ajuda {
+    margin: 20px 0 0;
+    font-size: 0.9rem;
+    color: var(--texto-suave);
+    text-align: center;
+}
+
+/* Bloco "Ainda não usa o StockControl?" no fim do login */
+.login-cadastro {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.95rem;
+    color: var(--texto-suave);
+    text-align: center;
+}
+.botao-largo {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Tela de cadastro: caixa mais larga e campos agrupados */
+.login-caixa-larga { max-width: 560px; }
+.grupo-cadastro {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px 4px;
+    margin: 0 0 20px;
+}
+.grupo-cadastro legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 6px;
+    font-weight: 700;
+    color: var(--texto);
+}
+.grupo-numero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--azul-claro);
+    color: var(--azul);
+    font-size: 0.85rem;
+}
+.login-caixa .alerta { margin-bottom: 20px; }
+
+/* Tablet e celular: esconde o painel da marca e mostra o logo em cima do formulário */
+@media (max-width: 900px) {
+    .login-tela { grid-template-columns: 1fr; }
+    .login-marca { display: none; }
+    .login-logo-celular { display: block; }
+    .login-formulario { align-items: flex-start; padding-top: 40px; }
+}
+@media (max-width: 520px) {
+    .grupo-cadastro { padding: 12px 14px 0; }
+}

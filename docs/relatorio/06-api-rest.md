@@ -57,7 +57,7 @@ A API REST permite que o **aplicativo mobile** do grupo use os mesmos dados e as
 | POST | `/api/movimentacoes` | **Registro rápido** de entrada ou venda, pelo Id ou pelo código de barras. | Logado |
 | GET | `/api/movimentacoes?dataInicio=2026-10-01&dataFim=2026-10-27` | Movimentações do período (padrão: últimos 7 dias). | Logado |
 | GET | `/api/movimentacoes/ultimas?quantidade=10` | Últimas movimentações. | Logado |
-| GET | `/api/dashboard/resumo` | Totais, produtos abaixo do mínimo e últimas movimentações. | Logado |
+| GET | `/api/dashboard/resumo` | Totais, vendas de hoje em R$ (`valorVendidoHoje`, `itensVendidosHoje`), vendas dos últimos 7 dias (`vendasUltimos7Dias`, para gráfico no app), produtos abaixo do mínimo e últimas movimentações. | Logado |
 
 ## 6.3 Exemplos de uso
 

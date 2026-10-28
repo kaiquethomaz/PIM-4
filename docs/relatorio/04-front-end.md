@@ -2,15 +2,35 @@
 
 ## 4.1 Visão geral
 
-A interface do sistema web é gerada no servidor com **ASP.NET Core MVC e Views Razor** (`.cshtml`): o Controller monta os dados e a View transforma esses dados em HTML. Não foram usados frameworks de CSS ou JavaScript. O visual é feito com **HTML5 semântico, CSS3 próprio** (`wwwroot/css/site.css`) e um pequeno script em **JavaScript puro** (`wwwroot/js/site.js`), só para abrir e fechar o menu no celular.
+A interface do sistema web é gerada no servidor com **ASP.NET Core MVC e Views Razor** (`.cshtml`): o Controller monta os dados e a View transforma esses dados em HTML. Não foram usados frameworks de CSS ou JavaScript. O visual é feito com:
+- **HTML5 semântico**;
+- **CSS3 próprio**: `wwwroot/css/site.css` para o sistema e `wwwroot/css/conta.css` para login e cadastro;
+- **JavaScript puro**, só onde é preciso: `site.js` abre e fecha o menu no celular, e `conta.js` mostra e oculta a senha.
 
-A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a identidade visual do grupo. O logo é um ícone de caixa desenhado em **SVG** (`Views/Shared/_Logo.cshtml`), reutilizado no cabeçalho e no login. Diferente de um emoji, o SVG fica nítido em qualquer tamanho e aparece igual em todos os navegadores e sistemas operacionais. Os demais ícones (e-mail, cadeado, olho, gráfico, celular, escudo) também são SVG embutidos no HTML, sem depender de bibliotecas externas.
+A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a identidade visual do grupo. O logo é um ícone de caixa desenhado em **SVG** (`Views/Shared/_Logo.cshtml`). Diferente de um emoji, o SVG fica nítido em qualquer tamanho e aparece igual em todos os navegadores e sistemas operacionais.
+
+**Ícones:** todos os ícones do sistema (menu, indicadores, botões) são SVG embutidos, gerados pela classe `Extensions/Icones.cs` (`@Icones.Svg("produtos")`). Eles não dependem de biblioteca externa nem de internet, herdam a cor do texto e são marcados como decorativos (`aria-hidden`), porque o texto ao lado já informa o significado.
+
+## 4.1.1 Design system
+
+O `site.css` funciona como um pequeno **design system**: as cores, raios e sombras ficam em variáveis CSS (`--azul`, `--texto-suave`, `--borda-campo`, `--sombra`...) e todos os componentes usam essas variáveis. Assim as telas ficam consistentes, e uma mudança de cor é feita num lugar só.
+
+| Componente | Uso |
+|---|---|
+| **Menu lateral** (`.sidebar`) | Navegação agrupada em "Operação", "Cadastros" e "Administração", com ícones; card do usuário (iniciais, nome, perfil) e botão Sair no rodapé. |
+| **Barra superior** (`.topbar`) | Nome do estabelecimento, data de hoje e atalho "Nova venda". |
+| **Cabeçalho de página** (`.barra-titulo`) | Título, subtítulo explicando a tela e botões de ação. |
+| **Cartão** (`.cartao`) | Superfície branca com borda e sombra leves; as tabelas encostam nas bordas do cartão. |
+| **Indicador** (`.kpi`) | Número em destaque com ícone colorido e uma linha de detalhe. |
+| **Etiqueta** (`.etiqueta`) | Situação com texto e pontinho colorido (OK, Abaixo do mínimo, Inativo, Entrada, Venda). |
+| **Botões** | Primário (azul), secundário (contorno), perigo (vermelho) e "texto" (ações discretas nas tabelas, com ícone). |
+| **Estado vazio** (`.vazio`) | Ícone e mensagem quando uma lista não tem registros. |
 
 ## 4.2 Organização das Views
 
 | Pasta / arquivo | Função |
 |---|---|
-| `Views/Shared/_Layout.cshtml` | Modelo comum a todas as páginas: cabeçalho, menu, área de mensagens e conteúdo. |
+| `Views/Shared/_Layout.cshtml` | Modelo comum das telas internas: menu lateral, barra superior, área de mensagens e conteúdo. |
 | `Views/Shared/_LayoutLogin.cshtml` | Modelo da tela de login (sem menu). |
 | `Views/Shared/_Mensagens.cshtml` | *Partial view* que exibe as mensagens de sucesso e erro. |
 | `Views/Conta/` | Login e acesso negado. |
@@ -28,9 +48,9 @@ A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a i
 | **Login** | Tela dividida: à esquerda, um painel com a identidade visual e os principais recursos do sistema; à direita, o formulário com ícones nos campos, botão para mostrar/ocultar a senha e a opção "Manter conectado". No celular, o painel é ocultado e o logo aparece acima do formulário. | Todos |
 | **Cadastrar meu estabelecimento** | Mesmo layout do login, com o formulário em dois grupos numerados: "1. Dados do estabelecimento" (nome, CNPJ, telefone) e "2. Seus dados de acesso" (nome, e-mail e senha com confirmação). Depois de cadastrar, o dono já entra no sistema. | Público |
 | **Meu estabelecimento** | CNPJ e data de cadastro (só leitura) + edição do nome, telefone e e-mail. O nome alterado aparece na hora no cabeçalho. | Somente Admin |
-| **Dashboard** | Cartões com os números do dia (produtos ativos, abaixo do mínimo, vendas e entradas de hoje, valor em estoque), tabela "Precisam de reposição" com botão **Repor** em cada produto, últimas 10 movimentações e atalhos "Registrar venda" / "Registrar entrada". | Todos (valor em estoque só Admin/Gerente) |
+| **Dashboard** | 4 indicadores (**vendas de hoje em R$** e itens vendidos, vendas dos últimos 7 dias com média diária, produtos abaixo do mínimo, valor em estoque); **gráfico de barras** das vendas dos últimos 7 dias (SVG, com o dia de hoje destacado); lista "Precisam de reposição" com **barra de nível de estoque** e botão **Repor**; últimas 10 movimentações com valor e quem registrou; atalhos "Registrar venda" / "Registrar entrada". | Todos (valor em estoque só Admin/Gerente; o Operador vê "Produtos ativos") |
 | **Registrar movimentação** | Formulário único para venda ou entrada: tipo (botões de opção), produto (lista com o estoque atual de cada um), quantidade e observação. Depois de salvar, mostra o estoque atualizado e volta pronto para a próxima venda. | Todos |
-| **Movimentações** | Listagem por período (padrão: últimos 7 dias) com totais de unidades vendidas e de entrada. | Todos |
+| **Movimentações** | Indicadores do período (movimentações, unidades de entrada, unidades vendidas) e listagem filtrada por período (padrão: últimos 7 dias). | Todos |
 | **Produtos** | Lista com busca por nome ou código de barras, etiqueta de situação (OK / Abaixo do mínimo / Inativo), cadastro, edição e exclusão. | Consulta: todos; edição: Admin e Gerente |
 | **Categorias** | Lista, cadastro, edição e exclusão. | Admin e Gerente |
 | **Fornecedores** | Lista com CNPJ formatado, cadastro, edição e exclusão. | Admin e Gerente |
@@ -38,7 +58,7 @@ A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a i
 | **Página não encontrada** | Mostrada em endereços inexistentes ou ao tentar abrir um registro de outro estabelecimento (erro 404), no visual do sistema em vez da página padrão do navegador. | Todos |
 | **Usuários** | Lista com perfil e situação, cadastro (com confirmação de senha), edição (senha em branco mantém a atual; ativar/desativar) e exclusão. | Somente Admin |
 
-**Cabeçalho:** mostra o nome do estabelecimento, o nome do usuário e o perfil (ex.: "Mercadinho Bom Preço · Administrador (Admin)"), para o funcionário sempre saber em qual mercadinho está.
+**Estrutura das telas internas:** menu lateral fixo à esquerda e, no topo, uma barra com o **nome do estabelecimento**, a data e o atalho "Nova venda", para o funcionário sempre saber em qual mercadinho está. O usuário logado (iniciais, nome e perfil) e o botão Sair ficam no rodapé do menu.
 
 **Adaptação ao perfil:** o menu e os botões mudam conforme o usuário logado. O Operador, por exemplo, não vê os itens "Categorias" e "Fornecedores" nem os botões "Editar" e "Excluir" de produtos. Mesmo que digite o endereço da página, ele é redirecionado para "Acesso negado", porque a proteção também existe no servidor.
 
@@ -51,11 +71,17 @@ A paleta de cores (tons de azul) foi herdada do projeto do PIM III, mantendo a i
 ## 4.4 Responsividade
 
 O layout se adapta a celulares, tablets e computadores:
-- Página com largura máxima de 1200 px, centralizada; nas telas pequenas ocupa a largura toda.
-- **Abaixo de 768 px** (celular), o menu vira um botão **"Menu"** que abre e fecha as opções, e os formulários em duas colunas passam para uma coluna só.
-- Tabelas largas ficam dentro de um contêiner com rolagem horizontal, para não quebrar a página.
-- No Dashboard, os cartões de números usam CSS Grid com `auto-fit`: são 6 por linha no computador e 2 por linha no celular. Os dois quadros de baixo ficam lado a lado no computador e um embaixo do outro abaixo de 960 px.
-- Todos os botões têm no mínimo **44 px de altura**, tamanho recomendado para toque com o dedo.
+- **Computador:** menu lateral fixo à esquerda e conteúdo com largura máxima de 1280 px.
+- **Tablet e celular (abaixo de 900 px):** o menu lateral vira uma **gaveta**. Ela abre pelo botão ☰ da barra superior, por cima de um fundo escurecido, e fecha pelo botão ×, pelo clique no fundo ou pela tecla Esc.
+- **Celular (abaixo de 600 px):**
+  - formulários em duas colunas passam para uma coluna;
+  - os botões do cabeçalho ocupam a largura toda;
+  - abaixo de 420 px, o atalho "Nova venda" vira só o ícone +.
+- **Dashboard:**
+  - os 4 indicadores ficam lado a lado no computador e 2 por linha em telas menores;
+  - o gráfico e a lista de reposição ficam lado a lado e passam para um embaixo do outro abaixo de 1180 px.
+- **Tabelas largas** rolam na horizontal dentro do cartão, sem quebrar a página. Isso foi conferido: em 375 px, a página tem exatamente 375 px de largura.
+- **Toque:** os botões têm no mínimo **42 a 44 px de altura** (40 px nos botões pequenos do celular), tamanho confortável para o dedo.
 - Os campos usam o teclado adequado no celular: `inputmode="decimal"` no preço, `inputmode="numeric"` no código de barras e no CNPJ, `type="email"` e `type="tel"`.
 - A tag `<meta name="viewport">` faz o navegador do celular usar a largura real da tela.
 
@@ -77,9 +103,11 @@ O sistema segue recomendações da **WCAG 2.1** (Diretrizes de Acessibilidade pa
 | **Mensagens anunciadas** | Erros com `role="alert"`, sucesso com `role="status"`. | O leitor de tela lê a mensagem sem o usuário procurar. |
 | **Botões com contexto** | "Editar" tem `aria-label="Editar Arroz Branco Tipo 1 5kg"`. | O leitor de tela diz *qual* item será editado. |
 | **Menu atual** | `aria-current="page"` no item da página aberta. | Orientação dentro do sistema. |
-| **Menu do celular** | Botão com `aria-expanded` e `aria-controls`. | O leitor de tela informa se o menu está aberto. |
-| **Contraste** | Cores com contraste mínimo de **4,5:1** (ex.: azul `#1e40af` sobre branco = 8,6:1). | Pessoas com baixa visão ou daltonismo. |
-| **Informação não depende só da cor** | A situação do produto usa texto + cor ("⚠ Abaixo do mínimo"). | Pessoas daltônicas. |
+| **Menu do celular (gaveta)** | Botão com `aria-expanded` e `aria-controls`; ao abrir, o foco vai para o botão "Fechar menu"; Esc fecha e o foco volta para o botão do menu. | Quem usa teclado ou leitor de tela não fica "perdido" com o menu aberto. |
+| **Grupos do menu** | Cada grupo ("Operação", "Cadastros", "Administração") tem título ligado à lista por `aria-labelledby`. | O leitor de tela anuncia a seção do menu. |
+| **Gráfico acessível** | O gráfico SVG tem `role="img"` com título e descrição, e uma **tabela escondida** (só para leitores de tela) com o valor de cada dia. | Pessoas cegas recebem os mesmos dados do gráfico. |
+| **Contraste** | Texto com contraste mínimo de **4,5:1** (ex.: azul `#1d4ed8` sobre branco = 6,7:1) e bordas de campos com **3:1** (`#8492a6`). | Pessoas com baixa visão ou daltonismo. |
+| **Informação não depende só da cor** | A situação do produto usa texto + cor ("Abaixo do mínimo"); a barra de nível de estoque tem o mesmo dado em texto ao lado ("3 de 12 · faltam 9"). | Pessoas daltônicas. |
 | **Tabelas semânticas** | `<caption>`, `<th scope="col">`. | Leitores de tela leem os cabeçalhos junto com cada célula. |
 | **Tamanho de fonte** | Fonte em `rem`, respeitando o tamanho escolhido no navegador. | Pessoas com baixa visão que aumentam a fonte. |
 | **Menos animação** | `prefers-reduced-motion` desliga animações. | Pessoas sensíveis a movimento. |

@@ -1,13 +1,19 @@
 @model StockControl.ViewModels.ProdutoListaViewModel
+@using StockControl.Extensions
 @{
     ViewData["Title"] = "Produtos";
 }
 
 <div class="barra-titulo">
-    <h1>Produtos</h1>
+    <div>
+        <h1>Produtos</h1>
+        <p class="subtitulo">Catálogo do estabelecimento: preços, estoque e situação de cada produto.</p>
+    </div>
     @if (Model.PodeGerenciar)
     {
-        <a class="botao" asp-action="Criar">+ Novo produto</a>
+        <div class="acoes">
+            <a class="botao" asp-action="Criar">@Icones.Svg("mais") Novo produto</a>
+        </div>
     }
 </div>
 
@@ -16,7 +22,7 @@
     <form method="get" asp-action="Index" class="busca" role="search">
         <div class="campo">
             <label for="busca">Buscar por nome ou código de barras</label>
-            <input type="search" id="busca" name="busca" value="@Model.Busca" />
+            <input type="search" id="busca" name="busca" value="@Model.Busca" placeholder="Ex.: arroz ou 7891000000011" />
         </div>
         @if (Model.PodeGerenciar)
         {
@@ -25,16 +31,19 @@
                 <label for="mostrarInativos">Mostrar inativos</label>
             </div>
         }
-        <button type="submit" class="botao">Buscar</button>
+        <button type="submit" class="botao botao-secundario">@Icones.Svg("busca") Buscar</button>
         @if (!string.IsNullOrEmpty(Model.Busca) || Model.MostrarInativos)
         {
-            <a class="botao botao-secundario" asp-action="Index">Limpar</a>
+            <a class="botao botao-texto" asp-action="Index">Limpar</a>
         }
     </form>
 
     @if (Model.Produtos.Count == 0)
     {
-        <p role="status">Nenhum produto encontrado.</p>
+        <div class="vazio" role="status">
+            @Icones.Svg("produtos")
+            <p>Nenhum produto encontrado.</p>
+        </div>
     }
     else
     {
@@ -45,7 +54,6 @@
                     <tr>
                         <th scope="col">Produto</th>
                         <th scope="col">Código de barras</th>
-                        <th scope="col">Categoria</th>
                         <th scope="col" class="numero">Preço</th>
                         <th scope="col" class="numero">Estoque</th>
                         <th scope="col">Situação</th>
@@ -59,11 +67,15 @@
                     @foreach (var p in Model.Produtos)
                     {
                         <tr>
-                            <td>@p.Nome</td>
-                            <td>@p.CodigoBarras</td>
-                            <td>@p.Categoria?.Nome</td>
+                            <td>
+                                <span class="celula-principal">
+                                    <strong>@p.Nome</strong>
+                                    <span>@p.Categoria?.Nome</span>
+                                </span>
+                            </td>
+                            <td><span class="dica">@p.CodigoBarras</span></td>
                             <td class="numero">@p.Preco.ToString("C")</td>
-                            <td class="numero">@p.EstoqueAtual <span class="dica">(mín. @p.EstoqueMinimo)</span></td>
+                            <td class="numero"><strong>@p.EstoqueAtual</strong> <span class="dica">/ mín. @p.EstoqueMinimo</span></td>
                             <td>
                                 @* Texto + cor: a informação não depende só da cor (acessibilidade) *@
                                 @if (!p.Ativo)
@@ -72,7 +84,7 @@
                                 }
                                 else if (p.EstaAbaixoDoMinimo())
                                 {
-                                    <span class="etiqueta etiqueta-alerta">⚠ Abaixo do mínimo</span>
+                                    <span class="etiqueta etiqueta-alerta">Abaixo do mínimo</span>
                                 }
                                 else
                                 {
@@ -83,12 +95,12 @@
                             {
                                 <td>
                                     <div class="acoes">
-                                        <a class="botao botao-secundario botao-pequeno" asp-action="Editar" asp-route-id="@p.Id"
-                                           aria-label="Editar @p.Nome">Editar</a>
+                                        <a class="botao botao-texto botao-pequeno" asp-action="Editar" asp-route-id="@p.Id"
+                                           aria-label="Editar @p.Nome">@Icones.Svg("editar") Editar</a>
                                         @if (p.Ativo)
                                         {
-                                            <a class="botao botao-perigo botao-pequeno" asp-action="Excluir" asp-route-id="@p.Id"
-                                               aria-label="Excluir @p.Nome">Excluir</a>
+                                            <a class="botao botao-texto perigo botao-pequeno" asp-action="Excluir" asp-route-id="@p.Id"
+                                               aria-label="Excluir @p.Nome">@Icones.Svg("excluir") Excluir</a>
                                         }
                                     </div>
                                 </td>

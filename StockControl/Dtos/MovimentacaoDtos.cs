@@ -96,8 +96,18 @@ public class DashboardResumoDto
     public List<ProdutoAbaixoMinimo> ProdutosAbaixoDoMinimo { get; set; } = new();
     public List<MovimentacaoDto> UltimasMovimentacoes { get; set; } = new();
 
+    /// <summary>Total vendido hoje em R$ (quantidade x preço atual).</summary>
+    public decimal ValorVendidoHoje { get; set; }
+    public int ItensVendidosHoje { get; set; }
+
+    /// <summary>Vendas dos últimos 7 dias, um item por dia (para gráfico no app).</summary>
+    public List<VendaDia> VendasUltimos7Dias { get; set; } = new();
+
     public static DashboardResumoDto DeModelo(ResumoDashboard r) => new()
     {
+        ValorVendidoHoje = r.ValorVendidoHoje,
+        ItensVendidosHoje = r.ItensVendidosHoje,
+        VendasUltimos7Dias = r.VendasUltimos7Dias,
         TotalProdutosAtivos = r.TotalProdutosAtivos,
         TotalCategorias = r.TotalCategorias,
         TotalFornecedores = r.TotalFornecedores,

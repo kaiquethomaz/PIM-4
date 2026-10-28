@@ -38,7 +38,8 @@ Entre como **admin@stockcontrol.local**.
 | ☐ | 11 | Login | https://localhost:7080 (sem estar logado), janela maximizada | Tela dividida: painel azul com os recursos à esquerda e formulário à direita, com "Cadastrar meu estabelecimento" embaixo | Tela de login |
 | ☐ | 11b | Cadastro de estabelecimento | No login, clique em **Cadastrar meu estabelecimento** | Formulário com os grupos "1. Dados do estabelecimento" e "2. Seus dados de acesso" | Cadastro de um novo mercadinho |
 | ☐ | 12 | Validação do login | Digite o e-mail do admin e uma senha errada, clique em "Entrar" | Aviso "E-mail ou senha inválidos." acima dos campos | Validação do login |
-| ☐ | 13 | Dashboard | Depois do login | Cartões (15 ativos, **5 abaixo do mínimo** em vermelho), tabela de reposição, últimas movimentações | Dashboard do sistema |
+| ☐ | 13 | Dashboard | Depois do login, janela maximizada | Menu lateral, 4 indicadores (vendas de hoje em R$, últimos 7 dias, **5 abaixo do mínimo**, valor em estoque), gráfico de vendas e lista de reposição com barras de nível | Dashboard do sistema |
+| ☐ | 13b | Últimas movimentações | Role o Dashboard até o fim | Tabela com tipo, produto, quantidade, valor e quem registrou | Últimas movimentações no Dashboard |
 | ☐ | 14 | Produtos | Menu **Produtos** | Lista com etiquetas OK / ⚠ Abaixo do mínimo | Listagem de produtos |
 | ☐ | 15 | Busca | Digite "café" e clique em Buscar | Só o Café | Busca de produtos |
 | ☐ | 16 | Cadastro de produto | **+ Novo produto** | Formulário com categoria, fornecedor e estoque inicial | Cadastro de produto |
@@ -62,8 +63,8 @@ Entre como **admin@stockcontrol.local**.
 
 | ✔ | # | O que capturar | Como fazer | O que deve aparecer | Legenda sugerida |
 |---|---|---|---|---|---|
-| ☐ | 29 | Dashboard no celular | F12 → modo celular → Dashboard | Botão "Menu", cartões 2 por linha | Layout responsivo (celular) |
-| ☐ | 30 | Menu aberto no celular | Clique em "Menu" | Itens do menu em lista | Menu no celular |
+| ☐ | 29 | Dashboard no celular | F12 → modo celular → Dashboard | Botão ☰ no topo, indicadores 2 por linha, sem rolagem lateral | Layout responsivo (celular) |
+| ☐ | 30 | Menu aberto no celular | Clique no ☰ | Menu lateral como gaveta sobre o fundo escurecido | Menu em gaveta no celular |
 | ☐ | 31 | Formulário no celular | Registrar venda no modo celular | Campos ocupando a largura toda | Formulário responsivo |
 | ☐ | 32 | Navegação por teclado | Em qualquer tela, recarregue e aperte **Tab** uma vez | Link "Pular para o conteúdo" visível no topo | Atalho de acessibilidade |
 | ☐ | 33 | Foco visível | Continue apertando Tab até um botão | Contorno amarelo no item focado | Indicador de foco para navegação por teclado |

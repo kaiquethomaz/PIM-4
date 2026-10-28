@@ -1,17 +1,26 @@
 @model List<Categoria>
+@using StockControl.Extensions
 @{
     ViewData["Title"] = "Categorias";
 }
 
 <div class="barra-titulo">
-    <h1>Categorias</h1>
-    <a class="botao" asp-action="Criar">+ Nova categoria</a>
+    <div>
+        <h1>Categorias</h1>
+        <p class="subtitulo">Grupos usados para organizar os produtos.</p>
+    </div>
+    <div class="acoes">
+        <a class="botao" asp-action="Criar">@Icones.Svg("mais") Nova categoria</a>
+    </div>
 </div>
 
 <div class="cartao">
     @if (Model.Count == 0)
     {
-        <p>Nenhuma categoria cadastrada.</p>
+        <div class="vazio">
+            @Icones.Svg("categorias")
+            <p>Nenhuma categoria cadastrada.</p>
+        </div>
     }
     else
     {
@@ -29,15 +38,15 @@
                     @foreach (var c in Model)
                     {
                         <tr>
-                            <td>@c.Nome</td>
-                            <td>@c.Descricao</td>
+                            <td><strong>@c.Nome</strong></td>
+                            <td><span class="dica">@c.Descricao</span></td>
                             <td>
                                 <div class="acoes">
                                     @* aria-label diz ao leitor de tela QUAL item será editado *@
-                                    <a class="botao botao-secundario botao-pequeno" asp-action="Editar" asp-route-id="@c.Id"
-                                       aria-label="Editar @c.Nome">Editar</a>
-                                    <a class="botao botao-perigo botao-pequeno" asp-action="Excluir" asp-route-id="@c.Id"
-                                       aria-label="Excluir @c.Nome">Excluir</a>
+                                    <a class="botao botao-texto botao-pequeno" asp-action="Editar" asp-route-id="@c.Id"
+                                       aria-label="Editar @c.Nome">@Icones.Svg("editar") Editar</a>
+                                    <a class="botao botao-texto perigo botao-pequeno" asp-action="Excluir" asp-route-id="@c.Id"
+                                       aria-label="Excluir @c.Nome">@Icones.Svg("excluir") Excluir</a>
                                 </div>
                             </td>
                         </tr>

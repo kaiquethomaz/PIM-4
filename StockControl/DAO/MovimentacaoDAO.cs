@@ -88,4 +88,22 @@ public class MovimentacaoDAO : IMovimentacaoDAO
     {
         return await _contexto.Movimentacoes.CountAsync(m => m.Tipo == tipo && m.Data >= desde);
     }
+
+    public async Task<List<VendaDia>> SomarVendasPorDiaAsync(DateTime desde)
+    {
+        // Vira um único SELECT ... GROUP BY CONVERT(date, Data) no banco.
+        // O valor usa o preço atual do produto (a movimentação não guarda o preço da época).
+        // O filtro automático garante que só entram as vendas do estabelecimento logado.
+        return await _contexto.Movimentacoes.AsNoTracking()
+            .Where(m => m.Tipo == TipoMovimentacao.Saida && m.Data >= desde)
+            .Select(m => new { Dia = m.Data.Date, Valor = m.Quantidade * m.Produto!.Preco, m.Quantidade })
+            .GroupBy(x => x.Dia)
+            .Select(g => new VendaDia
+            {
+                Dia = g.Key,
+                Valor = g.Sum(x => x.Valor),
+                Itens = g.Sum(x => x.Quantidade)
+            })
+            .ToListAsync();
+    }
 }

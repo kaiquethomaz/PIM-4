@@ -4,7 +4,10 @@
 }
 
 <div class="barra-titulo">
-    <h1>Registrar entrada ou venda</h1>
+    <div>
+        <h1>Registrar entrada ou venda</h1>
+        <p class="subtitulo">O estoque do produto é atualizado na hora.</p>
+    </div>
     <a class="botao botao-secundario" asp-action="Index">Ver movimentações</a>
 </div>
 
@@ -17,11 +20,11 @@
             <legend>Tipo da movimentação <span class="obrigatorio" aria-hidden="true">*</span></legend>
             <label class="opcao">
                 <input type="radio" asp-for="Tipo" id="tipo-saida" value="@TipoMovimentacao.Saida" />
-                <span><strong>Venda (saída)</strong> — tira do estoque</span>
+                <span class="celula-principal"><strong>Venda (saída)</strong><span>Tira do estoque</span></span>
             </label>
             <label class="opcao">
                 <input type="radio" asp-for="Tipo" id="tipo-entrada" value="@TipoMovimentacao.Entrada" />
-                <span><strong>Entrada</strong> — compra ou reposição do fornecedor</span>
+                <span class="celula-principal"><strong>Entrada</strong><span>Compra ou reposição do fornecedor</span></span>
             </label>
             <span asp-validation-for="Tipo" class="erro-campo"></span>
         </fieldset>

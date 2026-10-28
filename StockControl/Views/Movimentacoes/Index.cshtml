@@ -1,15 +1,49 @@
 @model StockControl.ViewModels.MovimentacaoListaViewModel
+@using StockControl.Extensions
 @{
     ViewData["Title"] = "Movimentações";
 }
 
 <div class="barra-titulo">
-    <h1>Movimentações</h1>
+    <div>
+        <h1>Movimentações</h1>
+        <p class="subtitulo">Entradas de mercadoria e vendas do estabelecimento, por período.</p>
+    </div>
     <div class="acoes">
-        <a class="botao" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Saida">+ Registrar venda</a>
-        <a class="botao botao-secundario" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Entrada">+ Registrar entrada</a>
+        <a class="botao" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Saida">@Icones.Svg("mais") Registrar venda</a>
+        <a class="botao botao-secundario" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Entrada">@Icones.Svg("entrada") Registrar entrada</a>
     </div>
 </div>
+
+@if (Model.Erro is null)
+{
+    <div class="kpis kpis-3">
+        <div class="cartao kpi">
+            <span class="kpi-icone kpi-azul">@Icones.Svg("movimentacoes")</span>
+            <span class="kpi-texto">
+                <span class="kpi-rotulo">Movimentações</span>
+                <span class="kpi-valor">@Model.Itens.Count</span>
+                <span class="kpi-detalhe">no período</span>
+            </span>
+        </div>
+        <div class="cartao kpi">
+            <span class="kpi-icone kpi-verde">@Icones.Svg("entrada")</span>
+            <span class="kpi-texto">
+                <span class="kpi-rotulo">Unidades de entrada</span>
+                <span class="kpi-valor">@Model.TotalEntradas</span>
+                <span class="kpi-detalhe">compras e reposições</span>
+            </span>
+        </div>
+        <div class="cartao kpi">
+            <span class="kpi-icone kpi-roxo">@Icones.Svg("carrinho")</span>
+            <span class="kpi-texto">
+                <span class="kpi-rotulo">Unidades vendidas</span>
+                <span class="kpi-valor">@Model.TotalSaidas</span>
+                <span class="kpi-detalhe">vendas no período</span>
+            </span>
+        </div>
+    </div>
+}
 
 <div class="cartao">
     @* Filtro por período: formulário GET, as datas ficam na URL *@
@@ -22,7 +56,7 @@
             <label for="dataFim">Data final</label>
             <input type="date" id="dataFim" name="dataFim" value="@Model.DataFim.ToString("yyyy-MM-dd")" />
         </div>
-        <button type="submit" class="botao">Filtrar</button>
+        <button type="submit" class="botao botao-secundario">@Icones.Svg("filtro") Filtrar</button>
     </form>
 
     @if (Model.Erro is not null)
@@ -31,27 +65,25 @@
     }
     else if (Model.Itens.Count == 0)
     {
-        <p role="status">Nenhuma movimentação entre @Model.DataInicio.ToString("dd/MM/yyyy") e @Model.DataFim.ToString("dd/MM/yyyy").</p>
+        <div class="vazio" role="status">
+            @Icones.Svg("movimentacoes")
+            <p>Nenhuma movimentação entre @Model.DataInicio.ToString("dd/MM/yyyy") e @Model.DataFim.ToString("dd/MM/yyyy").</p>
+        </div>
     }
     else
     {
-        <p role="status">
-            De <strong>@Model.DataInicio.ToString("dd/MM/yyyy")</strong> a <strong>@Model.DataFim.ToString("dd/MM/yyyy")</strong>:
-            @Model.Itens.Count movimentação(ões) ·
-            <strong>@Model.TotalEntradas</strong> unidade(s) de entrada ·
-            <strong>@Model.TotalSaidas</strong> unidade(s) vendida(s)
-        </p>
-
         <div class="tabela-container">
             <table>
-                <caption class="somente-leitor">Movimentações do período</caption>
+                <caption role="status">
+                    De @Model.DataInicio.ToString("dd/MM/yyyy") a @Model.DataFim.ToString("dd/MM/yyyy"): @Model.Itens.Count movimentação(ões)
+                </caption>
                 <thead>
                     <tr>
                         <th scope="col">Data</th>
                         <th scope="col">Tipo</th>
                         <th scope="col">Produto</th>
                         <th scope="col" class="numero">Qtd.</th>
-                        <th scope="col">Usuário</th>
+                        <th scope="col">Registrado por</th>
                         <th scope="col">Observação</th>
                     </tr>
                 </thead>
@@ -63,17 +95,17 @@
                             <td>
                                 @if (m.Tipo == "ENTRADA")
                                 {
-                                    <span class="etiqueta etiqueta-entrada">▲ Entrada</span>
+                                    <span class="etiqueta etiqueta-entrada">Entrada</span>
                                 }
                                 else
                                 {
-                                    <span class="etiqueta etiqueta-saida">▼ Venda</span>
+                                    <span class="etiqueta etiqueta-saida">Venda</span>
                                 }
                             </td>
-                            <td>@m.Produto</td>
+                            <td><strong>@m.Produto</strong></td>
                             <td class="numero">@m.Quantidade</td>
                             <td>@m.Usuario</td>
-                            <td>@m.Observacao</td>
+                            <td><span class="dica">@m.Observacao</span></td>
                         </tr>
                     }
                 </tbody>

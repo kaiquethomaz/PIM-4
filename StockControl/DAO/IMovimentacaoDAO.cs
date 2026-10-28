@@ -19,4 +19,7 @@ public interface IMovimentacaoDAO
 
     /// <summary>Quantidade de movimentações de um tipo a partir de uma data.</summary>
     Task<int> ContarDesdeAsync(TipoMovimentacao tipo, DateTime desde);
+
+    /// <summary>Vendas (saídas) agrupadas por dia, em R$ e em itens, a partir de uma data.</summary>
+    Task<List<VendaDia>> SomarVendasPorDiaAsync(DateTime desde);
 }

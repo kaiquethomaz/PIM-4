@@ -1,9 +1,23 @@
+@using StockControl.Extensions
 @{
     // Descobre em qual controller estamos, para destacar o item do menu.
     var controllerAtual = ViewContext.RouteData.Values["controller"]?.ToString();
     string? Atual(string controller) => controllerAtual == controller ? "page" : null;
 
     var podeGerenciar = User.IsInRole("Admin") || User.IsInRole("Gerente");
+    var ehAdmin = User.IsInRole("Admin");
+
+    var nomeUsuario = User.Identity?.Name ?? "";
+    var perfil = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+    var estabelecimento = User.FindFirst(ClaimsStockControl.Estabelecimento)?.Value ?? "";
+
+    // Iniciais para o "avatar" (ex.: "Gabriela Gerente" -> "GG")
+    var iniciais = string.Concat(nomeUsuario.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2).Select(p => char.ToUpper(p[0])));
+
+    // Data por extenso: "Terça-feira, 28 de outubro"
+    var hoje = DateTime.Today.ToString("dddd, d 'de' MMMM");
+    hoje = hoje.Length > 0 ? char.ToUpper(hoje[0]) + hoje[1..] : hoje;
 }
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -13,54 +27,94 @@
     <title>@ViewData["Title"] - StockControl</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
+<body class="app">
     @* Acessibilidade: permite pular o menu e ir direto ao conteúdo com o teclado *@
     <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
-    <header class="cabecalho">
-        <div class="cabecalho-conteudo">
-            <a class="logo" asp-controller="Home" asp-action="Index"><partial name="_Logo" /></a>
+    <div class="app-shell">
+        @* ================= Menu lateral ================= *@
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-topo">
+                <a class="logo" asp-controller="Home" asp-action="Index"><partial name="_Logo" /></a>
+                <button type="button" class="botao-icone sidebar-fechar" id="botao-fechar-menu" aria-label="Fechar menu">
+                    @Icones.Svg("fechar")
+                </button>
+            </div>
 
-            <button type="button" id="botao-menu" class="botao-menu"
-                    aria-expanded="false" aria-controls="menu-principal">
-                Menu
-            </button>
-
-            <nav aria-label="Menu principal">
-                <ul class="menu" id="menu-principal">
-                    <li><a asp-controller="Home" asp-action="Index" aria-current="@Atual("Home")">Dashboard</a></li>
-                    <li><a asp-controller="Movimentacoes" asp-action="Index" aria-current="@Atual("Movimentacoes")">Movimentações</a></li>
-                    <li><a asp-controller="Produtos" asp-action="Index" aria-current="@Atual("Produtos")">Produtos</a></li>
-                    @if (podeGerenciar)
-                    {
-                        <li><a asp-controller="Categorias" asp-action="Index" aria-current="@Atual("Categorias")">Categorias</a></li>
-                        <li><a asp-controller="Fornecedores" asp-action="Index" aria-current="@Atual("Fornecedores")">Fornecedores</a></li>
-                    }
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <li><a asp-controller="Usuarios" asp-action="Index" aria-current="@Atual("Usuarios")">Usuários</a></li>
-                        <li><a asp-controller="Estabelecimento" asp-action="Index" aria-current="@Atual("Estabelecimento")">Estabelecimento</a></li>
-                    }
+            <nav class="sidebar-nav" aria-label="Menu principal">
+                <p class="menu-grupo" id="grupo-operacao">Operação</p>
+                <ul class="menu" aria-labelledby="grupo-operacao">
+                    <li><a asp-controller="Home" asp-action="Index" aria-current="@Atual("Home")">@Icones.Svg("dashboard") <span>Dashboard</span></a></li>
+                    <li><a asp-controller="Movimentacoes" asp-action="Index" aria-current="@Atual("Movimentacoes")">@Icones.Svg("movimentacoes") <span>Movimentações</span></a></li>
+                    <li><a asp-controller="Produtos" asp-action="Index" aria-current="@Atual("Produtos")">@Icones.Svg("produtos") <span>Produtos</span></a></li>
                 </ul>
+
+                @if (podeGerenciar)
+                {
+                    <p class="menu-grupo" id="grupo-cadastros">Cadastros</p>
+                    <ul class="menu" aria-labelledby="grupo-cadastros">
+                        <li><a asp-controller="Categorias" asp-action="Index" aria-current="@Atual("Categorias")">@Icones.Svg("categorias") <span>Categorias</span></a></li>
+                        <li><a asp-controller="Fornecedores" asp-action="Index" aria-current="@Atual("Fornecedores")">@Icones.Svg("fornecedores") <span>Fornecedores</span></a></li>
+                    </ul>
+                }
+
+                @if (ehAdmin)
+                {
+                    <p class="menu-grupo" id="grupo-admin">Administração</p>
+                    <ul class="menu" aria-labelledby="grupo-admin">
+                        <li><a asp-controller="Usuarios" asp-action="Index" aria-current="@Atual("Usuarios")">@Icones.Svg("usuarios") <span>Usuários</span></a></li>
+                        <li><a asp-controller="Estabelecimento" asp-action="Index" aria-current="@Atual("Estabelecimento")">@Icones.Svg("estabelecimento") <span>Estabelecimento</span></a></li>
+                    </ul>
+                }
             </nav>
 
-            <div class="usuario-logado">
-                <span>
-                    <span class="estabelecimento-atual">@User.FindFirst(StockControl.Extensions.ClaimsStockControl.Estabelecimento)?.Value</span>
-                    <span class="separador" aria-hidden="true">·</span>
-                    @User.Identity?.Name <span class="somente-leitor">, perfil</span> (@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value)
-                </span>
+            <div class="sidebar-rodape">
+                <div class="cartao-usuario">
+                    <span class="avatar" aria-hidden="true">@iniciais</span>
+                    <span class="cartao-usuario-texto">
+                        <strong>@nomeUsuario</strong>
+                        <span>@perfil</span>
+                    </span>
+                </div>
                 <form method="post" asp-controller="Conta" asp-action="Sair">
-                    <button type="submit">Sair</button>
+                    <button type="submit" class="botao-sair">@Icones.Svg("sair") <span>Sair</span></button>
                 </form>
             </div>
-        </div>
-    </header>
+        </aside>
 
-    <main id="conteudo" class="conteudo" tabindex="-1">
-        <partial name="_Mensagens" />
-        @RenderBody()
-    </main>
+        @* Fundo escuro atrás do menu aberto no celular (clicar fecha o menu) *@
+        <div class="sidebar-fundo" id="sidebar-fundo" hidden></div>
+
+        @* ================= Área principal ================= *@
+        <div class="app-principal">
+            <header class="topbar">
+                <button type="button" class="botao-icone botao-menu" id="botao-menu"
+                        aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">
+                    @Icones.Svg("menu")
+                </button>
+
+                <div class="topbar-estabelecimento">
+                    <span class="topbar-estabelecimento-icone">@Icones.Svg("estabelecimento")</span>
+                    <span>
+                        <span class="somente-leitor">Estabelecimento: </span>
+                        <strong>@estabelecimento</strong>
+                    </span>
+                </div>
+
+                <div class="topbar-acoes">
+                    <span class="topbar-data">@Icones.Svg("calendario") @hoje</span>
+                    <a class="botao botao-pequeno" asp-controller="Movimentacoes" asp-action="Registrar" asp-route-tipo="Saida">
+                        @Icones.Svg("mais") <span>Nova venda</span>
+                    </a>
+                </div>
+            </header>
+
+            <main id="conteudo" class="conteudo" tabindex="-1">
+                <partial name="_Mensagens" />
+                @RenderBody()
+            </main>
+        </div>
+    </div>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

@@ -52,7 +52,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R6 | `GET /api/produtos` | 15 produtos ativos | ✅ Passou |
 | R7 | `GET /api/produtos/codigo-barras/7891000000011` | Arroz, com categoria e estoque | ✅ Passou |
 | R8 | Código de barras inexistente | 404 com mensagem | ✅ Passou |
-| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.9) |
+| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.10) |
 | R10 | Entrada de 10 unidades pelo código de barras | 201; `estoqueAtual` = 34 | ✅ Passou |
 | R11 | Venda de 100 detergentes (estoque 3) | 400 "Estoque insuficiente..." | ✅ Passou |
 | R12 | Tipo "TROCA" | 400 "O tipo deve ser ENTRADA ou SAIDA." | ✅ Passou |
@@ -62,7 +62,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R16 | `GET /api/movimentacoes` com período invertido | 400 "A data inicial não pode ser maior..." | ✅ Passou |
 | R17 | Admin cadastra categoria "Pães e Bolos" (com acento) | 201 | ✅ Passou |
 | R18 | Categoria com nome repetido | 400 "Já existe uma categoria com este nome." | ✅ Passou |
-| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.9) |
+| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.10) |
 | R20 | Alterar o preço do produto (PUT) | 200; preço novo e estoque mantido | ✅ Passou |
 | R21 | Excluir categoria que tem produto | 400 com mensagem | ✅ Passou |
 | R22 | Excluir produto com movimentação | 200; produto desativado | ✅ Passou |
@@ -90,7 +90,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | U8 | Reativar o Operador pela edição, com a senha em branco | Reativado; o login com a senha antiga continua funcionando | ✅ Passou |
 | U9 | Gerente abrindo `/Usuarios` | "Acesso negado"; o menu do Gerente não tem "Usuários" | ✅ Passou |
 | U10 | POST de venda sem o token anti-CSRF | Recusado com HTTP 400 | ✅ Passou |
-| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.9) |
+| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.10) |
 
 ## 7.6 Interface
 
@@ -137,11 +137,25 @@ Feitos com os dois estabelecimentos do seed (Mercadinho Bom Preço e Mercearia D
 | E16 | Dono renomeia o estabelecimento em "Meu estabelecimento" | Cabeçalho mostra o nome novo na hora | ✅ Passou |
 | E17 | Gerente abre `/Estabelecimento` | "Acesso negado" | ✅ Passou |
 
-## 7.9 Defeitos encontrados e corrigidos
+## 7.9 Novo visual (menu lateral, dashboard e telas internas)
+
+| # | Teste | Resultado esperado | Resultado |
+|---|---|---|---|
+| V1 | Dashboard em 1440 px | Menu lateral agrupado, barra superior com o estabelecimento e a data, 4 indicadores, gráfico de 7 dias com hoje destacado, reposição com barras de nível | ✅ Passou |
+| V2 | Vendas de hoje no Dashboard (banco recém-criado) | R$ 368,25 e 31 itens (Detergente 15 × 2,99 + Café 9 × 18,90 + Papel 7 × 21,90) | ✅ Passou |
+| V3 | Produtos, Movimentações e Registrar em 1440 px | Cabeçalho com subtítulo, tabelas com categoria embaixo do nome, ações com ícone, opções Venda/Entrada em cartões | ✅ Passou |
+| V4 | Dashboard em 375 px | Menu escondido, botão ☰ visível, indicadores 2 por linha, página com exatamente 375 px (sem rolagem lateral) | ✅ Passou |
+| V5 | Abrir o menu no celular | Gaveta aparece sobre fundo escuro; `aria-expanded="true"`; foco no botão "Fechar menu" | ✅ Passou |
+| V6 | Tecla Esc com o menu aberto | Menu fecha; `aria-expanded="false"`; foco volta para "Abrir menu" | ✅ Passou |
+| V7 | 18 páginas × 3 perfis depois da reforma | 54/54 com o comportamento esperado; menu mostra só o que cada perfil acessa (Admin 7 itens, Gerente 5, Operador 3) | ✅ Passou |
+| V8 | `GET /api/dashboard/resumo` | Traz `valorVendidoHoje`, `itensVendidosHoje` e 7 dias em `vendasUltimos7Dias` | ✅ Passou |
+
+## 7.10 Defeitos encontrados e corrigidos
 
 | Defeito | Causa | Correção |
 |---|---|---|
 | Depois de uma venda pela API, a resposta mostrava o estoque **antigo** (29 em vez de 27), embora o banco estivesse correto. | O Entity Framework guarda em memória os objetos já lidos na requisição. A trigger `trg_AtualizaEstoque` altera o estoque direto no banco, sem o EF saber, então a segunda leitura devolvia a cópia antiga. | Depois de executar a procedure, o `MovimentacaoDAO` recarrega do banco o produto que estava em memória (`Entry(produto).ReloadAsync()`). Testes R9 e R19 repetidos com sucesso. |
 | Mensagens de validação da API em inglês ("One or more validation errors occurred"). | Formato padrão do ASP.NET Core. | Resposta personalizada (`InvalidModelStateResponseFactory`) no formato `{ "mensagem": "Dados inválidos.", "erros": {...} }`. |
+| No computador, apareciam os botões "×" e "☰", que deveriam existir só no celular. | A regra genérica `.botao-icone { display: inline-flex }` vinha depois no CSS e "ganhava" da regra que escondia esses botões. | Regra com dois nomes de classe (`.botao-icone.botao-menu`), que é mais específica e vale em qualquer ordem. |
 | Campo **Telefone** (cadastro de estabelecimento e de fornecedor) menor e com borda diferente dos outros campos. | A regra de estilo dos campos de formulário não incluía `input[type="tel"]`. | `type="tel"` incluído na regra; conferido que Telefone e CNPJ ficaram idênticos (48 px de altura, mesma borda e fonte). |
 | No celular (375 px), o Dashboard ficava com 449 px de largura: o navegador reduzia o zoom e os quadros encostavam na borda. | Em um CSS Grid, cada coluna tem largura mínima igual ao seu conteúdo; a tabela de reposição "empurrava" a coluna para além da tela. | `min-width: 0` nas colunas do grid, para a tabela rolar por dentro do quadro. A página passou a ter exatamente 375 px. |

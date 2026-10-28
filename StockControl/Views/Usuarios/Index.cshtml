@@ -1,12 +1,18 @@
 @model List<Usuario>
+@using StockControl.Extensions
 @{
     ViewData["Title"] = "Usuários";
     var usuarioLogadoId = (int)ViewBag.UsuarioLogadoId;
 }
 
 <div class="barra-titulo">
-    <h1>Usuários</h1>
-    <a class="botao" asp-action="Criar">+ Novo usuário</a>
+    <div>
+        <h1>Usuários</h1>
+        <p class="subtitulo">Equipe do estabelecimento: quem pode entrar no sistema e o que cada um pode fazer.</p>
+    </div>
+    <div class="acoes">
+        <a class="botao" asp-action="Criar">@Icones.Svg("mais") Novo usuário</a>
+    </div>
 </div>
 
 <div class="cartao">
@@ -15,8 +21,7 @@
             <caption>@Model.Count usuário(s)</caption>
             <thead>
                 <tr>
-                    <th scope="col">Nome</th>
-                    <th scope="col">E-mail</th>
+                    <th scope="col">Usuário</th>
                     <th scope="col">Perfil</th>
                     <th scope="col">Situação</th>
                     <th scope="col">Cadastrado em</th>
@@ -26,15 +31,23 @@
             <tbody>
                 @foreach (var u in Model)
                 {
+                    var iniciais = string.Concat(u.Nome.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => char.ToUpper(p[0])));
                     <tr>
                         <td>
-                            @u.Nome
-                            @if (u.Id == usuarioLogadoId)
-                            {
-                                <span class="dica">(você)</span>
-                            }
+                            <span style="display: flex; align-items: center; gap: 12px">
+                                <span class="avatar" aria-hidden="true">@iniciais</span>
+                                <span class="celula-principal">
+                                    <strong>
+                                        @u.Nome
+                                        @if (u.Id == usuarioLogadoId)
+                                        {
+                                            <span class="dica" style="font-weight: normal">(você)</span>
+                                        }
+                                    </strong>
+                                    <span>@u.Email</span>
+                                </span>
+                            </span>
                         </td>
-                        <td>@u.Email</td>
                         <td>@u.Perfil</td>
                         <td>
                             @if (u.Ativo)
@@ -49,12 +62,12 @@
                         <td>@u.CriadoEm.ToString("dd/MM/yyyy")</td>
                         <td>
                             <div class="acoes">
-                                <a class="botao botao-secundario botao-pequeno" asp-action="Editar" asp-route-id="@u.Id"
-                                   aria-label="Editar @u.Nome">Editar</a>
+                                <a class="botao botao-texto botao-pequeno" asp-action="Editar" asp-route-id="@u.Id"
+                                   aria-label="Editar @u.Nome">@Icones.Svg("editar") Editar</a>
                                 @if (u.Id != usuarioLogadoId && u.Ativo)
                                 {
-                                    <a class="botao botao-perigo botao-pequeno" asp-action="Excluir" asp-route-id="@u.Id"
-                                       aria-label="Excluir @u.Nome">Excluir</a>
+                                    <a class="botao botao-texto perigo botao-pequeno" asp-action="Excluir" asp-route-id="@u.Id"
+                                       aria-label="Excluir @u.Nome">@Icones.Svg("excluir") Excluir</a>
                                 }
                             </div>
                         </td>

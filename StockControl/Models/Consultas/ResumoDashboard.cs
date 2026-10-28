@@ -14,4 +14,21 @@ public class ResumoDashboard
     public int SaidasHoje { get; set; }
     public List<ProdutoAbaixoMinimo> ProdutosAbaixoDoMinimo { get; set; } = new();
     public List<Movimentacao> UltimasMovimentacoes { get; set; } = new();
+
+    // Vendas em R$ (quantidade x preço atual do produto)
+    public decimal ValorVendidoHoje { get; set; }
+    public int ItensVendidosHoje { get; set; }
+
+    /// <summary>Um item por dia, dos últimos 7 dias (dias sem venda vêm com zero).</summary>
+    public List<VendaDia> VendasUltimos7Dias { get; set; } = new();
+
+    public decimal ValorVendido7Dias => VendasUltimos7Dias.Sum(v => v.Valor);
+}
+
+/// <summary>Total vendido em um dia (usado no gráfico do dashboard).</summary>
+public class VendaDia
+{
+    public DateTime Dia { get; set; }
+    public decimal Valor { get; set; }
+    public int Itens { get; set; }
 }

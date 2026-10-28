@@ -1,137 +1,243 @@
 @model ResumoDashboard
+@using System.Globalization
+@using StockControl.Extensions
 @{
     ViewData["Title"] = "Dashboard";
     var podeGerenciar = User.IsInRole("Admin") || User.IsInRole("Gerente");
     var qtdAbaixo = Model.ProdutosAbaixoDoMinimo.Count;
+    var primeiroNome = (User.Identity?.Name ?? "").Split(' ')[0];
+    var estabelecimento = User.FindFirst(ClaimsStockControl.Estabelecimento)?.Value;
+    var mediaDia = Model.ValorVendido7Dias / 7;
+
+    // ---------- Gráfico de barras (SVG) ----------
+    // Números no SVG precisam de PONTO decimal (cultura invariante), não vírgula.
+    string N(double valor) => valor.ToString("0.##", CultureInfo.InvariantCulture);
+    const double largura = 640, altura = 240, topo = 28, rodape = 40, lateral = 8;
+    var vendas = Model.VendasUltimos7Dias;
+    var maior = (double)Math.Max(vendas.Count == 0 ? 0 : vendas.Max(v => v.Valor), 1);
+    var faixa = (largura - 2 * lateral) / Math.Max(vendas.Count, 1);
+    var larguraBarra = faixa * 0.56;
+    var alturaUtil = altura - topo - rodape;
 }
 
 <div class="barra-titulo">
-    <h1>Olá, @User.Identity?.Name</h1>
+    <div>
+        <h1>Olá, @primeiroNome</h1>
+        <p class="subtitulo">Resumo de hoje do <strong>@estabelecimento</strong>.</p>
+    </div>
     <div class="acoes">
-        <a class="botao" asp-controller="Movimentacoes" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Saida">+ Registrar venda</a>
-        <a class="botao botao-secundario" asp-controller="Movimentacoes" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Entrada">+ Registrar entrada</a>
+        <a class="botao" asp-controller="Movimentacoes" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Saida">@Icones.Svg("mais") Registrar venda</a>
+        <a class="botao botao-secundario" asp-controller="Movimentacoes" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Entrada">@Icones.Svg("entrada") Registrar entrada</a>
     </div>
 </div>
 
-@* Cartões com os números principais. <section aria-labelledby> dá um nome à região para o leitor de tela. *@
-<section aria-labelledby="titulo-resumo">
-    <h2 id="titulo-resumo" class="somente-leitor">Resumo do estoque</h2>
-    <div class="painel-cartoes">
-        <div class="cartao cartao-numero">
-            <span class="rotulo">Produtos ativos</span>
-            <span class="valor">@Model.TotalProdutosAtivos</span>
+@* ================= Indicadores ================= *@
+<section aria-labelledby="titulo-indicadores">
+    <h2 id="titulo-indicadores" class="somente-leitor">Indicadores</h2>
+    <div class="kpis">
+        <div class="cartao kpi">
+            <span class="kpi-icone kpi-verde">@Icones.Svg("dinheiro")</span>
+            <span class="kpi-texto">
+                <span class="kpi-rotulo">Vendas hoje</span>
+                <span class="kpi-valor">@Model.ValorVendidoHoje.ToString("C")</span>
+                <span class="kpi-detalhe">@Model.ItensVendidosHoje item(ns) vendido(s)</span>
+            </span>
         </div>
-        <div class="cartao cartao-numero @(qtdAbaixo > 0 ? "cartao-alerta" : "")">
-            <span class="rotulo">Abaixo do mínimo</span>
-            <span class="valor">@qtdAbaixo</span>
+        <div class="cartao kpi">
+            <span class="kpi-icone kpi-azul">@Icones.Svg("grafico")</span>
+            <span class="kpi-texto">
+                <span class="kpi-rotulo">Últimos 7 dias</span>
+                <span class="kpi-valor">@Model.ValorVendido7Dias.ToString("C")</span>
+                <span class="kpi-detalhe">média de @mediaDia.ToString("C") por dia</span>
+            </span>
         </div>
-        <div class="cartao cartao-numero">
-            <span class="rotulo">Vendas hoje</span>
-            <span class="valor">@Model.SaidasHoje</span>
-        </div>
-        <div class="cartao cartao-numero">
-            <span class="rotulo">Entradas hoje</span>
-            <span class="valor">@Model.EntradasHoje</span>
+        <div class="cartao kpi @(qtdAbaixo > 0 ? "kpi-alerta" : "")">
+            <span class="kpi-icone kpi-vermelho">@Icones.Svg("alerta")</span>
+            <span class="kpi-texto">
+                <span class="kpi-rotulo">Abaixo do mínimo</span>
+                <span class="kpi-valor">@qtdAbaixo</span>
+                <span class="kpi-detalhe">@(qtdAbaixo == 1 ? "produto para repor" : "produtos para repor")</span>
+            </span>
         </div>
         @if (podeGerenciar)
         {
-            <div class="cartao cartao-numero">
-                <span class="rotulo">Valor em estoque</span>
-                <span class="valor">@Model.ValorEmEstoque.ToString("C")</span>
+            <div class="cartao kpi">
+                <span class="kpi-icone kpi-roxo">@Icones.Svg("estoque")</span>
+                <span class="kpi-texto">
+                    <span class="kpi-rotulo">Valor em estoque</span>
+                    <span class="kpi-valor">@Model.ValorEmEstoque.ToString("C")</span>
+                    <span class="kpi-detalhe">@Model.TotalProdutosAtivos produtos ativos</span>
+                </span>
             </div>
-            <div class="cartao cartao-numero">
-                <span class="rotulo">Categorias / Fornecedores</span>
-                <span class="valor">@Model.TotalCategorias / @Model.TotalFornecedores</span>
+        }
+        else
+        {
+            <div class="cartao kpi">
+                <span class="kpi-icone kpi-roxo">@Icones.Svg("produtos")</span>
+                <span class="kpi-texto">
+                    <span class="kpi-rotulo">Produtos ativos</span>
+                    <span class="kpi-valor">@Model.TotalProdutosAtivos</span>
+                    <span class="kpi-detalhe">@Model.TotalCategorias categorias</span>
+                </span>
             </div>
         }
     </div>
 </section>
 
-<div class="grade-dashboard">
-    <section class="cartao" aria-labelledby="titulo-reposicao">
-        <h2 id="titulo-reposicao">⚠ Precisam de reposição</h2>
-        @if (qtdAbaixo == 0)
-        {
-            <p>Nenhum produto abaixo do estoque mínimo. 👍</p>
-        }
-        else
-        {
-            <div class="tabela-container">
-                <table>
-                    <caption>@qtdAbaixo produto(s) com estoque abaixo do mínimo</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Produto</th>
-                            <th scope="col" class="numero">Atual</th>
-                            <th scope="col" class="numero">Mínimo</th>
-                            <th scope="col" class="numero">Falta</th>
-                            <th scope="col"><span class="somente-leitor">Ações</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var p in Model.ProdutosAbaixoDoMinimo)
-                        {
-                            <tr>
-                                <td>@p.Nome <span class="dica">(@p.Categoria)</span></td>
-                                <td class="numero"><strong>@p.EstoqueAtual</strong></td>
-                                <td class="numero">@p.EstoqueMinimo</td>
-                                <td class="numero">@p.QuantidadeFaltante</td>
-                                <td>
-                                    <a class="botao botao-secundario botao-pequeno"
-                                       asp-controller="Movimentacoes" asp-action="Registrar"
-                                       asp-route-tipo="@TipoMovimentacao.Entrada" asp-route-produtoId="@p.Id"
-                                       aria-label="Registrar entrada de @p.Nome">Repor</a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+<div class="dash-grade">
+    @* ================= Gráfico de vendas ================= *@
+    <section class="cartao" aria-labelledby="titulo-grafico">
+        <div class="cartao-cabecalho">
+            <div>
+                <h2 id="titulo-grafico">Vendas dos últimos 7 dias</h2>
+                <p>Valor vendido por dia (quantidade × preço atual)</p>
             </div>
-        }
+            <div class="grafico-total">
+                <div><span>Total</span><strong>@Model.ValorVendido7Dias.ToString("C")</strong></div>
+                <div><span>Itens</span><strong>@vendas.Sum(v => v.Itens)</strong></div>
+            </div>
+        </div>
+
+        <figure class="grafico" style="margin: 0">
+            @* role="img" + título/descrição: o leitor de tela lê o resumo; a tabela abaixo traz os números *@
+            <svg viewBox="0 0 @N(largura) @N(altura)" role="img" aria-labelledby="grafico-titulo grafico-descricao">
+                <title id="grafico-titulo">Gráfico de vendas dos últimos 7 dias</title>
+                <desc id="grafico-descricao">Total de @Model.ValorVendido7Dias.ToString("C") na semana. Os valores de cada dia estão na tabela a seguir.</desc>
+                <line class="linha-base" x1="@N(lateral)" x2="@N(largura - lateral)" y1="@N(altura - rodape)" y2="@N(altura - rodape)" />
+                @for (var i = 0; i < vendas.Count; i++)
+                {
+                    var v = vendas[i];
+                    var h = Math.Max((double)v.Valor / maior * alturaUtil, v.Valor > 0 ? 3 : 0);
+                    var x = lateral + i * faixa + (faixa - larguraBarra) / 2;
+                    var y = altura - rodape - h;
+                    var centro = x + larguraBarra / 2;
+                    var ehHoje = i == vendas.Count - 1;
+                    @* <g> agrupa a barra e os rótulos do dia. Obs.: no Razor, "<text>" logo depois
+                       de código é palavra reservada; por isso o rótulo de valor usa "@:" *@
+                    <g>
+                        <rect class="@(ehHoje ? "barra barra-hoje" : "barra")" x="@N(x)" y="@N(y)" width="@N(larguraBarra)" height="@N(h)" rx="6" />
+                        @if (v.Valor > 0)
+                        {
+                            @:<text class="rotulo-valor" x="@N(centro)" y="@N(y - 8)" text-anchor="middle">@v.Valor.ToString("C0")</text>
+                        }
+                        <text class="rotulo-eixo" x="@N(centro)" y="@N(altura - rodape + 18)" text-anchor="middle">@(ehHoje ? "Hoje" : v.Dia.ToString("ddd").TrimEnd('.'))</text>
+                        <text class="rotulo-eixo" x="@N(centro)" y="@N(altura - rodape + 33)" text-anchor="middle">@v.Dia.ToString("dd/MM")</text>
+                    </g>
+                }
+            </svg>
+        </figure>
+
+        <table class="somente-leitor">
+            <caption>Vendas por dia</caption>
+            <thead><tr><th scope="col">Dia</th><th scope="col">Valor</th><th scope="col">Itens</th></tr></thead>
+            <tbody>
+                @foreach (var v in vendas)
+                {
+                    <tr><td>@v.Dia.ToString("dd/MM/yyyy")</td><td>@v.Valor.ToString("C")</td><td>@v.Itens</td></tr>
+                }
+            </tbody>
+        </table>
     </section>
 
-    <section class="cartao" aria-labelledby="titulo-ultimas">
-        <h2 id="titulo-ultimas">Últimas movimentações</h2>
-        @if (Model.UltimasMovimentacoes.Count == 0)
+    @* ================= Reposição ================= *@
+    <section class="cartao" aria-labelledby="titulo-reposicao">
+        <div class="cartao-cabecalho">
+            <div>
+                <h2 id="titulo-reposicao">Precisam de reposição</h2>
+                <p>Estoque abaixo do mínimo</p>
+            </div>
+        </div>
+
+        @if (qtdAbaixo == 0)
         {
-            <p>Nenhuma movimentação registrada.</p>
+            <div class="vazio">
+                @Icones.Svg("ok")
+                <p>Tudo certo! Nenhum produto abaixo do estoque mínimo.</p>
+            </div>
         }
         else
         {
-            <div class="tabela-container">
-                <table>
-                    <caption class="somente-leitor">As 10 movimentações mais recentes</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Data</th>
-                            <th scope="col">Tipo</th>
-                            <th scope="col">Produto</th>
-                            <th scope="col" class="numero">Qtd.</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var m in Model.UltimasMovimentacoes)
-                        {
-                            <tr>
-                                <td style="white-space: nowrap">@m.Data.ToString("dd/MM HH:mm")</td>
-                                <td>
-                                    @if (m.Tipo == TipoMovimentacao.Entrada)
-                                    {
-                                        <span class="etiqueta etiqueta-entrada">▲ Entrada</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="etiqueta etiqueta-saida">▼ Venda</span>
-                                    }
-                                </td>
-                                <td>@m.Produto?.Nome</td>
-                                <td class="numero">@m.Quantidade</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <p><a asp-controller="Movimentacoes" asp-action="Index">Ver todas as movimentações →</a></p>
+            <ul class="lista-reposicao">
+                @foreach (var p in Model.ProdutosAbaixoDoMinimo)
+                {
+                    var percentual = p.EstoqueMinimo == 0 ? 100 : Math.Min(100, p.EstoqueAtual * 100 / p.EstoqueMinimo);
+                    <li>
+                        <span class="celula-principal">
+                            <strong>@p.Nome</strong>
+                            <span>@p.Categoria</span>
+                        </span>
+                        <span class="nivel">
+                            @* A barra é decorativa: o texto ao lado tem a mesma informação *@
+                            <span class="barra-nivel" aria-hidden="true"><span class="@(percentual >= 50 ? "medio" : "")" style="width: @percentual%"></span></span>
+                            <span class="nivel-texto">@p.EstoqueAtual de @p.EstoqueMinimo · faltam @p.QuantidadeFaltante</span>
+                        </span>
+                        <a class="botao botao-secundario botao-pequeno"
+                           asp-controller="Movimentacoes" asp-action="Registrar"
+                           asp-route-tipo="@TipoMovimentacao.Entrada" asp-route-produtoId="@p.Id"
+                           aria-label="Registrar entrada de @p.Nome">Repor</a>
+                    </li>
+                }
+            </ul>
         }
     </section>
 </div>
+
+@* ================= Últimas movimentações ================= *@
+<section class="cartao" aria-labelledby="titulo-ultimas">
+    <div class="cartao-cabecalho">
+        <div>
+            <h2 id="titulo-ultimas">Últimas movimentações</h2>
+            <p>As 10 entradas e vendas mais recentes</p>
+        </div>
+        <a class="link-discreto" asp-controller="Movimentacoes" asp-action="Index">Ver todas @Icones.Svg("seta-direita")</a>
+    </div>
+
+    @if (Model.UltimasMovimentacoes.Count == 0)
+    {
+        <div class="vazio">
+            @Icones.Svg("movimentacoes")
+            <p>Nenhuma movimentação registrada ainda.</p>
+        </div>
+    }
+    else
+    {
+        <div class="tabela-container">
+            <table>
+                <caption class="somente-leitor">As 10 movimentações mais recentes</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Data</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Produto</th>
+                        <th scope="col" class="numero">Qtd.</th>
+                        <th scope="col" class="numero">Valor</th>
+                        <th scope="col">Registrado por</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in Model.UltimasMovimentacoes)
+                    {
+                        var valor = m.Quantidade * (m.Produto?.Preco ?? 0);
+                        <tr>
+                            <td style="white-space: nowrap">@m.Data.ToString("dd/MM HH:mm")</td>
+                            <td>
+                                @if (m.Tipo == TipoMovimentacao.Entrada)
+                                {
+                                    <span class="etiqueta etiqueta-entrada">Entrada</span>
+                                }
+                                else
+                                {
+                                    <span class="etiqueta etiqueta-saida">Venda</span>
+                                }
+                            </td>
+                            <td>@m.Produto?.Nome</td>
+                            <td class="numero">@m.Quantidade</td>
+                            <td class="numero">@valor.ToString("C")</td>
+                            <td>@m.Usuario?.Nome</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
