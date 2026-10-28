@@ -46,6 +46,8 @@
                                     <a class="botao botao-texto botao-pequeno" asp-action="Editar" asp-route-id="@c.Id"
                                        aria-label="Editar @c.Nome">@Icones.Svg("editar") Editar</a>
                                     <a class="botao botao-texto perigo botao-pequeno" asp-action="Excluir" asp-route-id="@c.Id"
+                                       data-confirmar-titulo="Excluir categoria?"
+                                       data-confirmar="A categoria “@c.Nome” será excluída. Essa ação não pode ser desfeita. Categorias com produtos não podem ser excluídas."
                                        aria-label="Excluir @c.Nome">@Icones.Svg("excluir") Excluir</a>
                                 </div>
                             </td>

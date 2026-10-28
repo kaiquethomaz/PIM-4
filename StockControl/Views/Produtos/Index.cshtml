@@ -100,6 +100,8 @@
                                         @if (p.Ativo)
                                         {
                                             <a class="botao botao-texto perigo botao-pequeno" asp-action="Excluir" asp-route-id="@p.Id"
+                                               data-confirmar-titulo="Excluir produto?"
+                                               data-confirmar="O produto “@p.Nome” será excluído. Se ele já teve entradas ou vendas, será apenas desativado, para não perder o histórico."
                                                aria-label="Excluir @p.Nome">@Icones.Svg("excluir") Excluir</a>
                                         }
                                     </div>

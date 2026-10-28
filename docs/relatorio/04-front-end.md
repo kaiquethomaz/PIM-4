@@ -27,7 +27,34 @@ O `site.css` funciona como um pequeno **design system**: as cores, raios e sombr
 | **Estado vazio** (`.vazio`) | Ícone e mensagem quando uma lista não tem registros. |
 | **Aviso "toast"** (`.toast`) | Mensagens de sucesso/erro no canto superior direito, com ícone e botão de fechar; somem sozinhas (6 s sucesso, 10 s erro). |
 
-## 4.1.2 Comportamentos dos formulários (`wwwroot/js/formularios.js`)
+## 4.1.2 Modo escuro
+
+O botão com ícone de lua/sol na barra superior alterna entre o tema claro e o escuro.
+
+- **Como funciona:** o tema escuro só troca os **valores** das variáveis de cor (`:root[data-tema="escuro"]`); os componentes são os mesmos. A escolha fica salva no navegador (`localStorage`). Se o usuário nunca escolheu, o sistema segue a preferência do sistema operacional (`prefers-color-scheme`).
+- **Sem "piscar":** um pequeno script no `<head>` aplica o tema antes de a página ser desenhada.
+- **Controles nativos:** `color-scheme: dark` deixa o calendário, as listas de seleção e as barras de rolagem do navegador também escuros.
+- **Acessibilidade:**
+  - o botão tem nome fixo ("Modo escuro") e o estado em `aria-pressed`, então o leitor de tela anuncia "Modo escuro, botão, pressionado";
+  - o azul usado como **cor de texto** é diferente do azul dos botões (`--azul-texto`), porque o azul escuro dos botões não teria contraste suficiente como letra sobre fundo escuro;
+  - **verificação automática de contraste** em todos os textos de 12 telas, nos dois temas: todas passaram (≥ 4,5:1 em texto normal, ≥ 3:1 em texto grande).
+- O login e o cadastro continuam no tema claro, que já tem o painel azul escuro como destaque.
+
+## 4.1.3 Confirmação de exclusão em janela
+
+Ao clicar em **Excluir** (produtos, categorias, fornecedores, usuários), abre uma janela de confirmação em vez de outra página. Ela foi feita com o elemento nativo **`<dialog>`** do HTML, que já resolve a maior parte da acessibilidade:
+
+| Recurso | Como funciona |
+|---|---|
+| **Janela modal** | `showModal()`: o resto da página fica inerte e escurecido; o foco do teclado não sai da janela. |
+| **Foco inicial seguro** | O foco começa em **"Cancelar"**, para que um Enter acidental não exclua nada. |
+| **Teclado** | Tab alterna entre os botões; **Esc** fecha a janela (cancela). |
+| **Foco de volta** | Ao fechar, o foco volta para o link "Excluir" que abriu a janela. |
+| **Leitor de tela** | `aria-labelledby` (título "Excluir produto?") e `aria-describedby` (mensagem explicando o que vai acontecer). |
+| **Segurança** | A janela envia um POST com o token anti-CSRF para o mesmo endereço da página de confirmação. |
+| **Sem JavaScript** | O link "Excluir" continua apontando para a página de confirmação antiga, que funciona normalmente se o script não carregar (*melhoria progressiva*). |
+
+## 4.1.4 Comportamentos dos formulários (`wwwroot/js/formularios.js`)
 
 | Recurso | Como funciona | Por quê |
 |---|---|---|
@@ -114,6 +141,8 @@ O sistema segue recomendações da **WCAG 2.1** (Diretrizes de Acessibilidade pa
 | **Mensagens anunciadas** | Erros com `role="alert"`, sucesso com `role="status"` (também nos avisos "toast"). | O leitor de tela lê a mensagem sem o usuário procurar. |
 | **Avisos sem pressa** | O "toast" **pausa** enquanto o mouse está em cima ou o foco do teclado está nele, e tem botão "Fechar aviso". | Quem lê mais devagar não perde a mensagem. |
 | **Ação em andamento** | Botão enviando recebe `aria-busy="true"` e texto "Salvando…". | O leitor de tela informa que a ação está sendo processada. |
+| **Modo escuro** | Botão com `aria-pressed`; contraste verificado em todas as telas também no tema escuro; segue a preferência do sistema operacional. | Pessoas com sensibilidade à luz, enxaqueca ou baixa visão que leem melhor em fundo escuro. |
+| **Janela de confirmação** | `<dialog>` modal: foco preso na janela, foco inicial em "Cancelar", Esc fecha, foco volta ao botão de origem. | Quem usa teclado ou leitor de tela não se perde e não exclui nada por acidente. |
 | **Botões com contexto** | "Editar" tem `aria-label="Editar Arroz Branco Tipo 1 5kg"`. | O leitor de tela diz *qual* item será editado. |
 | **Menu atual** | `aria-current="page"` no item da página aberta. | Orientação dentro do sistema. |
 | **Menu do celular (gaveta)** | Botão com `aria-expanded` e `aria-controls`; ao abrir, o foco vai para o botão "Fechar menu"; Esc fecha e o foco volta para o botão do menu. | Quem usa teclado ou leitor de tela não fica "perdido" com o menu aberto. |

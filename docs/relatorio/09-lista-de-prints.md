@@ -52,6 +52,8 @@ Entre como **admin@stockcontrol.local**.
 | ☐ | 23 | Movimentações | Menu **Movimentações** | Lista dos últimos 7 dias com totais | Movimentações por período |
 | ☐ | 24 | Usuários | Menu **Usuários** | 3 usuários do Mercadinho Bom Preço, o admin marcado como "(você)" | Gerenciamento dos funcionários (estrutura administrativa) |
 | ☐ | 24b | Meu estabelecimento | Menu **Estabelecimento** | CNPJ e "Cliente desde" + nome, telefone e e-mail editáveis | Dados do estabelecimento |
+| ☐ | 24g | Confirmação em janela | Produtos → **Excluir** em qualquer produto (não confirme) | Janela "Excluir produto?" sobre a tela escurecida, com Cancelar e "Sim, excluir" | Confirmação de exclusão acessível |
+| ☐ | 24h | Modo escuro | Clique no botão de lua na barra superior, depois abra o Dashboard | Sistema inteiro no tema escuro | Modo escuro |
 | ☐ | 24c | Aviso de sucesso (toast) | Em "Meu estabelecimento", clique em **Salvar** e capture logo em seguida | Aviso verde no canto superior direito ("Dados do estabelecimento atualizados.") | Mensagem de confirmação |
 | ☐ | 24d | Auditoria | Primeiro mude o preço de um produto (Produtos → Editar → Preço → Salvar); depois menu **Auditoria** | Linha "Alteração de preço" com o valor antes e depois | Auditoria de preços exibida no sistema (trigger) |
 | ☐ | 24e | Minha conta | Clique no seu nome no rodapé do menu | Dados do usuário e o formulário "Trocar senha" | Troca da própria senha |

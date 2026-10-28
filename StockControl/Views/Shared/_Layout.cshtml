@@ -27,6 +27,17 @@
     <title>@ViewData["Title"] - StockControl</title>
     <link rel="icon" type="image/svg+xml" href="~/favicon.svg" asp-append-version="true" />
     <meta name="theme-color" content="#0b1f4d" />
+    @* Aplica o tema ANTES de desenhar a página (evita "piscar" claro e depois escuro).
+       Ordem: escolha salva pelo usuário; se não houver, a preferência do sistema operacional. *@
+    <script>
+        (function () {
+            var tema = null;
+            try { tema = localStorage.getItem("stockcontrol-tema"); } catch (e) { }
+            if (tema !== "escuro" && tema !== "claro")
+                tema = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "escuro" : "claro";
+            document.documentElement.setAttribute("data-tema", tema);
+        })();
+    </script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="app">
@@ -108,6 +119,13 @@
 
                 <div class="topbar-acoes">
                     <span class="topbar-data">@Icones.Svg("calendario") @hoje</span>
+                    @* Botão de alternar (toggle): o nome é fixo ("Modo escuro") e o estado vai em
+                       aria-pressed, assim o leitor de tela anuncia "Modo escuro, botão, pressionado". *@
+                    <button type="button" class="botao-icone botao-tema" id="botao-tema"
+                            aria-label="Modo escuro" aria-pressed="false" title="Alternar modo escuro">
+                        <span class="icone-tema-lua">@Icones.Svg("lua")</span>
+                        <span class="icone-tema-sol">@Icones.Svg("sol")</span>
+                    </button>
                     <a class="botao botao-pequeno" asp-controller="Movimentacoes" asp-action="Registrar" asp-route-tipo="Saida">
                         @Icones.Svg("mais") <span>Nova venda</span>
                     </a>
@@ -120,6 +138,27 @@
             </main>
         </div>
     </div>
+
+    @* ================= Janela de confirmação de exclusão =================
+       Elemento <dialog> nativo do HTML, aberto com showModal():
+       - o foco fica preso dentro da janela e o resto da página fica inerte;
+       - a tecla Esc fecha (cancela);
+       - o foco começa em "Cancelar" (a opção segura) e volta ao botão "Excluir" ao fechar;
+       - aria-labelledby/aria-describedby: o leitor de tela lê o título e a mensagem.
+       Os links "Excluir" levam data-confirmar com a mensagem. Sem JavaScript,
+       eles continuam abrindo a página de confirmação (funciona do mesmo jeito). *@
+    <dialog id="dialogo-confirmacao" class="dialogo" aria-labelledby="dialogo-titulo" aria-describedby="dialogo-mensagem">
+        <form method="post" id="dialogo-form">
+            @Html.AntiForgeryToken()
+            <span class="dialogo-icone" aria-hidden="true">@Icones.Svg("alerta")</span>
+            <h2 id="dialogo-titulo">Confirmar exclusão</h2>
+            <p id="dialogo-mensagem"></p>
+            <div class="acoes dialogo-acoes">
+                <button type="button" class="botao botao-secundario" id="dialogo-cancelar">Cancelar</button>
+                <button type="submit" class="botao botao-perigo" data-texto-enviando="Excluindo…">Sim, excluir</button>
+            </div>
+        </form>
+    </dialog>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/formularios.js" asp-append-version="true"></script>

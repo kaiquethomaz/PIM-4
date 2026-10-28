@@ -67,6 +67,8 @@
                                 @if (u.Id != usuarioLogadoId && u.Ativo)
                                 {
                                     <a class="botao botao-texto perigo botao-pequeno" asp-action="Excluir" asp-route-id="@u.Id"
+                                       data-confirmar-titulo="Excluir usuário?"
+                                       data-confirmar="O usuário “@u.Nome” será excluído. Se ele já registrou entradas ou vendas, será apenas desativado (não consegue mais entrar)."
                                        aria-label="Excluir @u.Nome">@Icones.Svg("excluir") Excluir</a>
                                 }
                             </div>

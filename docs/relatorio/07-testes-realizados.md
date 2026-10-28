@@ -52,7 +52,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R6 | `GET /api/produtos` | 15 produtos ativos | ✅ Passou |
 | R7 | `GET /api/produtos/codigo-barras/7891000000011` | Arroz, com categoria e estoque | ✅ Passou |
 | R8 | Código de barras inexistente | 404 com mensagem | ✅ Passou |
-| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.11) |
+| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.12) |
 | R10 | Entrada de 10 unidades pelo código de barras | 201; `estoqueAtual` = 34 | ✅ Passou |
 | R11 | Venda de 100 detergentes (estoque 3) | 400 "Estoque insuficiente..." | ✅ Passou |
 | R12 | Tipo "TROCA" | 400 "O tipo deve ser ENTRADA ou SAIDA." | ✅ Passou |
@@ -62,7 +62,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R16 | `GET /api/movimentacoes` com período invertido | 400 "A data inicial não pode ser maior..." | ✅ Passou |
 | R17 | Admin cadastra categoria "Pães e Bolos" (com acento) | 201 | ✅ Passou |
 | R18 | Categoria com nome repetido | 400 "Já existe uma categoria com este nome." | ✅ Passou |
-| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.11) |
+| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.12) |
 | R20 | Alterar o preço do produto (PUT) | 200; preço novo e estoque mantido | ✅ Passou |
 | R21 | Excluir categoria que tem produto | 400 com mensagem | ✅ Passou |
 | R22 | Excluir produto com movimentação | 200; produto desativado | ✅ Passou |
@@ -90,7 +90,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | U8 | Reativar o Operador pela edição, com a senha em branco | Reativado; o login com a senha antiga continua funcionando | ✅ Passou |
 | U9 | Gerente abrindo `/Usuarios` | "Acesso negado"; o menu do Gerente não tem "Usuários" | ✅ Passou |
 | U10 | POST de venda sem o token anti-CSRF | Recusado com HTTP 400 | ✅ Passou |
-| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.11) |
+| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.12) |
 
 ## 7.6 Interface
 
@@ -170,12 +170,26 @@ Feitos com os dois estabelecimentos do seed (Mercadinho Bom Preço e Mercearia D
 | P14 | `favicon.svg` | 200, `image/svg+xml`, referenciado nas telas | ✅ Passou |
 | P15 | 19 páginas × 3 perfis (com Auditoria e Minha conta) | 57/57 com o comportamento esperado | ✅ Passou |
 
-## 7.11 Defeitos encontrados e corrigidos
+## 7.11 Modo escuro e janela de confirmação (acessibilidade)
+
+| # | Teste | Resultado esperado | Resultado |
+|---|---|---|---|
+| D1 | Clicar no botão "Modo escuro" | Tema muda; `aria-pressed="true"`; escolha salva no navegador | ✅ Passou |
+| D2 | Navegar para outra tela depois de ativar | Continua no tema escuro, sem "piscar" claro | ✅ Passou |
+| D3 | Verificação automática de contraste em **12 telas × 2 temas** (todos os textos visíveis) | Nenhum texto abaixo de 4,5:1 (3:1 para texto grande) | ✅ Passou (após correção — ver 7.12) |
+| D4 | Clicar em "Excluir" do Sabonete | Janela modal abre com "Excluir produto?", mensagem explicando a desativação; foco em **Cancelar** | ✅ Passou |
+| D5 | Tab dentro da janela | Foco vai para "Sim, excluir" | ✅ Passou |
+| D6 | Esc | Janela fecha, nada é excluído, foco volta para "Excluir Sabonete 90g" | ✅ Passou |
+| D7 | Enter no link focado reabre; confirmar | POST com token anti-CSRF; produto desativado; aviso "...foi desativado (não excluído)." | ✅ Passou |
+| D8 | Página de confirmação antiga (`/Produtos/Excluir/1`) | Continua existindo (usada se o JavaScript não carregar) | ✅ Passou |
+
+## 7.12 Defeitos encontrados e corrigidos
 
 | Defeito | Causa | Correção |
 |---|---|---|
 | Depois de uma venda pela API, a resposta mostrava o estoque **antigo** (29 em vez de 27), embora o banco estivesse correto. | O Entity Framework guarda em memória os objetos já lidos na requisição. A trigger `trg_AtualizaEstoque` altera o estoque direto no banco, sem o EF saber, então a segunda leitura devolvia a cópia antiga. | Depois de executar a procedure, o `MovimentacaoDAO` recarrega do banco o produto que estava em memória (`Entry(produto).ReloadAsync()`). Testes R9 e R19 repetidos com sucesso. |
 | Mensagens de validação da API em inglês ("One or more validation errors occurred"). | Formato padrão do ASP.NET Core. | Resposta personalizada (`InvalidModelStateResponseFactory`) no formato `{ "mensagem": "Dados inválidos.", "erros": {...} }`. |
+| Iniciais brancas no círculo azul (lista de Usuários) com contraste de 3,7:1 no início do degradê. | O degradê começava num azul claro demais (`#3b82f6`). | Degradê mais escuro (`#2563eb` → `#1e40af`): contraste de 5,2:1 a 8,7:1. |
 | As barras do ranking "Mais vendidos" apareciam vermelhas (cor da reposição) em vez de azuis. | As duas barras usam a mesma classe base (`.barra-nivel`), e a regra vermelha vinha depois no CSS. | Regra mais específica para o ranking (`.ranking .ranking-barra span`). |
 | Na tabela de últimas movimentações do Dashboard, os nomes quebravam em 3 linhas depois que ela passou a dividir a linha com o ranking. | 6 colunas numa coluna estreita. | Tabela com 4 colunas: data e quem registrou foram para a linha de baixo do nome do produto. |
 | No computador, apareciam os botões "×" e "☰", que deveriam existir só no celular. | A regra genérica `.botao-icone { display: inline-flex }` vinha depois no CSS e "ganhava" da regra que escondia esses botões. | Regra com dois nomes de classe (`.botao-icone.botao-menu`), que é mais específica e vale em qualquer ordem. |
