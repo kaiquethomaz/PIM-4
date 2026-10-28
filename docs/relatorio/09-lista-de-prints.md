@@ -39,7 +39,7 @@ Entre como **admin@stockcontrol.local**.
 | ☐ | 11b | Cadastro de estabelecimento | No login, clique em **Cadastrar meu estabelecimento** | Formulário com os grupos "1. Dados do estabelecimento" e "2. Seus dados de acesso" | Cadastro de um novo mercadinho |
 | ☐ | 12 | Validação do login | Digite o e-mail do admin e uma senha errada, clique em "Entrar" | Aviso "E-mail ou senha inválidos." acima dos campos | Validação do login |
 | ☐ | 13 | Dashboard | Depois do login, janela maximizada | Menu lateral, 4 indicadores (vendas de hoje em R$, últimos 7 dias, **5 abaixo do mínimo**, valor em estoque), gráfico de vendas e lista de reposição com barras de nível | Dashboard do sistema |
-| ☐ | 13b | Últimas movimentações | Role o Dashboard até o fim | Tabela com tipo, produto, quantidade, valor e quem registrou | Últimas movimentações no Dashboard |
+| ☐ | 13b | Últimas movimentações e mais vendidos | Role o Dashboard até o fim | À esquerda, as últimas movimentações (produto, data, quem registrou, valor); à direita, o ranking dos 5 mais vendidos | Movimentações recentes e produtos mais vendidos |
 | ☐ | 14 | Produtos | Menu **Produtos** | Lista com etiquetas OK / ⚠ Abaixo do mínimo | Listagem de produtos |
 | ☐ | 15 | Busca | Digite "café" e clique em Buscar | Só o Café | Busca de produtos |
 | ☐ | 16 | Cadastro de produto | **+ Novo produto** | Formulário com categoria, fornecedor e estoque inicial | Cadastro de produto |
@@ -52,6 +52,10 @@ Entre como **admin@stockcontrol.local**.
 | ☐ | 23 | Movimentações | Menu **Movimentações** | Lista dos últimos 7 dias com totais | Movimentações por período |
 | ☐ | 24 | Usuários | Menu **Usuários** | 3 usuários do Mercadinho Bom Preço, o admin marcado como "(você)" | Gerenciamento dos funcionários (estrutura administrativa) |
 | ☐ | 24b | Meu estabelecimento | Menu **Estabelecimento** | CNPJ e "Cliente desde" + nome, telefone e e-mail editáveis | Dados do estabelecimento |
+| ☐ | 24c | Aviso de sucesso (toast) | Em "Meu estabelecimento", clique em **Salvar** e capture logo em seguida | Aviso verde no canto superior direito ("Dados do estabelecimento atualizados.") | Mensagem de confirmação |
+| ☐ | 24d | Auditoria | Primeiro mude o preço de um produto (Produtos → Editar → Preço → Salvar); depois menu **Auditoria** | Linha "Alteração de preço" com o valor antes e depois | Auditoria de preços exibida no sistema (trigger) |
+| ☐ | 24e | Minha conta | Clique no seu nome no rodapé do menu | Dados do usuário e o formulário "Trocar senha" | Troca da própria senha |
+| ☐ | 24f | Máscaras | Fornecedores → Novo, digite só os números do CNPJ e do telefone | Campos formatados automaticamente (`11.444.777/0001-61`, `(11) 98765-4321`) | Máscaras de digitação |
 | ☐ | 25 | Cadastro de usuário | **+ Novo usuário** | Formulário com perfil e confirmação de senha | Cadastro de usuário |
 | ☐ | 26 | Proteção do último Admin | Editar o Administrador → Perfil "Operador" → Salvar | "O sistema precisa ter pelo menos um administrador ativo." | Proteção da estrutura administrativa |
 | ☐ | 27 | Menu do Operador | Saia e entre como **operador@stockcontrol.local** | Menu só com Dashboard, Movimentações e Produtos; sem botões Editar/Excluir | Permissões do perfil Operador |

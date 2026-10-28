@@ -106,4 +106,23 @@ public class MovimentacaoDAO : IMovimentacaoDAO
             })
             .ToListAsync();
     }
+
+    public async Task<List<ProdutoMaisVendido>> ListarMaisVendidosAsync(DateTime desde, int quantidade)
+    {
+        // SELECT TOP (n) ... GROUP BY ProdutoId, Nome ORDER BY SUM(Quantidade) DESC
+        return await _contexto.Movimentacoes.AsNoTracking()
+            .Where(m => m.Tipo == TipoMovimentacao.Saida && m.Data >= desde)
+            .Select(m => new { m.ProdutoId, m.Produto!.Nome, m.Quantidade, Valor = m.Quantidade * m.Produto.Preco })
+            .GroupBy(x => new { x.ProdutoId, x.Nome })
+            .Select(g => new ProdutoMaisVendido
+            {
+                ProdutoId = g.Key.ProdutoId,
+                Nome = g.Key.Nome,
+                Quantidade = g.Sum(x => x.Quantidade),
+                Valor = g.Sum(x => x.Valor)
+            })
+            .OrderByDescending(p => p.Quantidade)
+            .Take(quantidade)
+            .ToListAsync();
+    }
 }

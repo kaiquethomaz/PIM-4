@@ -183,6 +183,7 @@
 </div>
 
 @* ================= Últimas movimentações ================= *@
+<div class="dash-grade dash-grade-inferior">
 <section class="cartao" aria-labelledby="titulo-ultimas">
     <div class="cartao-cabecalho">
         <div>
@@ -206,12 +207,10 @@
                 <caption class="somente-leitor">As 10 movimentações mais recentes</caption>
                 <thead>
                     <tr>
-                        <th scope="col">Data</th>
-                        <th scope="col">Tipo</th>
                         <th scope="col">Produto</th>
+                        <th scope="col">Tipo</th>
                         <th scope="col" class="numero">Qtd.</th>
                         <th scope="col" class="numero">Valor</th>
-                        <th scope="col">Registrado por</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -219,7 +218,13 @@
                     {
                         var valor = m.Quantidade * (m.Produto?.Preco ?? 0);
                         <tr>
-                            <td style="white-space: nowrap">@m.Data.ToString("dd/MM HH:mm")</td>
+                            <td>
+                                @* Nome em destaque; quando e quem registrou na linha de baixo *@
+                                <span class="celula-principal">
+                                    <strong>@m.Produto?.Nome</strong>
+                                    <span>@m.Data.ToString("dd/MM HH:mm") · @m.Usuario?.Nome</span>
+                                </span>
+                            </td>
                             <td>
                                 @if (m.Tipo == TipoMovimentacao.Entrada)
                                 {
@@ -230,10 +235,8 @@
                                     <span class="etiqueta etiqueta-saida">Venda</span>
                                 }
                             </td>
-                            <td>@m.Produto?.Nome</td>
                             <td class="numero">@m.Quantidade</td>
                             <td class="numero">@valor.ToString("C")</td>
-                            <td>@m.Usuario?.Nome</td>
                         </tr>
                     }
                 </tbody>
@@ -241,3 +244,38 @@
         </div>
     }
 </section>
+
+@* ================= Mais vendidos ================= *@
+<section class="cartao" aria-labelledby="titulo-mais-vendidos">
+    <div class="cartao-cabecalho">
+        <div>
+            <h2 id="titulo-mais-vendidos">Mais vendidos</h2>
+            <p>Top 5 em unidades, últimos 30 dias</p>
+        </div>
+    </div>
+
+    @if (Model.MaisVendidos.Count == 0)
+    {
+        <div class="vazio">
+            @Icones.Svg("carrinho")
+            <p>Nenhuma venda nos últimos 30 dias.</p>
+        </div>
+    }
+    else
+    {
+        var maisVendido = Model.MaisVendidos.Max(p => p.Quantidade);
+        <ol class="ranking">
+            @foreach (var p in Model.MaisVendidos)
+            {
+                var larguraBarraRanking = p.Quantidade * 100 / Math.Max(maisVendido, 1);
+                <li>
+                    <span class="ranking-nome">@p.Nome</span>
+                    <span class="ranking-numeros">@p.Quantidade un · @p.Valor.ToString("C")</span>
+                    @* Barra decorativa: os números ao lado já trazem a informação *@
+                    <span class="barra-nivel ranking-barra" aria-hidden="true"><span style="width: @larguraBarraRanking%"></span></span>
+                </li>
+            }
+        </ol>
+    }
+</section>
+</div>

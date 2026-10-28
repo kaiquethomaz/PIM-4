@@ -23,7 +23,7 @@
 
         <div class="campo">
             <label asp-for="CNPJ">CNPJ <span class="obrigatorio" aria-hidden="true">*</span></label>
-            <input asp-for="CNPJ" type="text" inputmode="numeric" maxlength="18" required aria-required="true"
+            <input asp-for="CNPJ" data-mascara="cnpj" type="text" inputmode="numeric" maxlength="18" required aria-required="true"
                    aria-describedby="dica-cnpj" />
             <span id="dica-cnpj" class="dica">Com ou sem pontuação. Ex.: 11.222.333/0001-81</span>
             <span asp-validation-for="CNPJ" class="erro-campo"></span>
@@ -32,7 +32,7 @@
         <div class="grade-2">
             <div class="campo">
                 <label asp-for="Telefone"></label>
-                <input asp-for="Telefone" type="tel" maxlength="20" autocomplete="tel" />
+                <input asp-for="Telefone" data-mascara="telefone" type="tel" maxlength="20" autocomplete="tel" />
                 <span asp-validation-for="Telefone" class="erro-campo"></span>
             </div>
 

@@ -1,0 +1,68 @@
+@model List<RegistroAuditoria>
+@using StockControl.Extensions
+@{
+    ViewData["Title"] = "Auditoria";
+}
+
+<div class="barra-titulo">
+    <div>
+        <h1>Auditoria</h1>
+        <p class="subtitulo">Histórico automático de mudanças de preço e exclusões de produtos, gravado pelo banco de dados.</p>
+    </div>
+</div>
+
+<div class="alerta alerta-info">
+    @Icones.Svg("historico")
+    <span>
+        Estes registros são criados pela <strong>trigger</strong> <code>trg_AuditoriaProduto</code> no SQL Server, sempre que um preço muda
+        ou um produto é excluído, não importa se pelo site, pelo app ou direto no banco. Ninguém consegue editar ou apagar este histórico pelo sistema.
+    </span>
+</div>
+
+<div class="cartao">
+    @if (Model.Count == 0)
+    {
+        <div class="vazio">
+            @Icones.Svg("historico")
+            <p>Nenhuma alteração de preço ou exclusão registrada ainda.</p>
+        </div>
+    }
+    else
+    {
+        <div class="tabela-container">
+            <table>
+                <caption>Últimos @Model.Count registro(s)</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Data</th>
+                        <th scope="col">Ação</th>
+                        <th scope="col">Produto</th>
+                        <th scope="col">Antes</th>
+                        <th scope="col">Depois</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td style="white-space: nowrap">@r.Data.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @if (r.Acao == "DELETE")
+                                {
+                                    <span class="etiqueta etiqueta-alerta">@r.Descricao</span>
+                                }
+                                else
+                                {
+                                    <span class="etiqueta etiqueta-saida">@r.Descricao</span>
+                                }
+                            </td>
+                            <td><strong>@r.Produto</strong></td>
+                            <td><span class="dica">@r.Antes</span></td>
+                            <td>@r.Depois</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

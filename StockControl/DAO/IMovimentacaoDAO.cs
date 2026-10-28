@@ -22,4 +22,7 @@ public interface IMovimentacaoDAO
 
     /// <summary>Vendas (saídas) agrupadas por dia, em R$ e em itens, a partir de uma data.</summary>
     Task<List<VendaDia>> SomarVendasPorDiaAsync(DateTime desde);
+
+    /// <summary>Ranking dos produtos mais vendidos (em unidades) a partir de uma data.</summary>
+    Task<List<ProdutoMaisVendido>> ListarMaisVendidosAsync(DateTime desde, int quantidade);
 }

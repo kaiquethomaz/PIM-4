@@ -21,4 +21,10 @@ public interface IUsuarioService
     /// (o histórico precisa saber quem fez cada venda). Retorna o que foi feito.
     /// </summary>
     Task<string> ExcluirAsync(int id, int idUsuarioLogado);
+
+    /// <summary>
+    /// O próprio usuário troca a senha ("Minha conta").
+    /// Exige a senha atual, para ninguém trocar a senha de um computador deixado logado.
+    /// </summary>
+    Task AlterarMinhaSenhaAsync(int usuarioId, string senhaAtual, string novaSenha);
 }

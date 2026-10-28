@@ -1,10 +1,31 @@
-@* Mensagens de sucesso/erro enviadas pelos controllers via TempData.
-   role="status" e role="alert" fazem o leitor de tela anunciar a mensagem. *@
-@if (TempData["Sucesso"] is string sucesso)
-{
-    <div class="alerta alerta-sucesso" role="status">@sucesso</div>
+@using StockControl.Extensions
+@* Mensagens de sucesso/erro enviadas pelos controllers via TempData,
+   mostradas como "toast": um aviso no canto da tela que some sozinho.
+   - role="status" (sucesso) e role="alert" (erro): o leitor de tela anuncia a mensagem;
+   - some depois de alguns segundos, mas PAUSA com o mouse em cima ou com o foco do teclado;
+   - tem botão para fechar (wwwroot/js/site.js). *@
+@{
+    var sucesso = TempData["Sucesso"] as string;
+    var erro = TempData["Erro"] as string;
 }
-@if (TempData["Erro"] is string erro)
+@if (sucesso is not null || erro is not null)
 {
-    <div class="alerta alerta-erro" role="alert">@erro</div>
+    <div class="toasts">
+        @if (sucesso is not null)
+        {
+            <div class="toast toast-sucesso" role="status" data-duracao="6000">
+                @Icones.Svg("ok")
+                <span class="toast-texto">@sucesso</span>
+                <button type="button" class="toast-fechar" aria-label="Fechar aviso">@Icones.Svg("fechar")</button>
+            </div>
+        }
+        @if (erro is not null)
+        {
+            <div class="toast toast-erro" role="alert" data-duracao="10000">
+                @Icones.Svg("alerta")
+                <span class="toast-texto">@erro</span>
+                <button type="button" class="toast-fechar" aria-label="Fechar aviso">@Icones.Svg("fechar")</button>
+            </div>
+        }
+    </div>
 }

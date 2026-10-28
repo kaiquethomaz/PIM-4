@@ -41,6 +41,7 @@ public class DashboardService : IDashboardService
         // duas consultas ao mesmo tempo.
         return new ResumoDashboard
         {
+            MaisVendidos = await _movimentacaoDAO.ListarMaisVendidosAsync(hoje.AddDays(-29), 5),
             ValorVendidoHoje = vendasHoje.Valor,
             ItensVendidosHoje = vendasHoje.Itens,
             VendasUltimos7Dias = vendas7Dias,

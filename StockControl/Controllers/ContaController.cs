@@ -113,6 +113,60 @@ public class ContaController : Controller
         return View();
     }
 
+    // GET /Conta/MinhaConta -> dados do usuário logado e troca da própria senha
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> MinhaConta()
+    {
+        var modelo = await MontarMinhaContaAsync();
+        return modelo is null ? NotFound() : View(modelo);
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MinhaConta(MinhaContaViewModel modelo)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                await _usuarioService.AlterarMinhaSenhaAsync(User.ObterUsuarioId(), modelo.SenhaAtual, modelo.NovaSenha);
+                TempData["Sucesso"] = "Senha alterada com sucesso.";
+                return RedirectToAction(nameof(MinhaConta));
+            }
+            catch (RegraNegocioException erro)
+            {
+                ModelState.AddModelError(string.Empty, erro.Message);
+            }
+        }
+
+        // Volta para a tela com os dados de exibição preenchidos de novo.
+        var dados = await MontarMinhaContaAsync();
+        if (dados is null)
+            return NotFound();
+        modelo.Nome = dados.Nome;
+        modelo.Email = dados.Email;
+        modelo.Perfil = dados.Perfil;
+        modelo.Estabelecimento = dados.Estabelecimento;
+        return View(modelo);
+    }
+
+    private async Task<MinhaContaViewModel?> MontarMinhaContaAsync()
+    {
+        var usuario = await _usuarioService.ObterAsync(User.ObterUsuarioId());
+        if (usuario is null)
+            return null;
+
+        return new MinhaContaViewModel
+        {
+            Nome = usuario.Nome,
+            Email = usuario.Email,
+            Perfil = usuario.Perfil.ToString(),
+            Estabelecimento = usuario.Estabelecimento?.NomeFantasia ?? string.Empty
+        };
+    }
+
     /// <summary>
     /// Cria o cookie de autenticação com os dados do usuário ("claims"):
     /// Id, nome, e-mail, perfil e o estabelecimento em que ele trabalha.

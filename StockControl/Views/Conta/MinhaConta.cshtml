@@ -1,0 +1,64 @@
+@model StockControl.ViewModels.MinhaContaViewModel
+@{
+    ViewData["Title"] = "Minha conta";
+    var iniciais = string.Concat(Model.Nome.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => char.ToUpper(p[0])));
+}
+
+<div class="barra-titulo">
+    <div>
+        <h1>Minha conta</h1>
+        <p class="subtitulo">Seus dados de acesso ao StockControl.</p>
+    </div>
+</div>
+
+<div class="cartao formulario">
+    <div class="perfil-resumo">
+        <span class="avatar avatar-grande" aria-hidden="true">@iniciais</span>
+        <div>
+            <strong>@Model.Nome</strong>
+            <span>@Model.Email</span>
+        </div>
+    </div>
+
+    <dl class="dados-fixos">
+        <div>
+            <dt>Perfil</dt>
+            <dd>@Model.Perfil</dd>
+        </div>
+        <div>
+            <dt>Estabelecimento</dt>
+            <dd>@Model.Estabelecimento</dd>
+        </div>
+    </dl>
+    <p class="dica">Para mudar o nome, o e-mail ou o perfil, fale com o administrador do estabelecimento.</p>
+
+    <h2 class="secao-titulo">Trocar senha</h2>
+
+    <form method="post" asp-action="MinhaConta" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alerta alerta-erro" role="alert"></div>
+
+        <div class="campo">
+            <label asp-for="SenhaAtual"></label>
+            <input asp-for="SenhaAtual" autocomplete="current-password" required aria-required="true" />
+            <span asp-validation-for="SenhaAtual" class="erro-campo"></span>
+        </div>
+
+        <div class="grade-2">
+            <div class="campo">
+                <label asp-for="NovaSenha"></label>
+                <input asp-for="NovaSenha" autocomplete="new-password" required aria-required="true" aria-describedby="dica-nova-senha" />
+                <span id="dica-nova-senha" class="dica">Mínimo de 6 caracteres.</span>
+                <span asp-validation-for="NovaSenha" class="erro-campo"></span>
+            </div>
+            <div class="campo">
+                <label asp-for="ConfirmarSenha"></label>
+                <input asp-for="ConfirmarSenha" autocomplete="new-password" required aria-required="true" />
+                <span asp-validation-for="ConfirmarSenha" class="erro-campo"></span>
+            </div>
+        </div>
+
+        <div class="acoes">
+            <button type="submit" class="botao">Salvar nova senha</button>
+        </div>
+    </form>
+</div>

@@ -23,6 +23,18 @@ public class ResumoDashboard
     public List<VendaDia> VendasUltimos7Dias { get; set; } = new();
 
     public decimal ValorVendido7Dias => VendasUltimos7Dias.Sum(v => v.Valor);
+
+    /// <summary>Os 5 produtos mais vendidos (em unidades) nos últimos 30 dias.</summary>
+    public List<ProdutoMaisVendido> MaisVendidos { get; set; } = new();
+}
+
+/// <summary>Uma linha do ranking de mais vendidos.</summary>
+public class ProdutoMaisVendido
+{
+    public int ProdutoId { get; set; }
+    public string Nome { get; set; } = string.Empty;
+    public int Quantidade { get; set; }
+    public decimal Valor { get; set; }
 }
 
 /// <summary>Total vendido em um dia (usado no gráfico do dashboard).</summary>

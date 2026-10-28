@@ -56,6 +56,9 @@ Legenda: ✅ atendido · ➕ entregue além do pedido
 | Fornecedores: CRUD | ✅ | `/Fornecedores` ➕ validação do dígito verificador do CNPJ |
 | Movimentações: registrar entrada/saída + listagem por período | ✅ | `/Movimentacoes`, `/Movimentacoes/Registrar` |
 | Usuários: CRUD somente Admin (estrutura administrativa) | ✅ | `/Usuarios` ➕ proteção do último administrador |
+| ➕ Minha conta (troca da própria senha) | ➕ | `/Conta/MinhaConta` |
+| ➕ Tela de Auditoria (resultado da trigger no sistema) | ➕ | `/Auditoria` (somente Admin) |
+| ➕ Ranking dos mais vendidos, gráfico de vendas, avisos, máscaras, proteção contra duplo envio | ➕ | Dashboard e formulários; ver [04-front-end.md](04-front-end.md) |
 | ➕ Vários estabelecimentos no mesmo sistema | ➕ | `/Conta/Cadastrar` (cadastro do mercadinho + dono), `/Estabelecimento` (dados do mercadinho) e isolamento automático dos dados; ver [10-multiestabelecimento.md](10-multiestabelecimento.md) |
 | Layout simples, responsivo e acessível | ✅ | [04-front-end.md](04-front-end.md) |
 

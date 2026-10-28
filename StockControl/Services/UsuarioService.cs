@@ -100,6 +100,23 @@ public class UsuarioService : IUsuarioService
         return $"Usuário \"{usuario.Nome}\" excluído.";
     }
 
+    public async Task AlterarMinhaSenhaAsync(int usuarioId, string senhaAtual, string novaSenha)
+    {
+        var usuario = await _usuarioDAO.BuscarPorIdAsync(usuarioId)
+            ?? throw new RegraNegocioException("Usuário não encontrado.");
+
+        if (!BCrypt.Net.BCrypt.Verify(senhaAtual ?? string.Empty, usuario.SenhaHash))
+            throw new RegraNegocioException("A senha atual está incorreta.");
+
+        ValidarSenha(novaSenha);
+
+        if (BCrypt.Net.BCrypt.Verify(novaSenha, usuario.SenhaHash))
+            throw new RegraNegocioException("A nova senha deve ser diferente da atual.");
+
+        usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(novaSenha);
+        await _usuarioDAO.AtualizarAsync(usuario);
+    }
+
     private async Task ValidarAsync(Usuario usuario)
     {
         usuario.Nome = (usuario.Nome ?? string.Empty).Trim();

@@ -14,7 +14,7 @@
 
     <form method="post" asp-action="Excluir" asp-route-id="@Model.Id">
         <div class="acoes">
-            <button type="submit" class="botao botao-perigo">Sim, excluir</button>
+            <button type="submit" class="botao botao-perigo" data-texto-enviando="Excluindo…">Sim, excluir</button>
             <a class="botao botao-secundario" asp-action="Index">Cancelar</a>
         </div>
     </form>

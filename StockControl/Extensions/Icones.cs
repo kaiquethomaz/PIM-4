@@ -38,7 +38,9 @@ public static class Icones
         ["grafico"] = "<line x1='18' y1='20' x2='18' y2='10'/><line x1='12' y1='20' x2='12' y2='4'/><line x1='6' y1='20' x2='6' y2='14'/>",
         ["cadeado"] = "<rect x='3' y='11' width='18' height='11' rx='2' ry='2'/><path d='M7 11V7a5 5 0 0 1 10 0v4'/>",
         ["ok"] = "<path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/><polyline points='22 4 12 14.01 9 11.01'/>",
-        ["filtro"] = "<polygon points='22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3'/>"
+        ["historico"] = "<circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/>",
+        ["info"] = "<circle cx='12' cy='12' r='10'/><line x1='12' y1='16' x2='12' y2='12'/><line x1='12' y1='8' x2='12.01' y2='8'/>",
+        ["filtro"] ="<polygon points='22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3'/>"
     };
 
     /// <summary>Devolve o &lt;svg&gt; do ícone pedido (ou vazio, se o nome não existir).</summary>

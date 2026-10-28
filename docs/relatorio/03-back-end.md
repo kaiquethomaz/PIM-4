@@ -15,6 +15,8 @@ Recebem a requisição HTTP, validam os dados de entrada (`ModelState`), chamam 
 |---|---|---|
 | `ContaController` | Login, logout, acesso negado e **cadastro de um novo estabelecimento** | Todos (login e cadastro sem autenticação) |
 | `EstabelecimentoController` | "Meu estabelecimento": dados do mercadinho | Somente Admin |
+| `AuditoriaController` | Histórico de mudanças de preço e exclusões gravado pela trigger | Somente Admin |
+| `ContaController` → `MinhaConta` | Dados do usuário logado e troca da própria senha | Usuários logados |
 | `HomeController` | Dashboard (totais, reposição, últimas movimentações) | Usuários logados |
 | `MovimentacoesController` | Registrar entrada/venda e listar por período | Usuários logados |
 | `ProdutosController` | Listagem com busca e CRUD de produtos | Consulta: todos; cadastro/edição/exclusão: Admin e Gerente |
@@ -40,8 +42,10 @@ Cada Service tem uma **interface** (`IProdutoService`) e uma **implementação**
 | `CategoriaService` | Nome obrigatório e único; não exclui categoria que tenha produtos. |
 | `FornecedorService` | Remove a máscara do CNPJ e **valida os dígitos verificadores**; CNPJ único; não exclui fornecedor que tenha produtos. |
 | `UsuarioService` | Senha com no mínimo 6 caracteres, guardada com hash BCrypt; e-mail único e sempre minúsculo; o sistema não pode ficar sem administrador ativo; o usuário não pode desativar nem excluir a si mesmo; usuário que já registrou movimentações é **desativado** em vez de excluído (o histórico precisa mostrar quem fez cada venda); na edição, senha em branco mantém a atual. |
+| `AuditoriaService` | Monta a tela de Auditoria a partir do `LogAuditoria`: traduz a ação ("Alteração de preço" / "Exclusão de produto"), formata os preços gravados pela trigger (`28.90` → R$ 28,90) e, para produtos já excluídos, recupera o nome do próprio log. |
+| `UsuarioService.AlterarMinhaSenhaAsync` | Troca da própria senha: exige a **senha atual** correta, a nova precisa ter 6+ caracteres e ser diferente da atual. |
 | `EstabelecimentoService` | Cadastro de mercadinho novo: CNPJ válido e ainda não usado, e-mail do dono ainda não usado, senha com no mínimo 6 caracteres; o dono vira Admin; cria 6 categorias iniciais; tudo em uma transação. Edição do nome, telefone e e-mail (o CNPJ não muda). |
-| `DashboardService` | Monta os indicadores do painel: vendas de hoje em R$ e em itens, vendas dos últimos 7 dias (completando com zero os dias sem venda, para o gráfico), produtos abaixo do mínimo, valor em estoque e as últimas movimentações. O valor de cada venda é quantidade × preço atual do produto. |
+| `DashboardService` | Monta os indicadores do painel: vendas de hoje em R$ e em itens, vendas dos últimos 7 dias (completando com zero os dias sem venda, para o gráfico), **top 5 mais vendidos** dos últimos 30 dias (consulta com `GROUP BY` no banco), produtos abaixo do mínimo, valor em estoque e as últimas movimentações. O valor de cada venda é quantidade × preço atual do produto. |
 
 Quando uma regra é violada, o Service lança uma `RegraNegocioException` com uma mensagem amigável. O Controller captura essa exceção e mostra a mensagem na tela (ou devolve no JSON).
 
@@ -87,6 +91,7 @@ classDiagram
 
 - `IDAOBase<T>` / `DAOBase<T>`: CRUD genérico, escrito uma única vez e herdado por `ProdutoDAO`, `CategoriaDAO`, `FornecedorDAO` e `UsuarioDAO`.
 - Cada DAO específico acrescenta suas consultas (ex.: `ProdutoDAO.ListarAbaixoDoMinimoAsync()` chama a procedure `sp_ProdutosAbaixoDoMinimo`).
+- `LogAuditoriaDAO` só **lê** o `LogAuditoria` (quem grava é a trigger); a tabela não tem tela de edição nem exclusão.
 - `EstabelecimentoDAO` faz o cadastro do estabelecimento, do dono e das categorias iniciais **em uma única transação** (`BeginTransactionAsync` / `CommitAsync`).
 - Todos os DAOs passam pelo **filtro automático por estabelecimento** do `AppDbContext`. Só o login e a checagem de e-mail/CNPJ únicos usam `IgnoreQueryFilters()` (ver [10-multiestabelecimento.md](10-multiestabelecimento.md)).
 - `MovimentacaoDAO` **não** herda o CRUD genérico: uma movimentação é histórica e não pode ser editada nem excluída. Ela é registrada pela procedure `sp_RegistrarMovimentacao`.

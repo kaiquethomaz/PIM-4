@@ -25,6 +25,15 @@ O `site.css` funciona como um pequeno **design system**: as cores, raios e sombr
 | **Etiqueta** (`.etiqueta`) | Situação com texto e pontinho colorido (OK, Abaixo do mínimo, Inativo, Entrada, Venda). |
 | **Botões** | Primário (azul), secundário (contorno), perigo (vermelho) e "texto" (ações discretas nas tabelas, com ícone). |
 | **Estado vazio** (`.vazio`) | Ícone e mensagem quando uma lista não tem registros. |
+| **Aviso "toast"** (`.toast`) | Mensagens de sucesso/erro no canto superior direito, com ícone e botão de fechar; somem sozinhas (6 s sucesso, 10 s erro). |
+
+## 4.1.2 Comportamentos dos formulários (`wwwroot/js/formularios.js`)
+
+| Recurso | Como funciona | Por quê |
+|---|---|---|
+| **Proteção contra duplo clique** | Ao enviar, o botão fica desabilitado, mostra um *spinner* e um texto ("Registrando…", "Salvando…", "Excluindo…") e recebe `aria-busy="true"`. Um segundo clique é ignorado. | Sem isso, dois cliques rápidos em "Registrar" gravariam a **mesma venda duas vezes**. Testado: duplo clique gerou só 1 movimentação. |
+| **Máscaras** | CNPJ vira `11.222.333/0001-81` e telefone vira `(11) 98765-4321` enquanto a pessoa digita; o preço aceita só números e uma vírgula, com até 2 casas (ponto vira vírgula). | Evita erro de digitação; o servidor continua validando tudo. |
+| **Ícone da aba** | `wwwroot/favicon.svg`: o logo do sistema aparece na aba do navegador e nos favoritos. | Identidade visual. |
 
 ## 4.2 Organização das Views
 
@@ -48,7 +57,7 @@ O `site.css` funciona como um pequeno **design system**: as cores, raios e sombr
 | **Login** | Tela dividida: à esquerda, um painel com a identidade visual e os principais recursos do sistema; à direita, o formulário com ícones nos campos, botão para mostrar/ocultar a senha e a opção "Manter conectado". No celular, o painel é ocultado e o logo aparece acima do formulário. | Todos |
 | **Cadastrar meu estabelecimento** | Mesmo layout do login, com o formulário em dois grupos numerados: "1. Dados do estabelecimento" (nome, CNPJ, telefone) e "2. Seus dados de acesso" (nome, e-mail e senha com confirmação). Depois de cadastrar, o dono já entra no sistema. | Público |
 | **Meu estabelecimento** | CNPJ e data de cadastro (só leitura) + edição do nome, telefone e e-mail. O nome alterado aparece na hora no cabeçalho. | Somente Admin |
-| **Dashboard** | 4 indicadores (**vendas de hoje em R$** e itens vendidos, vendas dos últimos 7 dias com média diária, produtos abaixo do mínimo, valor em estoque); **gráfico de barras** das vendas dos últimos 7 dias (SVG, com o dia de hoje destacado); lista "Precisam de reposição" com **barra de nível de estoque** e botão **Repor**; últimas 10 movimentações com valor e quem registrou; atalhos "Registrar venda" / "Registrar entrada". | Todos (valor em estoque só Admin/Gerente; o Operador vê "Produtos ativos") |
+| **Dashboard** | 4 indicadores (**vendas de hoje em R$** e itens vendidos, vendas dos últimos 7 dias com média diária, produtos abaixo do mínimo, valor em estoque); **gráfico de barras** das vendas dos últimos 7 dias (SVG, com o dia de hoje destacado); lista "Precisam de reposição" com **barra de nível de estoque** e botão **Repor**; últimas 10 movimentações com valor, data e quem registrou; **ranking dos 5 mais vendidos** dos últimos 30 dias, com barras proporcionais; atalhos "Registrar venda" / "Registrar entrada". | Todos (valor em estoque só Admin/Gerente; o Operador vê "Produtos ativos") |
 | **Registrar movimentação** | Formulário único para venda ou entrada: tipo (botões de opção), produto (lista com o estoque atual de cada um), quantidade e observação. Depois de salvar, mostra o estoque atualizado e volta pronto para a próxima venda. | Todos |
 | **Movimentações** | Indicadores do período (movimentações, unidades de entrada, unidades vendidas) e listagem filtrada por período (padrão: últimos 7 dias). | Todos |
 | **Produtos** | Lista com busca por nome ou código de barras, etiqueta de situação (OK / Abaixo do mínimo / Inativo), cadastro, edição e exclusão. | Consulta: todos; edição: Admin e Gerente |
@@ -56,6 +65,8 @@ O `site.css` funciona como um pequeno **design system**: as cores, raios e sombr
 | **Fornecedores** | Lista com CNPJ formatado, cadastro, edição e exclusão. | Admin e Gerente |
 | **Acesso negado** | Mostrada quando o usuário tenta abrir uma página sem permissão. | Todos |
 | **Página não encontrada** | Mostrada em endereços inexistentes ou ao tentar abrir um registro de outro estabelecimento (erro 404), no visual do sistema em vez da página padrão do navegador. | Todos |
+| **Minha conta** | Aberta ao clicar no próprio nome, no rodapé do menu: mostra nome, e-mail, perfil e estabelecimento, e permite **trocar a própria senha** (pede a senha atual). | Todos |
+| **Auditoria** | Histórico de mudanças de preço (antes → depois) e exclusões de produtos, gravado pela trigger `trg_AuditoriaProduto`, com um aviso explicando de onde vêm os dados. | Somente Admin |
 | **Usuários** | Lista com perfil e situação, cadastro (com confirmação de senha), edição (senha em branco mantém a atual; ativar/desativar) e exclusão. | Somente Admin |
 
 **Estrutura das telas internas:** menu lateral fixo à esquerda e, no topo, uma barra com o **nome do estabelecimento**, a data e o atalho "Nova venda", para o funcionário sempre saber em qual mercadinho está. O usuário logado (iniciais, nome e perfil) e o botão Sair ficam no rodapé do menu.
@@ -100,7 +111,9 @@ O sistema segue recomendações da **WCAG 2.1** (Diretrizes de Acessibilidade pa
 | **Ícones decorativos** | Todos os ícones SVG têm `aria-hidden="true"`; o significado está sempre no texto ao lado. | O leitor de tela não lê "imagem" sem sentido. |
 | **Grupos de opções** | Entrada/Venda em `<fieldset>` com `<legend>`, e cada opção com o rótulo clicável inteiro. | O leitor de tela anuncia a pergunta antes das opções; a área de clique é maior. |
 | **Regiões do Dashboard** | `<section aria-labelledby>` em cada bloco. | O leitor de tela permite pular direto para "Precisam de reposição". |
-| **Mensagens anunciadas** | Erros com `role="alert"`, sucesso com `role="status"`. | O leitor de tela lê a mensagem sem o usuário procurar. |
+| **Mensagens anunciadas** | Erros com `role="alert"`, sucesso com `role="status"` (também nos avisos "toast"). | O leitor de tela lê a mensagem sem o usuário procurar. |
+| **Avisos sem pressa** | O "toast" **pausa** enquanto o mouse está em cima ou o foco do teclado está nele, e tem botão "Fechar aviso". | Quem lê mais devagar não perde a mensagem. |
+| **Ação em andamento** | Botão enviando recebe `aria-busy="true"` e texto "Salvando…". | O leitor de tela informa que a ação está sendo processada. |
 | **Botões com contexto** | "Editar" tem `aria-label="Editar Arroz Branco Tipo 1 5kg"`. | O leitor de tela diz *qual* item será editado. |
 | **Menu atual** | `aria-current="page"` no item da página aberta. | Orientação dentro do sistema. |
 | **Menu do celular (gaveta)** | Botão com `aria-expanded` e `aria-controls`; ao abrir, o foco vai para o botão "Fechar menu"; Esc fecha e o foco volta para o botão do menu. | Quem usa teclado ou leitor de tela não fica "perdido" com o menu aberto. |

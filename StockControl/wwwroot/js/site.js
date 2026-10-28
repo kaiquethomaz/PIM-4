@@ -1,3 +1,28 @@
+// Avisos "toast" (mensagens de sucesso e erro): somem sozinhos depois de
+// alguns segundos, mas o tempo pausa com o mouse em cima ou com o foco do
+// teclado, e o botão × fecha na hora.
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".toast").forEach(function (toast) {
+        var restante = parseInt(toast.dataset.duracao || "6000", 10);
+        var inicio, timer;
+
+        function fechar() {
+            clearTimeout(timer);
+            toast.classList.add("toast-saindo");
+            setTimeout(function () { toast.remove(); }, 200);
+        }
+        function iniciar() { inicio = Date.now(); timer = setTimeout(fechar, restante); }
+        function pausar() { clearTimeout(timer); restante -= Date.now() - inicio; }
+
+        toast.querySelector(".toast-fechar").addEventListener("click", fechar);
+        toast.addEventListener("mouseenter", pausar);
+        toast.addEventListener("mouseleave", iniciar);
+        toast.addEventListener("focusin", pausar);
+        toast.addEventListener("focusout", iniciar);
+        iniciar();
+    });
+});
+
 // Menu lateral no celular: abre e fecha como uma "gaveta".
 // - aria-expanded avisa o leitor de tela se o menu está aberto;
 // - a tecla Esc e o clique no fundo escuro fecham o menu;

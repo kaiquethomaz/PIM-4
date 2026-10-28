@@ -27,13 +27,13 @@
         <div class="grade-2">
             <div class="campo">
                 <label asp-for="CNPJ">CNPJ <span class="obrigatorio" aria-hidden="true">*</span></label>
-                <input asp-for="CNPJ" type="text" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00"
+                <input asp-for="CNPJ" data-mascara="cnpj" type="text" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00"
                        required aria-required="true" />
                 <span asp-validation-for="CNPJ" class="erro-campo"></span>
             </div>
             <div class="campo">
                 <label asp-for="Telefone"></label>
-                <input asp-for="Telefone" type="tel" maxlength="20" placeholder="(11) 4000-1000" autocomplete="tel" />
+                <input asp-for="Telefone" data-mascara="telefone" type="tel" maxlength="20" placeholder="(11) 4000-1000" autocomplete="tel" />
                 <span asp-validation-for="Telefone" class="erro-campo"></span>
             </div>
         </div>
@@ -69,7 +69,7 @@
         </div>
     </fieldset>
 
-    <button type="submit" class="botao botao-grande">Criar conta do estabelecimento</button>
+    <button type="submit" class="botao botao-grande" data-texto-enviando="Criando a conta…">Criar conta do estabelecimento</button>
 </form>
 
 <p class="login-ajuda">

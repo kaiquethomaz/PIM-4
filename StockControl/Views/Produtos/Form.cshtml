@@ -31,7 +31,7 @@
             <div class="campo">
                 <label asp-for="Preco">Preço (R$) <span class="obrigatorio" aria-hidden="true">*</span></label>
                 @* type="text" + inputmode="decimal": aceita vírgula (28,90) e abre o teclado numérico no celular *@
-                <input asp-for="Preco" type="text" inputmode="decimal" required aria-required="true" aria-describedby="dica-preco" />
+                <input asp-for="Preco" data-mascara="preco" type="text" inputmode="decimal" required aria-required="true" aria-describedby="dica-preco" />
                 <span id="dica-preco" class="dica">Use vírgula para os centavos. Ex.: 28,90</span>
                 <span asp-validation-for="Preco" class="erro-campo"></span>
             </div>

@@ -173,6 +173,8 @@ Grava em `LogAuditoria`, junto com o estabelecimento do produto:
 - **`UPDATE_PRECO`:** quando o preço muda, com o valor antigo e o novo.
 - **`DELETE`:** quando um produto é excluído, com os dados que ele tinha.
 
+O resultado aparece no sistema, na tela **Auditoria** (somente Admin), com o preço antes e depois de cada mudança e os dados de cada produto excluído.
+
 Como a trigger de estoque também faz `UPDATE` em `Produto`, a auditoria filtra apenas as linhas em que o preço realmente mudou (`WHERE i.Preco <> d.Preco`), evitando registros desnecessários a cada venda.
 
 ## 2.7 Índices (otimização)

@@ -103,6 +103,7 @@ Mais cuidados:
 - O fator de custo 11 deixa cada tentativa propositalmente lenta, o que dificulta ataques de força bruta.
 - No login, `BCrypt.Verify` calcula o hash da senha digitada e compara com o hash salvo. A senha original não pode ser recuperada a partir do hash.
 - Tamanho mínimo: 6 caracteres.
+- **Troca da própria senha ("Minha conta"):** exige a **senha atual**. Assim, alguém que encontre um computador deixado logado não consegue trocar a senha do dono da sessão. A nova senha precisa ser diferente da atual.
 
 ## 5.5 Proteção contra CSRF
 
@@ -135,5 +136,6 @@ Os ViewModels também impedem o **overposting**: só os campos previstos são ac
 | **Dados em trânsito** | `UseHttpsRedirection` redireciona HTTP para HTTPS; em produção, `UseHsts` obriga o navegador a usar sempre HTTPS. |
 | **Detalhes de erro expostos** | Em produção, erros mostram uma página genérica, sem detalhes técnicos. |
 | **Concorrência no estoque** | A procedure bloqueia a linha do produto durante a venda (`UPDLOCK, HOLDLOCK`), para que duas vendas simultâneas não deixem o estoque negativo. |
-| **Perda de histórico** | Produtos com movimentações são desativados, não excluídos. Mudanças de preço e exclusões ficam registradas em `LogAuditoria`. |
+| **Perda de histórico** | Produtos com movimentações são desativados, não excluídos. Mudanças de preço e exclusões ficam registradas em `LogAuditoria`, que o Admin consulta na tela **Auditoria** (só leitura: o sistema não permite editar nem apagar o histórico). |
+| **Envio duplicado** | O botão do formulário é desabilitado depois do primeiro clique, evitando registrar a mesma venda duas vezes. |
 | **Ficar sem administrador** | O sistema impede desativar ou rebaixar o último Admin ativo. |

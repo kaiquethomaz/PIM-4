@@ -200,6 +200,7 @@ builder.Services.AddScoped<ICategoriaDAO, CategoriaDAO>();
 builder.Services.AddScoped<IFornecedorDAO, FornecedorDAO>();
 builder.Services.AddScoped<IProdutoDAO, ProdutoDAO>();
 builder.Services.AddScoped<IMovimentacaoDAO, MovimentacaoDAO>();
+builder.Services.AddScoped<ILogAuditoriaDAO, LogAuditoriaDAO>();
 
 // Services (regras de negócio)
 builder.Services.AddScoped<IEstabelecimentoService, EstabelecimentoService>();
@@ -209,6 +210,7 @@ builder.Services.AddScoped<IFornecedorService, FornecedorService>();
 builder.Services.AddScoped<IProdutoService, ProdutoService>();
 builder.Services.AddScoped<IMovimentacaoService, MovimentacaoService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IAuditoriaService, AuditoriaService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();

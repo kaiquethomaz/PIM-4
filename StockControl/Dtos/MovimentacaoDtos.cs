@@ -103,8 +103,12 @@ public class DashboardResumoDto
     /// <summary>Vendas dos últimos 7 dias, um item por dia (para gráfico no app).</summary>
     public List<VendaDia> VendasUltimos7Dias { get; set; } = new();
 
+    /// <summary>Os 5 produtos mais vendidos nos últimos 30 dias.</summary>
+    public List<ProdutoMaisVendido> MaisVendidos { get; set; } = new();
+
     public static DashboardResumoDto DeModelo(ResumoDashboard r) => new()
     {
+        MaisVendidos = r.MaisVendidos,
         ValorVendidoHoje = r.ValorVendidoHoje,
         ItensVendidosHoje = r.ItensVendidosHoje,
         VendasUltimos7Dias = r.VendasUltimos7Dias,
