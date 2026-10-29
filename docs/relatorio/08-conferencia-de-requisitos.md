@@ -55,6 +55,7 @@ Legenda: ✅ atendido · ➕ entregue além do pedido
 | Categorias: CRUD | ✅ | `/Categorias` |
 | Fornecedores: CRUD | ✅ | `/Fornecedores` ➕ validação do dígito verificador do CNPJ |
 | Movimentações: registrar entrada/saída + listagem por período | ✅ | `/Movimentacoes`, `/Movimentacoes/Registrar` |
+| ➕ Tela de Vendas (só as saídas, com valor em R$ e totais) | ➕ | `/Vendas` |
 | Usuários: CRUD somente Admin (estrutura administrativa) | ✅ | `/Usuarios` ➕ proteção do último administrador |
 | ➕ Minha conta (troca da própria senha) | ➕ | `/Conta/MinhaConta` |
 | ➕ Tela de Auditoria (resultado da trigger no sistema) | ➕ | `/Auditoria` (somente Admin) |

@@ -49,6 +49,7 @@ Entre como **admin@stockcontrol.local**.
 | ☐ | 20 | Regra: CNPJ inválido | **+ Novo fornecedor**, CNPJ `11.222.333/0001-82` | "CNPJ inválido." | Validação de CNPJ |
 | ☐ | 21 | Registrar venda | Dashboard → **+ Registrar venda** → escolha o Detergente, quantidade 100 | "Estoque insuficiente. "Detergente..." tem 3 unidade(s)." | Bloqueio de venda sem estoque |
 | ☐ | 22 | Venda registrada | Mude a quantidade para 2 e registre | "Venda registrada: 2 x Detergente... Estoque atual: 1." | Registro de venda |
+| ☐ | 22b | Vendas | Menu **Vendas** | Totais do período (R$, itens, valor médio), atalhos de período e a tabela de vendas com a linha de total | Tela de vendas |
 | ☐ | 23 | Movimentações | Menu **Movimentações** | Lista dos últimos 7 dias com totais | Movimentações por período |
 | ☐ | 24 | Usuários | Menu **Usuários** | 3 usuários do Mercadinho Bom Preço, o admin marcado como "(você)" | Gerenciamento dos funcionários (estrutura administrativa) |
 | ☐ | 24b | Meu estabelecimento | Menu **Estabelecimento** | CNPJ e "Cliente desde" + nome, telefone e e-mail editáveis | Dados do estabelecimento |

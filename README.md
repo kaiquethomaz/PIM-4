@@ -11,6 +11,7 @@ Baseado no projeto do PIM III, reescrito para atender aos requisitos do PIM IV.
 - **Login** com perfis **Admin**, **Gerente** e **Operador** (cookie no site, JWT na API)
 - **Dashboard** com totais do dia, produtos que precisam de reposição e últimas movimentações
 - **Vendas e entradas** de estoque, com bloqueio de venda sem estoque
+- **Tela de Vendas** com total vendido em R$, itens e valor médio por período
 - **Cadastros** de produtos (com busca), categorias, fornecedores e usuários
 - **Relatório de movimentações** por período
 - **Auditoria automática** de mudanças de preço e exclusões (trigger)

@@ -58,6 +58,7 @@
                 <p class="menu-grupo" id="grupo-operacao">Operação</p>
                 <ul class="menu" aria-labelledby="grupo-operacao">
                     <li><a asp-controller="Home" asp-action="Index" aria-current="@Atual("Home")">@Icones.Svg("dashboard") <span>Dashboard</span></a></li>
+                    <li><a asp-controller="Vendas" asp-action="Index" aria-current="@Atual("Vendas")">@Icones.Svg("carrinho") <span>Vendas</span></a></li>
                     <li><a asp-controller="Movimentacoes" asp-action="Index" aria-current="@Atual("Movimentacoes")">@Icones.Svg("movimentacoes") <span>Movimentações</span></a></li>
                     <li><a asp-controller="Produtos" asp-action="Index" aria-current="@Atual("Produtos")">@Icones.Svg("produtos") <span>Produtos</span></a></li>
                 </ul>

@@ -52,7 +52,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R6 | `GET /api/produtos` | 15 produtos ativos | ✅ Passou |
 | R7 | `GET /api/produtos/codigo-barras/7891000000011` | Arroz, com categoria e estoque | ✅ Passou |
 | R8 | Código de barras inexistente | 404 com mensagem | ✅ Passou |
-| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.12) |
+| R9 | Venda de 3 unidades (estoque 27) | 201; resposta com `estoqueAtual` = 24 | ✅ Passou (após correção — ver 7.13) |
 | R10 | Entrada de 10 unidades pelo código de barras | 201; `estoqueAtual` = 34 | ✅ Passou |
 | R11 | Venda de 100 detergentes (estoque 3) | 400 "Estoque insuficiente..." | ✅ Passou |
 | R12 | Tipo "TROCA" | 400 "O tipo deve ser ENTRADA ou SAIDA." | ✅ Passou |
@@ -62,7 +62,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | R16 | `GET /api/movimentacoes` com período invertido | 400 "A data inicial não pode ser maior..." | ✅ Passou |
 | R17 | Admin cadastra categoria "Pães e Bolos" (com acento) | 201 | ✅ Passou |
 | R18 | Categoria com nome repetido | 400 "Já existe uma categoria com este nome." | ✅ Passou |
-| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.12) |
+| R19 | Cadastrar produto com estoque inicial 7 | 201; resposta com `estoqueAtual` = 7 | ✅ Passou (após correção — ver 7.13) |
 | R20 | Alterar o preço do produto (PUT) | 200; preço novo e estoque mantido | ✅ Passou |
 | R21 | Excluir categoria que tem produto | 400 com mensagem | ✅ Passou |
 | R22 | Excluir produto com movimentação | 200; produto desativado | ✅ Passou |
@@ -90,7 +90,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | U8 | Reativar o Operador pela edição, com a senha em branco | Reativado; o login com a senha antiga continua funcionando | ✅ Passou |
 | U9 | Gerente abrindo `/Usuarios` | "Acesso negado"; o menu do Gerente não tem "Usuários" | ✅ Passou |
 | U10 | POST de venda sem o token anti-CSRF | Recusado com HTTP 400 | ✅ Passou |
-| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.12) |
+| U11 | Dashboard em 375 px (celular) | Menu recolhido, cartões 2 por linha, sem rolagem lateral | ✅ Passou (após correção — ver 7.13) |
 
 ## 7.6 Interface
 
@@ -176,14 +176,26 @@ Feitos com os dois estabelecimentos do seed (Mercadinho Bom Preço e Mercearia D
 |---|---|---|---|
 | D1 | Clicar no botão "Modo escuro" | Tema muda; `aria-pressed="true"`; escolha salva no navegador | ✅ Passou |
 | D2 | Navegar para outra tela depois de ativar | Continua no tema escuro, sem "piscar" claro | ✅ Passou |
-| D3 | Verificação automática de contraste em **12 telas × 2 temas** (todos os textos visíveis) | Nenhum texto abaixo de 4,5:1 (3:1 para texto grande) | ✅ Passou (após correção — ver 7.12) |
+| D3 | Verificação automática de contraste em **12 telas × 2 temas** (todos os textos visíveis) | Nenhum texto abaixo de 4,5:1 (3:1 para texto grande) | ✅ Passou (após correção — ver 7.13) |
 | D4 | Clicar em "Excluir" do Sabonete | Janela modal abre com "Excluir produto?", mensagem explicando a desativação; foco em **Cancelar** | ✅ Passou |
 | D5 | Tab dentro da janela | Foco vai para "Sim, excluir" | ✅ Passou |
 | D6 | Esc | Janela fecha, nada é excluído, foco volta para "Excluir Sabonete 90g" | ✅ Passou |
 | D7 | Enter no link focado reabre; confirmar | POST com token anti-CSRF; produto desativado; aviso "...foi desativado (não excluído)." | ✅ Passou |
 | D8 | Página de confirmação antiga (`/Produtos/Excluir/1`) | Continua existindo (usada se o JavaScript não carregar) | ✅ Passou |
 
-## 7.12 Defeitos encontrados e corrigidos
+## 7.12 Tela de Vendas
+
+| # | Teste | Resultado esperado | Resultado |
+|---|---|---|---|
+| S1 | Operador abre **Vendas** (últimos 7 dias) | R$ 1.417,17 · 155 itens · 12 vendas, **iguais à consulta direta no banco** | ✅ Passou |
+| S2 | Maria (outro estabelecimento) abre Vendas | Só as vendas da Mercearia Dona Maria (R$ 413,08 · 48 itens · 4 vendas) | ✅ Passou |
+| S3 | Filtro "só hoje" | Somente as vendas de hoje | ✅ Passou |
+| S4 | Período com data inicial maior que a final | "A data inicial não pode ser maior que a data final." | ✅ Passou |
+| S5 | Linha de total da tabela | "Total do período · 155 · R$ 1.417,17" | ✅ Passou |
+| S6 | Contraste (claro e escuro) e celular (375 px) | Sem textos abaixo do mínimo; sem rolagem lateral | ✅ Passou |
+| S7 | Item "Vendas" no menu | Aparece para todos os perfis, logo abaixo do Dashboard | ✅ Passou |
+
+## 7.13 Defeitos encontrados e corrigidos
 
 | Defeito | Causa | Correção |
 |---|---|---|

@@ -17,6 +17,9 @@ public interface IMovimentacaoDAO
 
     Task<List<Movimentacao>> ListarUltimasAsync(int quantidade);
 
+    /// <summary>Somente as vendas (saídas) do período, com produto, categoria e vendedor.</summary>
+    Task<List<Movimentacao>> ListarVendasAsync(DateTime dataInicio, DateTime dataFim);
+
     /// <summary>Quantidade de movimentações de um tipo a partir de uma data.</summary>
     Task<int> ContarDesdeAsync(TipoMovimentacao tipo, DateTime desde);
 

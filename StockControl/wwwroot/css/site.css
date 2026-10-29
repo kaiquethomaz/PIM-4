@@ -650,6 +650,13 @@ td .acoes { gap: 4px; flex-wrap: nowrap; justify-content: flex-end; }
 .opcoes-radio .opcao:has(input:checked) { border-color: var(--azul); background: var(--azul-claro); box-shadow: 0 0 0 1px var(--azul); }
 .opcoes-radio input[type="radio"] { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--azul); }
 
+/* Atalhos de período (Hoje, Últimos 7 dias...) e linha de total no fim da tabela */
+.atalhos-periodo { display: flex; flex-wrap: wrap; gap: 4px; margin: -8px 0 16px; }
+tfoot th, tfoot td { padding: 13px 16px; background: var(--superficie-2); border-top: 1px solid var(--borda); text-transform: none; letter-spacing: 0; font-size: 0.94rem; color: var(--texto); }
+tfoot th:first-child { padding-left: 24px; }
+tfoot td:last-child { padding-right: 24px; }
+.nota-tabela { margin: 16px 0 0; }
+
 /* Busca e filtros acima das tabelas */
 .busca { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 20px; }
 .busca .campo { margin: 0; flex: 1 1 240px; }

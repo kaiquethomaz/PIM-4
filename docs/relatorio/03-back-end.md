@@ -18,6 +18,7 @@ Recebem a requisição HTTP, validam os dados de entrada (`ModelState`), chamam 
 | `AuditoriaController` | Histórico de mudanças de preço e exclusões gravado pela trigger | Somente Admin |
 | `ContaController` → `MinhaConta` | Dados do usuário logado e troca da própria senha | Usuários logados |
 | `HomeController` | Dashboard (totais, reposição, últimas movimentações) | Usuários logados |
+| `VendasController` | Lista só as vendas (saídas) do período, com valor em R$ e totais | Usuários logados |
 | `MovimentacoesController` | Registrar entrada/venda e listar por período | Usuários logados |
 | `ProdutosController` | Listagem com busca e CRUD de produtos | Consulta: todos; cadastro/edição/exclusão: Admin e Gerente |
 | `CategoriasController` | CRUD de categorias | Admin e Gerente |

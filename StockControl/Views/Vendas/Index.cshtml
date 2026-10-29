@@ -1,0 +1,136 @@
+@model StockControl.ViewModels.VendasViewModel
+@using StockControl.Extensions
+@using StockControl.ViewModels
+@{
+    ViewData["Title"] = "Vendas";
+    var hoje = DateTime.Today;
+}
+
+<div class="barra-titulo">
+    <div>
+        <h1>Vendas</h1>
+        <p class="subtitulo">Vendas do estabelecimento no período, com o valor de cada uma.</p>
+    </div>
+    <div class="acoes">
+        <a class="botao" asp-controller="Movimentacoes" asp-action="Registrar" asp-route-tipo="@TipoMovimentacao.Saida">@Icones.Svg("mais") Nova venda</a>
+    </div>
+</div>
+
+@if (Model.Erro is null)
+{
+    <section aria-labelledby="titulo-totais">
+        <h2 id="titulo-totais" class="somente-leitor">Totais do período</h2>
+        <div class="kpis kpis-3">
+            <div class="cartao kpi">
+                <span class="kpi-icone kpi-verde">@Icones.Svg("dinheiro")</span>
+                <span class="kpi-texto">
+                    <span class="kpi-rotulo">Total vendido</span>
+                    <span class="kpi-valor">@Model.TotalVendido.ToString("C")</span>
+                    <span class="kpi-detalhe">de @Model.DataInicio.ToString("dd/MM") a @Model.DataFim.ToString("dd/MM")</span>
+                </span>
+            </div>
+            <div class="cartao kpi">
+                <span class="kpi-icone kpi-azul">@Icones.Svg("carrinho")</span>
+                <span class="kpi-texto">
+                    <span class="kpi-rotulo">Itens vendidos</span>
+                    <span class="kpi-valor">@Model.TotalItens</span>
+                    <span class="kpi-detalhe">em @Model.Vendas.Count venda(s)</span>
+                </span>
+            </div>
+            <div class="cartao kpi">
+                <span class="kpi-icone kpi-roxo">@Icones.Svg("grafico")</span>
+                <span class="kpi-texto">
+                    <span class="kpi-rotulo">Valor médio por venda</span>
+                    <span class="kpi-valor">@Model.ValorMedioPorVenda.ToString("C")</span>
+                    <span class="kpi-detalhe">total ÷ número de vendas</span>
+                </span>
+            </div>
+        </div>
+    </section>
+}
+
+<div class="cartao">
+    @* Filtro por período (formulário GET: as datas ficam na URL) + atalhos de período *@
+    <form method="get" asp-action="Index" class="busca" aria-label="Filtrar vendas por período">
+        <div class="campo">
+            <label for="dataInicio">Data inicial</label>
+            <input type="date" id="dataInicio" name="dataInicio" value="@Model.DataInicio.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="campo">
+            <label for="dataFim">Data final</label>
+            <input type="date" id="dataFim" name="dataFim" value="@Model.DataFim.ToString("yyyy-MM-dd")" />
+        </div>
+        <button type="submit" class="botao botao-secundario">@Icones.Svg("filtro") Filtrar</button>
+    </form>
+
+    <nav class="atalhos-periodo" aria-label="Atalhos de período">
+        <a class="botao botao-texto botao-pequeno" asp-action="Index"
+           asp-route-dataInicio="@hoje.ToString("yyyy-MM-dd")" asp-route-dataFim="@hoje.ToString("yyyy-MM-dd")">Hoje</a>
+        <a class="botao botao-texto botao-pequeno" asp-action="Index"
+           asp-route-dataInicio="@hoje.AddDays(-6).ToString("yyyy-MM-dd")" asp-route-dataFim="@hoje.ToString("yyyy-MM-dd")">Últimos 7 dias</a>
+        <a class="botao botao-texto botao-pequeno" asp-action="Index"
+           asp-route-dataInicio="@hoje.AddDays(-29).ToString("yyyy-MM-dd")" asp-route-dataFim="@hoje.ToString("yyyy-MM-dd")">Últimos 30 dias</a>
+        <a class="botao botao-texto botao-pequeno" asp-action="Index"
+           asp-route-dataInicio="@(new DateTime(hoje.Year, hoje.Month, 1).ToString("yyyy-MM-dd"))" asp-route-dataFim="@hoje.ToString("yyyy-MM-dd")">Este mês</a>
+    </nav>
+
+    @if (Model.Erro is not null)
+    {
+        <div class="alerta alerta-erro" role="alert">@Model.Erro</div>
+    }
+    else if (Model.Vendas.Count == 0)
+    {
+        <div class="vazio" role="status">
+            @Icones.Svg("carrinho")
+            <p>Nenhuma venda entre @Model.DataInicio.ToString("dd/MM/yyyy") e @Model.DataFim.ToString("dd/MM/yyyy").</p>
+        </div>
+    }
+    else
+    {
+        <div class="tabela-container">
+            <table>
+                <caption role="status">
+                    @Model.Vendas.Count venda(s) de @Model.DataInicio.ToString("dd/MM/yyyy") a @Model.DataFim.ToString("dd/MM/yyyy")
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Data</th>
+                        <th scope="col">Produto</th>
+                        <th scope="col" class="numero">Qtd.</th>
+                        <th scope="col" class="numero">Preço unit.</th>
+                        <th scope="col" class="numero">Valor</th>
+                        <th scope="col">Vendedor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model.Vendas)
+                    {
+                        <tr>
+                            <td style="white-space: nowrap">@v.Data.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <span class="celula-principal">
+                                    <strong>@v.Produto?.Nome</strong>
+                                    <span>@v.Produto?.Categoria?.Nome@(string.IsNullOrEmpty(v.Observacao) ? "" : " · " + v.Observacao)</span>
+                                </span>
+                            </td>
+                            <td class="numero">@v.Quantidade</td>
+                            <td class="numero">@((v.Produto?.Preco ?? 0).ToString("C"))</td>
+                            <td class="numero"><strong>@VendasViewModel.ValorDe(v).ToString("C")</strong></td>
+                            <td>@v.Usuario?.Nome</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row" colspan="2">Total do período</th>
+                        <td class="numero"><strong>@Model.TotalItens</strong></td>
+                        <td></td>
+                        <td class="numero"><strong>@Model.TotalVendido.ToString("C")</strong></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <p class="dica nota-tabela">Valor calculado pelo preço atual de cada produto.</p>
+    }
+</div>

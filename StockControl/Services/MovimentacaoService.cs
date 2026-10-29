@@ -56,4 +56,12 @@ public class MovimentacaoService : IMovimentacaoService
 
     public Task<List<Movimentacao>> ListarUltimasAsync(int quantidade = 10)
         => _movimentacaoDAO.ListarUltimasAsync(quantidade);
+
+    public async Task<List<Movimentacao>> ListarVendasAsync(DateTime dataInicio, DateTime dataFim)
+    {
+        if (dataInicio.Date > dataFim.Date)
+            throw new RegraNegocioException("A data inicial não pode ser maior que a data final.");
+
+        return await _movimentacaoDAO.ListarVendasAsync(dataInicio, dataFim);
+    }
 }

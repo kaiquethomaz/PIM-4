@@ -84,6 +84,20 @@ public class MovimentacaoDAO : IMovimentacaoDAO
             .ToListAsync();
     }
 
+    public async Task<List<Movimentacao>> ListarVendasAsync(DateTime dataInicio, DateTime dataFim)
+    {
+        var inicio = dataInicio.Date;
+        var fimExclusivo = dataFim.Date.AddDays(1);   // inclui o último dia inteiro
+
+        return await _contexto.Movimentacoes.AsNoTracking()
+            .Include(m => m.Produto!).ThenInclude(p => p.Categoria)
+            .Include(m => m.Usuario)
+            .Where(m => m.Tipo == TipoMovimentacao.Saida && m.Data >= inicio && m.Data < fimExclusivo)
+            .OrderByDescending(m => m.Data)
+            .ThenByDescending(m => m.Id)
+            .ToListAsync();
+    }
+
     public async Task<int> ContarDesdeAsync(TipoMovimentacao tipo, DateTime desde)
     {
         return await _contexto.Movimentacoes.CountAsync(m => m.Tipo == tipo && m.Data >= desde);
