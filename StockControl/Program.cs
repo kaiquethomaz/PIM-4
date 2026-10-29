@@ -259,6 +259,15 @@ app.UseCors();               // aplica a política "Mobile" nos controllers da A
 app.UseAuthentication();     // 1º descobre QUEM é o usuário (cookie ou token)
 app.UseAuthorization();      // 2º verifica se ele PODE acessar
 
+// Verificação de saúde (monitoramento): GET /health
+// Responde 200 se o sistema está no ar E consegue falar com o banco; 503 se o banco caiu.
+// Usado por ferramentas de monitoramento e pelo container (health check).
+app.MapGet("/health", async (AppDbContext contexto) =>
+    await contexto.Database.CanConnectAsync()
+        ? Results.Ok(new { status = "ok", banco = "conectado", horario = DateTime.Now })
+        : Results.Json(new { status = "erro", banco = "sem conexão" }, statusCode: StatusCodes.Status503ServiceUnavailable))
+    .AllowAnonymous();
+
 // Rota padrão das telas: /Controller/Acao/Id  (ex.: /Produtos/Editar/5)
 // Os controllers da API usam rotas próprias ([Route("api/...")]).
 app.MapControllerRoute(

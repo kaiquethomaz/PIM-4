@@ -72,6 +72,25 @@ Abra **https://localhost:7080** e entre com um dos usuários de teste, ou clique
 - Documentação da API: **https://localhost:7080/swagger**
 - Para o **celular** acessar a API pela rede: `dotnet run --urls "http://0.0.0.0:5080"` e use `http://<IP do PC>:5080/api` (detalhes em [`docs/relatorio/06-api-rest.md`](docs/relatorio/06-api-rest.md#69-como-o-app-mobile-se-conecta-guia-para-o-colega-do-grupo))
 - Se o SQL Server tiver outro nome, ajuste `ConnectionStrings:StockControl` em `StockControl/appsettings.json`
+- Verificação de saúde (monitoramento): **`GET /health`**. Responde `200` com `{"status":"ok","banco":"conectado"}`, ou `503` se o banco estiver fora.
+
+## Publicação em nuvem / container (informações para Cloud e DevOps)
+
+- **Um único serviço:** o sistema web (MVC) e a API REST estão no **mesmo projeto** (`StockControl/StockControl.csproj`). Basta **um** container ou App Service para os dois.
+- **Banco:** precisa ser **SQL Server** (ou Azure SQL), porque o projeto usa procedures e triggers em T-SQL. Crie o banco executando `database/script_stockcontrol.sql` (por exemplo: `sqlcmd -S servidor -U usuario -P senha -i database/script_stockcontrol.sql`).
+- **Build e publicação:** `dotnet publish StockControl/StockControl.csproj -c Release -o publicar` (requer o SDK do .NET 8).
+- **Configuração por variáveis de ambiente** (sobrescrevem o `appsettings.json`, sem mudar o código):
+
+| Variável | Exemplo | Para quê |
+|---|---|---|
+| `ConnectionStrings__StockControl` | `Server=sql;Database=StockControl;User Id=sa;Password=SuaSenhaForte!;TrustServerCertificate=True;` | Conexão com o banco. No container use **usuário e senha** do SQL Server: a "Autenticação do Windows" (`Trusted_Connection`) não funciona fora do Windows. |
+| `Jwt__Chave` | uma frase longa e secreta (32+ caracteres) | Assinatura dos tokens da API. **Troque a chave de desenvolvimento em produção.** |
+| `ASPNETCORE_ENVIRONMENT` | `Production` | Desliga o Swagger e mostra páginas de erro genéricas. Use `Development` só para testes. |
+| `ASPNETCORE_URLS` | `http://+:8080` | Porta em que o sistema escuta dentro do container. |
+| `Cors__OrigensPermitidas__0` | `https://app.exemplo.com` | Endereço do app mobile, se ele rodar no navegador. |
+
+- **Health check do container:** `GET /health` (sem login).
+- **Logs:** o ASP.NET Core escreve os logs no console (saída padrão), que é o que o Docker e as plataformas de nuvem coletam.
 
 ## Estrutura
 
