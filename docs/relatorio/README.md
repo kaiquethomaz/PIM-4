@@ -1,6 +1,6 @@
 # Documentação para o relatório — StockControl
 
-Textos prontos (ou quase) para copiar para o relatório do PIM IV. Cada arquivo cobre uma parte do sistema e é atualizado ao final de cada etapa do desenvolvimento.
+Textos prontos (ou quase) para copiar para o relatório do PIM IV. Cada arquivo cobre uma parte do sistema e foi atualizado ao final de cada fase do desenvolvimento.
 
 | Arquivo | Conteúdo | Onde usar no relatório |
 |---|---|---|

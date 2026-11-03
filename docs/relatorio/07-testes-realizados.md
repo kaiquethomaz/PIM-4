@@ -99,7 +99,7 @@ Testes feitos chamando a API diretamente (PowerShell `Invoke-RestMethod`) e pelo
 | I1 | Tela de login em 375 px (celular) | Cartão ocupa a largura, campos legíveis, sem rolagem lateral | ✅ Passou |
 | I2 | Tela de login em 1024 px | Cartão centralizado | ✅ Passou |
 
-## 7.7 Revisão final (etapa 7)
+## 7.7 Revisão final
 
 Sistema rodando do zero com `dotnet run` (HTTPS na porta 7080) e o banco recriado pelo script.
 

@@ -121,12 +121,11 @@ Tudo em [`docs/relatorio/`](docs/relatorio/README.md): arquitetura, banco de dad
 
 ## Andamento
 
-| Etapa | Situação |
-|---|---|
-| 1. Diagnóstico do projeto base | ✅ |
-| 2. Script SQL + MER + modelo lógico | ✅ |
-| 3. AppDbContext + Fluent API + DAOs + Services | ✅ |
-| 4. Login (cookie) + CRUDs de Produtos, Categorias e Fornecedores | ✅ |
-| 5. API para o mobile + JWT + Swagger | ✅ |
-| 6. Movimentações, Dashboard, Usuários | ✅ |
-| 7. Revisão final e lista de prints | ✅ |
+Organizado pelas Sprints do gerenciamento do projeto (as "Etapas" citadas na documentação são as do manual do PIM IV: Etapa 4 = Sistema Web, Etapa 7 = Banco de Dados).
+
+| Sprint | Entregas do sistema web e do banco | Situação |
+|---|---|---|
+| Sprint 1 — Planejamento | Diagnóstico do projeto base (PIM III), entidades do banco, MER e modelo lógico | ✅ |
+| Sprint 2 — Desenvolvimento | Script SQL (tabelas, procedures, triggers), AppDbContext + Fluent API + DAOs + Services, login, CRUDs, movimentações, dashboard, usuários, API para o mobile + JWT + Swagger | ✅ |
+| Sprint 3 — Integração e testes | Vários estabelecimentos, testes de telas, perfis, isolamento e API, tela de Vendas, acessibilidade e modo escuro | ✅ |
+| Sprint 4 — Finalização | Revisão final, health check, guia de publicação em nuvem, documentação do relatório, publicação no GitHub e prints | ✅ (falta só os prints) |

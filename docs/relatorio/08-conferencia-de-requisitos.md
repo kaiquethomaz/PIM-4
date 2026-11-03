@@ -95,9 +95,9 @@ Legenda: ✅ atendido · ➕ entregue além do pedido
 | Pedido | Situação |
 |---|---|
 | Comentários no código em português, soluções didáticas | ✅ |
-| Analisar o projeto existente antes de alterar | ✅ (diagnóstico da etapa 1; o PIM III foi preservado) |
+| Analisar o projeto existente antes de alterar | ✅ (diagnóstico inicial do projeto base; o PIM III foi preservado — ver [11-diferencas-pim3-pim4.md](11-diferencas-pim3-pim4.md)) |
 | Avisar antes de mudanças de estrutura | ✅ |
-| Ao final de cada etapa, dizer o que foi feito e como testar | ✅ |
+| Ao final de cada fase, dizer o que foi feito e como testar | ✅ |
 | Documentação para o relatório (back, front e banco) | ✅ (esta pasta) |
 | Lista de prints para o relatório | ✅ [09-lista-de-prints.md](09-lista-de-prints.md) |
 
