@@ -2,7 +2,7 @@
 
 Sistema de controle de estoque para mercadinhos: sistema web (ASP.NET Core MVC) + API REST para o app mobile + banco SQL Server. Vários estabelecimentos usam o mesmo sistema, e cada um só enxerga os próprios dados.
 
-Baseado no projeto do PIM III, reescrito para atender aos requisitos do PIM IV.
+Baseado no projeto do PIM III, reescrito para atender aos requisitos do PIM IV. O que mudou entre as duas versões está em [`docs/relatorio/11-diferencas-pim3-pim4.md`](docs/relatorio/11-diferencas-pim3-pim4.md).
 
 ## Funcionalidades
 

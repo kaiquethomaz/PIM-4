@@ -14,6 +14,7 @@ Textos prontos (ou quase) para copiar para o relatório do PIM IV. Cada arquivo 
 | [08-conferencia-de-requisitos.md](08-conferencia-de-requisitos.md) | Cada requisito do PIM IV × o que foi entregue | Conclusão / Checklist de entrega |
 | [09-lista-de-prints.md](09-lista-de-prints.md) | Checklist dos prints, na ordem certa, com legendas sugeridas | Montagem do relatório |
 | [10-multiestabelecimento.md](10-multiestabelecimento.md) | Vários mercadinhos no mesmo sistema: cadastro do estabelecimento, isolamento dos dados (banco, EF e sessão) | Etapa 4 — Arquitetura / Segurança; Etapa 7 — Banco |
+| [11-diferencas-pim3-pim4.md](11-diferencas-pim3-pim4.md) | O que mudou do PIM III para o PIM IV: arquitetura, banco, front-end, segurança e o que ficou de fora | Introdução / Desenvolvimento (evolução do projeto) |
 
 Arquivos de apoio:
 - [`../mer.md`](../mer.md) — diagrama MER/DER (Mermaid)
