@@ -153,6 +153,7 @@ O sistema segue recomendações da **WCAG 2.1** (Diretrizes de Acessibilidade pa
 | **Informação não depende só da cor** | A situação do produto usa texto + cor ("Abaixo do mínimo"); a barra de nível de estoque tem o mesmo dado em texto ao lado ("3 de 12 · faltam 9"). | Pessoas daltônicas. |
 | **Tabelas semânticas** | `<caption>`, `<th scope="col">`. | Leitores de tela leem os cabeçalhos junto com cada célula. |
 | **Tamanho de fonte** | Fonte em `rem`, respeitando o tamanho escolhido no navegador. | Pessoas com baixa visão que aumentam a fonte. |
+| **Tradução para Libras** | Widget oficial **VLibras**, do Governo Federal (`Views/Shared/_VLibras.cshtml`), presente em todas as telas; o botão fica na lateral direita. Precisa de internet; sem ela, o sistema funciona normalmente, só sem o botão. | Pessoas surdas que têm a Libras como primeira língua. |
 | **Menos animação** | `prefers-reduced-motion` desliga animações. | Pessoas sensíveis a movimento. |
 | **HTML semântico** | `<header>`, `<nav aria-label>`, `<main>`, `role="search"`. | Leitores de tela permitem pular entre regiões. |
 

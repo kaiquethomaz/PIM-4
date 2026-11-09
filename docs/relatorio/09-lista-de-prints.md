@@ -74,6 +74,7 @@ Entre como **admin@stockcontrol.local**.
 | ☐ | 30 | Menu aberto no celular | Clique no ☰ | Menu lateral como gaveta sobre o fundo escurecido | Menu em gaveta no celular |
 | ☐ | 31 | Formulário no celular | Registrar venda no modo celular | Campos ocupando a largura toda | Formulário responsivo |
 | ☐ | 32 | Navegação por teclado | Em qualquer tela, recarregue e aperte **Tab** uma vez | Link "Pular para o conteúdo" visível no topo | Atalho de acessibilidade |
+| ☐ | 32b | Tradução para Libras | Clique no botão azul do **VLibras**, na lateral direita da tela, e aguarde o avatar abrir | Avatar do VLibras aberto ao lado da tela | Tradução do conteúdo para Libras com o VLibras |
 | ☐ | 33 | Foco visível | Continue apertando Tab até um botão | Contorno amarelo no item focado | Indicador de foco para navegação por teclado |
 | ☐ | 34 | Lighthouse (opcional) | Chrome: F12 → aba **Lighthouse** → marque só "Acessibilidade" → *Analyze* | Nota de acessibilidade | Avaliação automática de acessibilidade |
 

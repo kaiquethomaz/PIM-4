@@ -62,7 +62,7 @@ Legenda: ✅ atendido · ➕ entregue além do pedido
 | ➕ Ranking dos mais vendidos, gráfico de vendas, avisos, máscaras, proteção contra duplo envio | ➕ | Dashboard e formulários; ver [04-front-end.md](04-front-end.md) |
 | ➕ Modo escuro e confirmação de exclusão em janela, com contraste verificado nos dois temas | ➕ | Ver [04-front-end.md](04-front-end.md#412-modo-escuro) |
 | ➕ Vários estabelecimentos no mesmo sistema | ➕ | `/Conta/Cadastrar` (cadastro do mercadinho + dono), `/Estabelecimento` (dados do mercadinho) e isolamento automático dos dados; ver [10-multiestabelecimento.md](10-multiestabelecimento.md) |
-| Layout simples, responsivo e acessível | ✅ | [04-front-end.md](04-front-end.md) |
+| Layout simples, responsivo e acessível | ✅ | [04-front-end.md](04-front-end.md) ➕ tradução para Libras com o VLibras |
 
 ## 8.4 API para o mobile
 

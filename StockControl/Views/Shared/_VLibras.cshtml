@@ -1,0 +1,9 @@
+@* VLibras: widget oficial do Governo Federal que traduz o texto da página para a Língua Brasileira de Sinais.
+   O script é carregado com defer para não atrasar a tela; sem internet, o sistema funciona normalmente, só sem o botão. *@
+<div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+        <div class="vw-plugin-top-wrapper"></div>
+    </div>
+</div>
+<script defer src="https://vlibras.gov.br/app/vlibras-plugin.js" onload="new window.VLibras.Widget('https://vlibras.gov.br/app')"></script>
